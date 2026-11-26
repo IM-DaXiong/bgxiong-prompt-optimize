@@ -92,123 +92,130 @@ export default function SettingsDialog({
       >
         <h2 id="settings-title">设置</h2>
         {checkSkillsOnOpen && skillUpdates()}
-        <UiChromeSelect
-          label="文本服务"
-          value={config.providerKind}
-          onChange={(event: ChangeEvent<HTMLSelectElement>) => {
-            setAddModel(false);
-            patch({
-              providerKind: event.target.value,
-              model: "",
-              localModelPath: "",
-              baseUrl: "",
-              apiKey: "",
-              maxOutputTokens: "",
-            });
-          }}
-        >
-          <option value=""> </option>
-          {channels.map((item) => (
-            <option key={item.providerKind} value={item.providerKind}>
-              {item.label}
-            </option>
-          ))}
-        </UiChromeSelect>
-        {selectedChannel && (
-          <>
-            <UiChromeSelect label="文本模型"
-              value={customModel ? "new" : modelChoice ? "model:" + modelChoice : ""}
-              onChange={event => {
-                const option = event.target.value;
-                setAddModel(option === "new");
-                changeModel(option.startsWith("model:") ? option.slice(6) : "");
-              }}>
-              <option value="" disabled>选择文本模型</option>
-              {savedModels.map(model => <option key={model} value={"model:" + model}>
-                {isLocal ? model.split(/[\\/]/).at(-1) || model : model}
-              </option>)}
-              <option value="new">{isLocal ? "输入模型路径…" : "输入模型名称…"}</option>
-            </UiChromeSelect>
-            {customModel && <label>
-              {isLocal ? "本地模型路径" : "模型名称"}
-              <input value={modelChoice} onChange={event => changeModel(event.target.value)} />
-            </label>}
-          </>
-        )}
-        {selectedChannel?.needsBaseUrl && <>
-        <label>
-          BaseURL
-          <input
-            value={config.baseUrl}
-            onChange={(event) => patch({ baseUrl: event.target.value })}
-          />
-        </label>
-        <label>
-          Key{hasApiKey ? "（已保存）" : ""}
-          <input
-            type="password"
-            autoComplete="off"
-            value={config.apiKey}
-            onChange={(event) => patch({ apiKey: event.target.value })}
-          />
-        </label>
-        </>}
+        <div className="settings-fields">
+          <UiChromeSelect
+            label="文本服务"
+            labelLayout="inline"
+            value={config.providerKind}
+            onChange={(event: ChangeEvent<HTMLSelectElement>) => {
+              setAddModel(false);
+              patch({
+                providerKind: event.target.value,
+                model: "",
+                localModelPath: "",
+                baseUrl: "",
+                apiKey: "",
+                maxOutputTokens: "",
+              });
+            }}
+          >
+            <option value=""> </option>
+            {channels.map((item) => (
+              <option key={item.providerKind} value={item.providerKind}>
+                {item.label}
+              </option>
+            ))}
+          </UiChromeSelect>
+          {selectedChannel && (
+            <>
+              <UiChromeSelect label="文本模型" labelLayout="inline"
+                value={customModel ? "new" : modelChoice ? "model:" + modelChoice : ""}
+                onChange={event => {
+                  const option = event.target.value;
+                  setAddModel(option === "new");
+                  changeModel(option.startsWith("model:") ? option.slice(6) : "");
+                }}>
+                <option value="" disabled>选择文本模型</option>
+                {savedModels.map(model => <option key={model} value={"model:" + model}>
+                  {isLocal ? model.split(/[\\/]/).at(-1) || model : model}
+                </option>)}
+                <option value="new">{isLocal ? "输入模型路径…" : "输入模型名称…"}</option>
+              </UiChromeSelect>
+              {customModel && <label className="settings-field">
+                <span>{isLocal ? "模型路径" : "模型名称"}</span>
+                <input value={modelChoice} onChange={event => changeModel(event.target.value)} />
+              </label>}
+            </>
+          )}
+          {selectedChannel?.needsBaseUrl && (
+            <>
+              <label className="settings-field">
+                <span>接口地址</span>
+                <input
+                  value={config.baseUrl}
+                  onChange={(event) => patch({ baseUrl: event.target.value })}
+                />
+              </label>
+              <label className="settings-field">
+                <span>API 密钥</span>
+                <input
+                  type="password"
+                  autoComplete="off"
+                  placeholder={hasApiKey ? "已保存" : undefined}
+                  value={config.apiKey}
+                  onChange={(event) => patch({ apiKey: event.target.value })}
+                />
+              </label>
+            </>
+          )}
+          <label className="settings-field">
+            <span>超时秒数</span>
+            <input
+              inputMode="numeric"
+              value={config.timeoutSecs}
+              onChange={(event) => patch({ timeoutSecs: event.target.value })}
+            />
+          </label>
+          <label className="settings-field">
+            <span>最大输出</span>
+            <input
+              inputMode="numeric"
+              value={config.maxOutputTokens}
+              onChange={(event) => patch({ maxOutputTokens: event.target.value })}
+            />
+          </label>
+          <label className="settings-field">
+            <span>适配包目录</span>
+            <input
+              value={config.adapterPackageRoot}
+              onChange={(event) => patch({ adapterPackageRoot: event.target.value })}
+            />
+          </label>
+          <label className="settings-field">
+            <span>技能库目录</span>
+            <input
+              value={config.skillLibraryRoot}
+              onChange={(event) => patch({ skillLibraryRoot: event.target.value })}
+            />
+          </label>
+          <label className="settings-field">
+            <span>模板目录</span>
+            <input
+              value={config.internalTemplateRoot}
+              onChange={(event) => patch({ internalTemplateRoot: event.target.value })}
+            />
+          </label>
+          <UiChromeSelect
+            label="输出语言"
+            labelLayout="inline"
+            value={config.language}
+            onChange={(event: ChangeEvent<HTMLSelectElement>) =>
+              patch({ language: event.target.value === "en" ? "en" : "zh" })
+            }
+          >
+            <option value="zh">中文</option>
+            <option value="en">英文</option>
+          </UiChromeSelect>
+          <label className="settings-field">
+            <span>支持看图</span>
+            <input
+              type="checkbox"
+              checked={config.supportsVision}
+              onChange={(event) => patch({ supportsVision: event.target.checked })}
+            />
+          </label>
+        </div>
         {error && <div className="banner error" role="alert">{error}</div>}
-        <label>
-          超时秒数
-          <input
-            inputMode="numeric"
-            value={config.timeoutSecs}
-            onChange={(event) => patch({ timeoutSecs: event.target.value })}
-          />
-        </label>
-        <label>
-          官方最大输出(maxOutputTokens)
-          <input
-            inputMode="numeric"
-            value={config.maxOutputTokens}
-            onChange={(event) => patch({ maxOutputTokens: event.target.value })}
-          />
-        </label>
-        <label>
-          适配包目录
-          <input
-            value={config.adapterPackageRoot}
-            onChange={(event) => patch({ adapterPackageRoot: event.target.value })}
-          />
-        </label>
-        <label>
-          技能库根
-          <input
-            value={config.skillLibraryRoot}
-            onChange={(event) => patch({ skillLibraryRoot: event.target.value })}
-          />
-        </label>
-        <label>
-          内部模板根
-          <input
-            value={config.internalTemplateRoot}
-            onChange={(event) => patch({ internalTemplateRoot: event.target.value })}
-          />
-        </label>
-        <UiChromeSelect
-          label="语言"
-          value={config.language}
-          onChange={(event: ChangeEvent<HTMLSelectElement>) =>
-            patch({ language: event.target.value === "en" ? "en" : "zh" })
-          }
-        >
-          <option value="zh">zh</option>
-          <option value="en">en</option>
-        </UiChromeSelect>
-        <label className="check">
-          <input
-            type="checkbox"
-            checked={config.supportsVision}
-            onChange={(event) => patch({ supportsVision: event.target.checked })}
-          />
-          看图
-        </label>
         {!checkSkillsOnOpen && skillUpdates()}
         <div className="settings-actions">
           <Btn type="button" variant="secondary" onClick={onClose}>

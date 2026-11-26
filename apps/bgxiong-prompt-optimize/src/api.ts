@@ -41,7 +41,7 @@ export async function saveConfig(input: ShellConfigInput): Promise<ShellConfigPu
   const timeout = input.timeoutSecs.trim();
   const timeoutSecs = timeout === "" ? null : Number(timeout);
   if (timeout !== "" && (!Number.isFinite(timeoutSecs) || (timeoutSecs ?? 0) < 0)) {
-    throw new Error("超时秒数必须是空（不限制整段请求）或正数，不能编造一个更短的默认值。");
+    throw new Error("超时秒数请留空或填写非负数。");
   }
   const capRaw = input.maxOutputTokens.trim();
   const maxOutputTokens = capRaw === "" ? null : Number(capRaw);
@@ -49,7 +49,7 @@ export async function saveConfig(input: ShellConfigInput): Promise<ShellConfigPu
     capRaw !== "" &&
     (!Number.isFinite(maxOutputTokens) || !Number.isInteger(maxOutputTokens) || (maxOutputTokens ?? 0) <= 0)
   ) {
-    throw new Error("官方最大输出(maxOutputTokens)必须是空或大于 0 的整数，不能编造默认上限。");
+    throw new Error("最大输出请留空或填写正整数。");
   }
   return invoke("save_config", {
     config: {
