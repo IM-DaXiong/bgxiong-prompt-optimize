@@ -37,7 +37,9 @@ export default function SettingsDialog({
   const [checking, setChecking] = useState(false);
   const [skillError, setSkillError] = useState<string | null>(null);
   const selectedChannel = channels.find(channel => channel.providerKind === config.providerKind);
-  const customModel = addModel || (config.model !== "" && !savedModels.includes(config.model));
+  const isLocal = selectedChannel?.group === "local";
+  const modelChoice = isLocal ? config.localModelPath : config.model;
+  const customModel = addModel || (modelChoice !== "" && !savedModels.includes(modelChoice));
 
   async function checkSkills() {
     setChecking(true);
@@ -70,6 +72,10 @@ export default function SettingsDialog({
     onChange({ ...config, ...partial });
   }
 
+  function changeModel(value: string) {
+    patch(isLocal ? { localModelPath: value } : { model: value });
+  }
+
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
     onSave();
@@ -94,6 +100,7 @@ export default function SettingsDialog({
             patch({
               providerKind: event.target.value,
               model: "",
+              localModelPath: "",
               baseUrl: "",
               apiKey: "",
               maxOutputTokens: "",
@@ -107,22 +114,24 @@ export default function SettingsDialog({
             </option>
           ))}
         </UiChromeSelect>
-        {selectedChannel?.group !== "local" && (
+        {selectedChannel && (
           <>
             <UiChromeSelect label="文本模型"
-              value={customModel ? "new" : config.model ? "model:" + config.model : ""}
+              value={customModel ? "new" : modelChoice ? "model:" + modelChoice : ""}
               onChange={event => {
                 const option = event.target.value;
                 setAddModel(option === "new");
-                patch({ model: option.startsWith("model:") ? option.slice(6) : "" });
+                changeModel(option.startsWith("model:") ? option.slice(6) : "");
               }}>
               <option value="" disabled>选择文本模型</option>
-              {savedModels.map(model => <option key={model} value={"model:" + model}>{model}</option>)}
-              <option value="new">输入模型名称…</option>
+              {savedModels.map(model => <option key={model} value={"model:" + model}>
+                {isLocal ? model.split(/[\\/]/).at(-1) || model : model}
+              </option>)}
+              <option value="new">{isLocal ? "输入模型路径…" : "输入模型名称…"}</option>
             </UiChromeSelect>
             {customModel && <label>
-              模型名称
-              <input value={config.model} onChange={event => patch({ model: event.target.value })} />
+              {isLocal ? "本地模型路径" : "模型名称"}
+              <input value={modelChoice} onChange={event => changeModel(event.target.value)} />
             </label>}
           </>
         )}
@@ -159,13 +168,6 @@ export default function SettingsDialog({
             inputMode="numeric"
             value={config.maxOutputTokens}
             onChange={(event) => patch({ maxOutputTokens: event.target.value })}
-          />
-        </label>
-        <label>
-          本地模型路径
-          <input
-            value={config.localModelPath}
-            onChange={(event) => patch({ localModelPath: event.target.value })}
           />
         </label>
         <label>

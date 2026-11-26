@@ -79,11 +79,17 @@ impl ShellConfig {
     }
 
     pub fn public_view(&self) -> ShellConfigPublic {
+        let mut saved_models = self.saved_models.clone();
+        if let Some(model) = self.model_choice() {
+            if !saved_models.contains(model) {
+                saved_models.push(model.clone());
+            }
+        }
         ShellConfigPublic {
             provider_kind: self.provider_kind.clone(),
             base_url: self.base_url.clone(),
             model: self.model.clone(),
-            saved_models: self.saved_models.clone(),
+            saved_models,
             has_api_key: self
                 .api_key
                 .as_deref()
@@ -115,21 +121,31 @@ impl ShellConfig {
         self.saved_models.clear();
         if let Some(previous) = previous.filter(|old| {
             old.provider_kind == self.provider_kind && old.base_url == self.base_url
+                && (self.provider_kind != ADAPTER_PROVIDER_KIND
+                    || old.adapter_package_root == self.adapter_package_root)
         }) {
+            let previous_model = previous.model_choice().cloned();
             self.saved_models = previous.saved_models;
-            if let Some(model) = previous.model {
+            if let Some(model) = previous_model {
                 self.saved_models.push(model);
             }
             if !has_text(&self.api_key) {
                 self.api_key = previous.api_key;
             }
         }
-        if let Some(model) = &self.model {
-            self.saved_models.push(model.clone());
+        if let Some(model) = self.model_choice().cloned() {
+            self.saved_models.push(model);
         }
         self.saved_models.retain(|model| !model.trim().is_empty());
         self.saved_models.sort();
         self.saved_models.dedup();
+    }
+
+    fn model_choice(&self) -> Option<&String> {
+        if self.provider_kind == LOCAL_PROVIDER_KIND {
+            return self.local_model_path.as_ref();
+        }
+        self.model.as_ref()
     }
 
     pub fn validate(&self) -> Result<(), OptimizeError> {

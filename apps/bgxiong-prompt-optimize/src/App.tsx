@@ -62,7 +62,8 @@ export default function App() {
   const selected = targets.find(target => target.targetId === targetId);
   const legacyHost = targetId === "image/general" ? IMAGE_HOST : targetId === "literary/general" ? LITERARY_HOST : null;
   const savedServiceMatches = saved?.providerKind === settings?.providerKind
-    && (saved?.baseUrl ?? "") === settings?.baseUrl;
+    && (saved?.baseUrl ?? "") === settings?.baseUrl
+    && (saved?.adapterPackageRoot ?? "") === settings?.adapterPackageRoot;
 
   useEffect(() => {
     const unlisten = listen<string>("optimize-started", event => {
