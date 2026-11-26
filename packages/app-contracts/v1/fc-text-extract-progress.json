@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "progressEventName": "fc_text_extract_progress",
+  "phases": [
+    "preparing",
+    "demux",
+    "transcribe",
+    "join",
+    "polish",
+    "write"
+  ]
+}

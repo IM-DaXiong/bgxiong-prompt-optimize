@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "supportedDomains": [
+    "role_portrait",
+    "scene_concept",
+    "storyboard_semantic_guidance",
+    "storyboard_static_frame",
+    "generic_video"
+  ],
+  "officialBuiltinId": "official_builtin",
+  "officialBuiltinVersion": "1",
+  "officialCustomId": "official-custom",
+  "officialCustomVersion": "1",
+  "maxGuidanceBytes": 65536,
+  "maxVocabEntries": 256,
+  "maxExamples": 32,
+  "maxTotalBytes": 262144,
+  "maxFilesPerPackage": 8,
+  "manifestAllowedFields": [
+    "schemaVersion",
+    "profileId",
+    "version",
+    "displayName",
+    "domains",
+    "description"
+  ],
+  "minSchemaVersion": 1,
+  "maxSchemaVersion": 1
+}

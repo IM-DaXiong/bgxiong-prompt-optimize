@@ -1,0 +1,6 @@
+{
+  "maxSourceChars": 20000,
+  "maxSegments": 200,
+  "minSegmentMs": 1000,
+  "textEstimateMsPerChar": 230
+}

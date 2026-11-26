@@ -1,0 +1,845 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-role-portrait-prompt.schema.json",
+  "title": "Story role portrait prompt text commands",
+  "description": "Global role Stage A/B text capability. Same args object as UI; batch run is flat jobId plus start fields, never startArgs. No retired story style/chapter scope. No image/video generation.",
+  "definitions": {
+    "serviceOverride": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [],
+      "properties": {
+        "baseUrl": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "apiKey": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "accessKeyId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "secretAccessKey": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "providerDisplayName": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "providerKind": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "credentialId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "endpointKind": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "timeoutSecs": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "endpointRevision": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "extra": {}
+      }
+    },
+    "actorPadFrame": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [],
+      "properties": {
+        "versionId": {
+          "type": "string"
+        },
+        "imageId": {
+          "type": "string"
+        },
+        "versionKeyInfo": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "imagePrompt": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "actorPadSupplement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [],
+      "properties": {
+        "boundActorNodeId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source": {
+          "type": "string"
+        },
+        "frames": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/actorPadFrame"
+          }
+        }
+      }
+    },
+    "storyScope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scope",
+        "roleNameDraft",
+        "roleKeyInfoDraft"
+      ],
+      "properties": {
+        "scope": {
+          "const": "story"
+        },
+        "roleNameDraft": {
+          "type": "string"
+        },
+        "roleKeyInfoDraft": {
+          "type": "string"
+        },
+        "boundActorNodeId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "boundActorKeyInfoDraft": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "characterBaseLockDraft": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "currentPromptAiDraft": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "generateArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "storyId",
+        "roleNodeId",
+        "scope"
+      ],
+      "properties": {
+        "storyId": {
+          "type": "string"
+        },
+        "roleNodeId": {
+          "type": "string"
+        },
+        "scope": {
+          "$ref": "#/definitions/storyScope"
+        },
+        "serviceOverride": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/serviceOverride"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "promptLanguage": {
+          "anyOf": [
+            {
+              "enum": [
+                "zh",
+                "en"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "shotScale": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "actorPadSupplement": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/actorPadSupplement"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "userConstraint": {
+          "type": "string"
+        },
+        "optimizeSkillId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "optimizeSkillDigest": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "photographyStyle": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "stableId",
+                "packageDigest"
+              ],
+              "properties": {
+                "stableId": {
+                  "type": "string"
+                },
+                "packageDigest": {
+                  "type": "string"
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "batchPreviewArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "storyId",
+        "generationMode"
+      ],
+      "properties": {
+        "storyId": {
+          "type": "string"
+        },
+        "generationMode": {
+          "enum": [
+            "incremental",
+            "overwrite"
+          ]
+        },
+        "roleNodeIds": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "batchStartArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "storyId",
+        "generationMode",
+        "promptLanguage",
+        "serviceOverride",
+        "textModelPickKey"
+      ],
+      "properties": {
+        "storyId": {
+          "type": "string"
+        },
+        "generationMode": {
+          "enum": [
+            "incremental",
+            "overwrite"
+          ]
+        },
+        "roleNodeIds": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "promptLanguage": {
+          "enum": [
+            "zh",
+            "en"
+          ]
+        },
+        "serviceOverride": {
+          "$ref": "#/definitions/serviceOverride"
+        },
+        "textModelPickKey": {
+          "type": "string"
+        },
+        "userConstraint": {
+          "type": "string"
+        },
+        "optimizeSkillId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "optimizeSkillDigest": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "photographyStyle": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "stableId",
+                "packageDigest"
+              ],
+              "properties": {
+                "stableId": {
+                  "type": "string"
+                },
+                "packageDigest": {
+                  "type": "string"
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "batchRunArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "jobId",
+        "storyId",
+        "generationMode",
+        "promptLanguage",
+        "serviceOverride",
+        "textModelPickKey"
+      ],
+      "properties": {
+        "jobId": {
+          "type": "string"
+        },
+        "storyId": {
+          "type": "string"
+        },
+        "generationMode": {
+          "enum": [
+            "incremental",
+            "overwrite"
+          ]
+        },
+        "roleNodeIds": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "promptLanguage": {
+          "enum": [
+            "zh",
+            "en"
+          ]
+        },
+        "serviceOverride": {
+          "$ref": "#/definitions/serviceOverride"
+        },
+        "textModelPickKey": {
+          "type": "string"
+        },
+        "userConstraint": {
+          "type": "string"
+        },
+        "optimizeSkillId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "optimizeSkillDigest": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "photographyStyle": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "stableId",
+                "packageDigest"
+              ],
+              "properties": {
+                "stableId": {
+                  "type": "string"
+                },
+                "packageDigest": {
+                  "type": "string"
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "generateInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "args"
+      ],
+      "properties": {
+        "args": {
+          "$ref": "#/definitions/generateArgs"
+        }
+      }
+    },
+    "batchStartInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "args"
+      ],
+      "properties": {
+        "args": {
+          "$ref": "#/definitions/batchStartArgs"
+        }
+      }
+    },
+    "batchRunInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "args"
+      ],
+      "properties": {
+        "args": {
+          "$ref": "#/definitions/batchRunArgs"
+        }
+      }
+    },
+    "batchPreviewInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "args"
+      ],
+      "properties": {
+        "args": {
+          "$ref": "#/definitions/batchPreviewArgs"
+        }
+      }
+    },
+    "propBatchPreviewArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "storyId",
+        "generationMode"
+      ],
+      "properties": {
+        "storyId": {
+          "type": "string"
+        },
+        "generationMode": {
+          "enum": [
+            "incremental",
+            "overwrite"
+          ]
+        }
+      }
+    },
+    "propBatchStartArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "storyId",
+        "generationMode",
+        "language",
+        "serviceOverride",
+        "textModelPickKey"
+      ],
+      "properties": {
+        "storyId": {
+          "type": "string"
+        },
+        "generationMode": {
+          "enum": [
+            "incremental",
+            "overwrite"
+          ]
+        },
+        "serviceOverride": {
+          "$ref": "#/definitions/serviceOverride"
+        },
+        "textModelPickKey": {
+          "type": "string"
+        },
+        "userConstraint": {
+          "type": "string"
+        },
+        "optimizeSkillId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "optimizeSkillDigest": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "photographyStyle": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "stableId",
+                "packageDigest"
+              ],
+              "properties": {
+                "stableId": {
+                  "type": "string"
+                },
+                "packageDigest": {
+                  "type": "string"
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "language": {
+          "enum": [
+            "zh",
+            "en"
+          ]
+        }
+      }
+    },
+    "propBatchRunArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "jobId",
+        "storyId",
+        "generationMode",
+        "language",
+        "serviceOverride",
+        "textModelPickKey"
+      ],
+      "properties": {
+        "jobId": {
+          "type": "string"
+        },
+        "storyId": {
+          "type": "string"
+        },
+        "generationMode": {
+          "enum": [
+            "incremental",
+            "overwrite"
+          ]
+        },
+        "serviceOverride": {
+          "$ref": "#/definitions/serviceOverride"
+        },
+        "textModelPickKey": {
+          "type": "string"
+        },
+        "userConstraint": {
+          "type": "string"
+        },
+        "optimizeSkillId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "optimizeSkillDigest": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "photographyStyle": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "stableId",
+                "packageDigest"
+              ],
+              "properties": {
+                "stableId": {
+                  "type": "string"
+                },
+                "packageDigest": {
+                  "type": "string"
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "language": {
+          "enum": [
+            "zh",
+            "en"
+          ]
+        }
+      }
+    },
+    "propBatchStartInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "args"
+      ],
+      "properties": {
+        "args": {
+          "$ref": "#/definitions/propBatchStartArgs"
+        }
+      }
+    },
+    "propBatchRunInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "args"
+      ],
+      "properties": {
+        "args": {
+          "$ref": "#/definitions/propBatchRunArgs"
+        }
+      }
+    },
+    "propBatchPreviewInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "args"
+      ],
+      "properties": {
+        "args": {
+          "$ref": "#/definitions/propBatchPreviewArgs"
+        }
+      }
+    }
+  }
+}

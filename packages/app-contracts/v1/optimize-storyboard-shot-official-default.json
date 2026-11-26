@@ -1,0 +1,17 @@
+{
+  "capability": "optimize.storyboard_shot",
+  "directives": {
+    "prose": {}
+  },
+  "outputSchema": {
+    "optimizedPrompt": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "emptyPolicy": {
+    "ifCurrentPromptEmpty": "draftFromContext",
+    "ifContextFieldEmpty": "omitFromPrompt",
+    "forbidHostFabrication": true
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["schema"],
+  "properties": {
+    "schema": { "type": "object" },
+    "prompt": { "type": "string" },
+    "text": { "type": "string" },
+    "imagePath": { "type": "string" },
+    "modelId": { "type": "string" }
+  },
+  "additionalProperties": false
+}

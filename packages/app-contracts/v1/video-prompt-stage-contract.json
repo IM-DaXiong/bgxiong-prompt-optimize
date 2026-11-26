@@ -1,0 +1,662 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "video-prompt-stage-contract.json",
+  "title": "VideoPromptStageContractV1",
+  "description": "Single source for video-prompt source, review, turn, failure and method-stage DTOs. Existing SourceUnitKind and projection draft shapes remain owned by their existing Rust/domain and projection contracts.",
+  "schemaVersion": 1,
+  "definitions": {
+    "localId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "digest": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "sourceMode": {
+      "type": "string",
+      "enum": [
+        "ordinary",
+        "span"
+      ]
+    },
+    "sourceOrigin": {
+      "type": "string",
+      "enum": [
+        "raw_user_input",
+        "span_source",
+        "structured_storyboard",
+        "declared_asset",
+        "reference_vision",
+        "application_context"
+      ]
+    },
+    "sourceWriteScope": {
+      "type": "string",
+      "enum": [
+        "writable",
+        "context_only",
+        "visual_only",
+        "boundary_only"
+      ]
+    },
+    "sourceUnit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "unitId",
+        "shotId",
+        "kind",
+        "text",
+        "origin",
+        "writeScope"
+      ],
+      "properties": {
+        "unitId": {
+          "$ref": "#/definitions/localId"
+        },
+        "shotId": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/localId"
+            }
+          ]
+        },
+        "kind": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Serialized existing SourceUnitKind. The owning Rust enum validates its closed set; this contract intentionally does not copy that enum."
+        },
+        "text": {
+          "type": "string"
+        },
+        "origin": {
+          "$ref": "#/definitions/sourceOrigin"
+        },
+        "writeScope": {
+          "$ref": "#/definitions/sourceWriteScope"
+        }
+      }
+    },
+    "vocalOccurrence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "occurrenceId",
+        "sourceUnitId",
+        "shotId",
+        "role",
+        "text"
+      ],
+      "properties": {
+        "occurrenceId": {
+          "$ref": "#/definitions/localId"
+        },
+        "sourceUnitId": {
+          "$ref": "#/definitions/localId"
+        },
+        "shotId": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/localId"
+            }
+          ]
+        },
+        "role": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Validated against the existing video-prompt semantic quoteRoles owner; not duplicated here."
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "candidateKind": {
+      "type": "string",
+      "enum": [
+        "declared_subject",
+        "single_subject",
+        "multiple_subjects",
+        "composite_reference_sheet",
+        "ambiguous_subject",
+        "unclassified_reference_slot"
+      ]
+    },
+    "subjectCandidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "subjectId",
+        "itemId",
+        "candidateKind",
+        "visualStatus",
+        "declaredEntityRef"
+      ],
+      "properties": {
+        "subjectId": {
+          "$ref": "#/definitions/localId"
+        },
+        "itemId": {
+          "$ref": "#/definitions/localId"
+        },
+        "candidateKind": {
+          "$ref": "#/definitions/candidateKind"
+        },
+        "visualStatus": {
+          "$ref": "creative-context-pack-v1.schema.json#/definitions/visualStatus"
+        },
+        "declaredEntityRef": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/localId"
+            }
+          ]
+        }
+      }
+    },
+    "referenceInventoryItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "itemId",
+        "mediaKind",
+        "ordinalWithinKind",
+        "declaredEntityRef",
+        "label"
+      ],
+      "properties": {
+        "itemId": {
+          "$ref": "#/definitions/localId"
+        },
+        "mediaKind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ordinalWithinKind": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "declaredEntityRef": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/localId"
+            }
+          ]
+        },
+        "label": {
+          "type": "string"
+        }
+      }
+    },
+    "frozenAppearance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "subjectId",
+        "text"
+      ],
+      "properties": {
+        "subjectId": {
+          "$ref": "#/definitions/localId"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "methodStage": {
+      "type": "string",
+      "enum": [
+        "mother_content",
+        "target_format"
+      ]
+    },
+    "methodStageAdvisoryCode": {
+      "type": "string",
+      "enum": [
+        "format_purpose_used_for_mother_content"
+      ]
+    },
+    "contentStagePolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "methodStage",
+        "methodId",
+        "methodFingerprint",
+        "contentRulesEnabled",
+        "targetFormatRulesDeferred",
+        "advisoryCodes"
+      ],
+      "properties": {
+        "methodStage": {
+          "const": "mother_content"
+        },
+        "methodId": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/localId"
+            }
+          ]
+        },
+        "methodFingerprint": {
+          "$ref": "#/definitions/digest"
+        },
+        "contentRulesEnabled": {
+          "const": true
+        },
+        "targetFormatRulesDeferred": {
+          "const": true
+        },
+        "advisoryCodes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/methodStageAdvisoryCode"
+          }
+        }
+      }
+    },
+    "frozenSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "sourceMode",
+        "outputShotIds",
+        "sourceFingerprint",
+        "originalText",
+        "sourceUnits",
+        "vocalOccurrences",
+        "subjectCandidates",
+        "referenceInventory",
+        "frozenAppearances",
+        "contentPolicy"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "sourceMode": {
+          "$ref": "#/definitions/sourceMode"
+        },
+        "outputShotIds": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/localId"
+          }
+        },
+        "sourceFingerprint": {
+          "$ref": "#/definitions/digest"
+        },
+        "originalText": {
+          "type": "string"
+        },
+        "sourceUnits": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/sourceUnit"
+          }
+        },
+        "vocalOccurrences": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/vocalOccurrence"
+          }
+        },
+        "subjectCandidates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/subjectCandidate"
+          }
+        },
+        "referenceInventory": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/referenceInventoryItem"
+          }
+        },
+        "frozenAppearances": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/frozenAppearance"
+          }
+        },
+        "contentPolicy": {
+          "$ref": "#/definitions/contentStagePolicy"
+        }
+      }
+    },
+    "sourceCheckResult": {
+      "type": "string",
+      "enum": [
+        "preserved",
+        "omitted",
+        "altered",
+        "not_required"
+      ]
+    },
+    "sourceCheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceUnitId",
+        "factIds",
+        "quoteIds",
+        "result"
+      ],
+      "properties": {
+        "sourceUnitId": {
+          "$ref": "#/definitions/localId"
+        },
+        "factIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/localId"
+          }
+        },
+        "quoteIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/localId"
+          }
+        },
+        "result": {
+          "$ref": "#/definitions/sourceCheckResult"
+        }
+      }
+    },
+    "reviewSeverity": {
+      "type": "string",
+      "enum": [
+        "blocking",
+        "minor"
+      ]
+    },
+    "reviewFinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "shotId",
+        "factIds",
+        "quoteIds",
+        "sourceUnitIds",
+        "referenceItemIds",
+        "code",
+        "severity",
+        "detail"
+      ],
+      "properties": {
+        "shotId": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/localId"
+            }
+          ]
+        },
+        "factIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/localId"
+          }
+        },
+        "quoteIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/localId"
+          }
+        },
+        "sourceUnitIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/localId"
+          }
+        },
+        "referenceItemIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/localId"
+          }
+        },
+        "code": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Validated against video-prompt-semantic-v1 issueCodes, whose version is upgraded separately; not duplicated here."
+        },
+        "severity": {
+          "$ref": "#/definitions/reviewSeverity"
+        },
+        "detail": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "motherReviewResult": {
+      "description": "Findings are advisory; severity never determines acceptance or automatic rewriting. No passed field exists.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceChecks",
+        "findings"
+      ],
+      "properties": {
+        "sourceChecks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/sourceCheck"
+          }
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/reviewFinding"
+          }
+        }
+      }
+    },
+    "structureDiagnostic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "code",
+        "detail"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "detail": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "expressionTurn": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "const": "first"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "rejectedRaw",
+            "diagnostics",
+            "schemaDigest",
+            "sourceFingerprint",
+            "motherFingerprint"
+          ],
+          "properties": {
+            "kind": {
+              "const": "regenerate_structure"
+            },
+            "rejectedRaw": {
+              "type": "string"
+            },
+            "diagnostics": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/definitions/structureDiagnostic"
+              }
+            },
+            "schemaDigest": {
+              "$ref": "#/definitions/digest"
+            },
+            "sourceFingerprint": {
+              "$ref": "#/definitions/digest"
+            },
+            "motherFingerprint": {
+              "$ref": "#/definitions/digest"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "previousDraft",
+            "blockingFindings"
+          ],
+          "properties": {
+            "kind": {
+              "const": "rewrite_semantics"
+            },
+            "previousDraft": {
+              "$ref": "video-prompt-projection-draft.schema.json#/definitions/projectionDraft"
+            },
+            "blockingFindings": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "video-prompt-projection-draft.schema.json#/definitions/reviewFinding"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "failureClass": {
+      "type": "string",
+      "enum": [
+        "expression_structure",
+        "mother_structure",
+        "review_structure",
+        "semantic_blocking",
+        "reference_ambiguity",
+        "transport_response_missing",
+        "target_conflict",
+        "commit_conflict"
+      ]
+    },
+    "failureStage": {
+      "type": "string",
+      "enum": [
+        "source_freeze",
+        "mother_expression",
+        "mother_review",
+        "reference_binding",
+        "projection_expression",
+        "projection_review",
+        "transport",
+        "commit"
+      ]
+    },
+    "failurePayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "failureClass",
+        "stage",
+        "stepLabel",
+        "attempt",
+        "repairRounds",
+        "diagnosticsRef"
+      ],
+      "properties": {
+        "failureClass": {
+          "$ref": "#/definitions/failureClass"
+        },
+        "stage": {
+          "$ref": "#/definitions/failureStage"
+        },
+        "stepLabel": {
+          "type": "string",
+          "minLength": 1
+        },
+        "attempt": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "repairRounds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "diagnosticsRef": {
+          "$ref": "#/definitions/localId"
+        }
+      }
+    },
+    "methodStageAdvisory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "methodId",
+        "methodStage",
+        "code"
+      ],
+      "properties": {
+        "methodId": {
+          "$ref": "#/definitions/localId"
+        },
+        "methodStage": {
+          "$ref": "#/definitions/methodStage"
+        },
+        "code": {
+          "$ref": "#/definitions/methodStageAdvisoryCode"
+        }
+      }
+    }
+  }
+}

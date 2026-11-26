@@ -1,0 +1,47 @@
+[package]
+name = "bgxiong-prompt-optimize"
+version = "0.1.0"
+description = "提示词优化独立壳（PLAN 20261115 T24–T29/T33）。不读主程序 app_data_root.txt 或 story.db。"
+edition = "2021"
+publish = false
+default-run = "bgxiong-prompt-optimize"
+
+# This package lives at apps/bgxiong-prompt-optimize/src-tauri/Cargo.toml.
+# Relative path check from that directory to the repo crates (do not guess):
+#   ../                                 = apps/bgxiong-prompt-optimize/
+#   ../../                              = apps/
+#   ../../../                           = repository root
+#   ../../../src-tauri/crates/<name>    = frozen crates (verified to exist)
+# This package is intentionally NOT registered in the main src-tauri workspace
+# (path C must not edit public Cargo.toml).
+
+[workspace]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+tauri-plugin-clipboard-manager = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["time", "rt-multi-thread", "macros", "sync"] }
+reqwest = { version = "0.13.2", default-features = false, features = ["json", "native-tls", "charset", "http2", "gzip", "system-proxy", "multipart", "stream"] }
+uuid = { version = "1", features = ["v4"] }
+sha2 = "0.10"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
+
+bgx-prompt-optimize = { path = "../../../src-tauri/crates/bgx-prompt-optimize" }
+bgx-text-http = { path = "../../../src-tauri/crates/bgx-text-http" }
+bgx-agent-skills-core = { path = "../../../src-tauri/crates/bgx-agent-skills-core" }
+bgx-video-prompt-contract = { path = "../../../src-tauri/crates/bgx-video-prompt-contract" }
+prompt-optimize-runtime = { path = "../../../crates/prompt-optimize-runtime" }
+
+[dev-dependencies]
+serde_json = "1"
+
+[[bin]]
+name = "bgxiong-prompt-optimize"
+path = "src/main.rs"

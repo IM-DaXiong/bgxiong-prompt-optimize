@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "description": "C06/C10: the single ComfyUI workflow catalog change event and the version-adoption receipt event. Rust (build.rs -> OUT_DIR) and TypeScript (direct JSON import) both derive event names and the phase closed set from this file; neither side hand-writes a second constant.",
+  "events": {
+    "catalogChanged": "comfy-workflow-catalog-changed",
+    "versionAdopted": "comfy-workflow-version-adopted"
+  },
+  "catalogChangedPayload": [
+    "catalogId",
+    "generation",
+    "entryIds"
+  ],
+  "versionAdoptedPayload": [
+    "catalogId",
+    "entryId",
+    "fromRevision",
+    "toRevision",
+    "operationId",
+    "phase"
+  ],
+  "adoptionPhases": [
+    "selected",
+    "prepared"
+  ],
+  "preferenceMigration": {
+    "extensionKey": "comfyWorkflowPreferenceMigrationV2",
+    "schemaVersion": 2
+  },
+  "submissionSnapshot": {
+    "schemaVersion": 1,
+    "serviceExtraKey": "comfyWorkflowSnapshotRef",
+    "directory": "submission_snapshots"
+  }
+}

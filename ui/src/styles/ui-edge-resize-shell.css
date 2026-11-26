@@ -1,0 +1,239 @@
+/**
+ * 模块：四边拖拽壳专用样式（ui-edge-resize-shell.css）
+ *
+ * 职责：仅壳层样式（.ui-edge-resize-shell、__hits、__hit、__body）；
+ *   focus-within 边框与现有表单 focus token 对齐。
+ *
+ * 禁止：写全局 textarea、@import 其它样式文件。
+ * 接入：ui/src/main.tsx 于 index.css 之后追加一行 import。
+ */
+
+/* 外壳：flex 列式布局，尺寸由 props 传入的 px 数值驱动 */
+.ui-edge-resize-shell {
+  --ui-edge-resize-bottom-overlay-height: calc(var(--textarea-history-icon-box) + 6px);
+  display: flex;
+  flex-direction: column;
+  /* 命中层外扩 halfHit=2.5px，必须 visible 才能被鼠标捕获 */
+  overflow: visible;
+  box-sizing: border-box;
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--input-bg);
+  transition: border-color .2s, box-shadow .2s;
+}
+
+.ui-edge-resize-shell:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--primary-glow);
+}
+
+/* surface2 变体 */
+.ui-edge-resize-shell.ui-edge-resize-shell--surface2 {
+  background: var(--input-bg);
+}
+
+/* surface 变体 */
+.ui-edge-resize-shell.ui-edge-resize-shell--surface {
+  background: var(--input-bg);
+}
+
+.ui-edge-resize-shell.ui-edge-resize-shell--surface > .ui-edit-textarea {
+  background: transparent !important;
+}
+
+.ui-edge-resize-shell.ui-edge-resize-shell--surface2 > .ui-edit-textarea {
+  background: transparent !important;
+}
+
+/* 版本历史修饰符 */
+.ui-edge-resize-shell.ui-edge-resize-shell--with-history > .ui-edit-textarea {
+  padding-left: var(--textarea-history-pad-left);
+}
+
+/* 命中层容器：相对定位，z-index 高于 body 区 */
+.ui-edge-resize-shell__hits {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* 单个命中条：pointer-events 恢复，确保可交互 */
+.ui-edge-resize-shell__hit {
+  position: absolute;
+  pointer-events: auto;
+  touch-action: none;
+  z-index: 11;
+}
+
+/* 内容区：占据全部空间，z-index 低于命中层；裁切溢出内容保持圆角 */
+.ui-edge-resize-shell__body {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+/* 内层 textarea：填满外壳，滚动由自身处理 */
+.ui-edge-resize-shell__body > .ui-edit-textarea {
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 8px 6px 12px 6px;
+  resize: none !important;
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  border: none !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  background: transparent;
+  border-radius: 0;
+}
+
+.ui-edge-resize-shell__body > .ui-edit-textarea:focus {
+  box-shadow: none !important;
+  outline: none;
+}
+
+.ui-edge-resize-shell--with-font-size .ui-edge-resize-shell__body > .ui-edit-textarea {
+  padding-bottom: var(--ui-edge-resize-bottom-overlay-height);
+}
+
+.ui-edge-resize-shell__bottom-overlay {
+  position: absolute;
+  inset: auto 0 0;
+  height: var(--ui-edge-resize-bottom-overlay-height);
+  background-color: inherit;
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
+  z-index: 11;
+  pointer-events: none;
+}
+
+/* Let the resize hit below receive events between and around the controls. */
+.ui-edge-resize-shell__bottom-overlay button {
+  pointer-events: auto;
+}
+
+.ui-chrome-textarea__history {
+  display: contents;
+}
+
+.ui-chrome-textarea__font-size {
+  position: absolute;
+  left: 3px;
+  bottom: 3px;
+  z-index: 10;
+  display: flex;
+  gap: 3px;
+}
+
+.ui-chrome-textarea__history:has(button) + .ui-chrome-textarea__font-size {
+  left: calc(6px + var(--textarea-history-icon-box));
+}
+
+.ui-chrome-textarea__font-size button:hover:not(:disabled) {
+  opacity: 1 !important;
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+}
+
+/* dialog / chapter 变体：更高的最小高度 */
+.ui-edge-resize-shell__body > .ui-edit-textarea.ui-textarea-chapter,
+.ui-edge-resize-shell__body > .ui-edit-textarea.ui-textarea-dialog {
+  min-height: max(calc(var(--textarea-resize-pad-top) + 3lh + 12px), 165px);
+}
+
+/* 角色提示词短框：约为同壳内默认多行框高度的一半 */
+.ui-edge-resize-shell__body > .ui-edit-textarea.ui-textarea-role-prompt {
+  min-height: max(calc(var(--textarea-resize-pad-top) + 1.5lh + 12px), 110px) !important;
+}
+
+/* scene-beat-textarea 变体 */
+.ui-edge-resize-shell__body > textarea.scene-beat-textarea {
+  resize: none !important;
+  overflow-y: auto !important;
+}
+
+.ui-edge-resize-shell__body > textarea.scene-beat-textarea.scene-beat-textarea--headline {
+  min-height: calc(var(--textarea-resize-pad-top) + 2lh + 12px) !important;
+}
+
+/* 故事板分镜工作台：标题可拖至约 1 行可见 */
+.ui-edge-resize-shell__body > textarea.scene-beat-textarea.scene-beat-textarea--headline-1row {
+  min-height: calc(var(--textarea-resize-pad-top, 8px) + 1lh + 12px) !important;
+}
+
+/* 底部拖拽提示条：3px 高度，居中，微弱渐变色 */
+.ui-edge-resize-shell__bottom-grip {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 48px;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--text3) 50%, transparent);
+  opacity: 0.35;
+  pointer-events: none;
+  z-index: 5;
+  transition: opacity .15s;
+}
+
+/* hover 时 grip 更明显 */
+.ui-edge-resize-shell:hover .ui-edge-resize-shell__bottom-grip {
+  opacity: 0.55;
+}
+
+.ui-edit-textarea[data-rich-plain="1"],
+.ui-edit-textarea[data-rich-plain="1"] * {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.ui-edit-textarea[data-rich-plain="1"] {
+  outline: none;
+  color: var(--text1);
+  font-family: inherit;
+  font-size: var(--text-md);
+  line-height: var(--leading-normal);
+  /* Override canvas node shell cursor:grab (textarea had global cursor:text). */
+  cursor: text;
+  caret-color: var(--text);
+}
+
+.ui-edit-textarea[data-rich-plain="1"][data-placeholder]:empty::before {
+  content: attr(data-placeholder);
+  color: var(--text3);
+  pointer-events: none;
+}
+
+.ui-edit-textarea[data-rich-plain="1"] [data-rich-color="c1"] { color: var(--rich-mark-c1); }
+.ui-edit-textarea[data-rich-plain="1"] [data-rich-color="c2"] { color: var(--rich-mark-c2); }
+.ui-edit-textarea[data-rich-plain="1"] [data-rich-color="c3"] { color: var(--rich-mark-c3); }
+.ui-edit-textarea[data-rich-plain="1"] [data-rich-color="c4"] { color: var(--rich-mark-c4); }
+.ui-edit-textarea[data-rich-plain="1"] [data-rich-color="c5"] { color: var(--rich-mark-c5); }
+.ui-edit-textarea[data-rich-plain="1"] [data-rich-color="c6"] { color: var(--rich-mark-c6); }
+.ui-edit-textarea[data-rich-plain="1"] [data-rich-deco="fieldKey"] { color: var(--prompt-syn-fieldKey); }
+.ui-edit-textarea[data-rich-plain="1"] [data-rich-deco="alignHeader"] { color: var(--prompt-syn-alignHeader); }
+.ui-edit-textarea[data-rich-plain="1"] [data-rich-deco="refTag"] { color: var(--prompt-syn-refTag); }
+.ui-edit-textarea[data-rich-plain="1"] [data-rich-deco="shotMarker"] { color: var(--prompt-syn-shotMarker); }
+.ui-edit-textarea[data-rich-plain="1"] [data-rich-deco="dialogue"] { color: var(--prompt-syn-dialogue); }
+.ui-edit-textarea[data-rich-plain="1"]::highlight(bgx-prompt-fieldKey) { color: var(--prompt-syn-fieldKey); }
+.ui-edit-textarea[data-rich-plain="1"]::highlight(bgx-prompt-alignHeader) { color: var(--prompt-syn-alignHeader); }
+.ui-edit-textarea[data-rich-plain="1"]::highlight(bgx-prompt-refTag) { color: var(--prompt-syn-refTag); }
+.ui-edit-textarea[data-rich-plain="1"]::highlight(bgx-prompt-shotMarker) { color: var(--prompt-syn-shotMarker); }
+.ui-edit-textarea[data-rich-plain="1"]::highlight(bgx-prompt-dialogue) { color: var(--prompt-syn-dialogue); }
+.ui-edit-textarea[data-rich-plain="1"]::highlight(bgx-prompt-timecode) { color: var(--prompt-syn-timecode); }
+.ui-edit-textarea[data-rich-plain="1"]::highlight(bgx-prompt-naLiteral) { color: var(--prompt-syn-naLiteral); }
+.ui-edit-textarea[data-rich-plain="1"] [data-rich-deco="timecode"] { color: var(--prompt-syn-timecode); }
+.ui-edit-textarea[data-rich-plain="1"] [data-rich-deco="naLiteral"] { color: var(--prompt-syn-naLiteral); }
+.ui-edit-textarea[data-rich-plain="1"] strong {
+  font-weight: 700;
+}

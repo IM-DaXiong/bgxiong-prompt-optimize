@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "bgx-internal-prompts/frozen-rules.schema.json",
+  "title": "FrozenRuleSet",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["formatVersion", "language", "tasks", "files", "digest"],
+  "properties": {
+    "formatVersion": { "const": 2 },
+    "language": { "enum": ["zh", "en"] },
+    "tasks": {
+      "type": "object",
+      "additionalProperties": { "enum": ["request", "material"] }
+    },
+    "files": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  }
+}

@@ -1,0 +1,303 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-view-refresh.schema.json",
+  "title": "CreatorViewRefresh",
+  "description": "RC05/§3.10: the single scopeRef definition plus refresh delivery states. Object scopes reference CreatorResourceRef; collection scopes use the closed collection set with a typed parentRef (null = global, never inferred from an empty storyId).",
+  "$defs": {
+    "collectionKind": {
+      "enum": [
+        "fcProjectList",
+        "fcProjectGraph",
+        "storyList",
+        "story",
+        "chapterList",
+        "sceneList",
+        "sceneContent",
+        "storyboard",
+        "segmentCanvas",
+        "clipsWork",
+        "actorList",
+        "roleList",
+        "visualAssetList",
+        "settings",
+        "runtime",
+        "contentSkills",
+        "audioProject",
+        "files",
+        "memoryList",
+        "skillLibrary",
+        "skillVersions",
+        "skillDraft",
+        "deliveryDraft",
+        "deliverySources",
+        "deliveryTimeline",
+        "deliveryExport",
+        "videoSpanList",
+        "taskList",
+        "singingPlan",
+        "uiSurface",
+        "uiWorkbench"
+      ]
+    },
+    "scopeRef": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "scopeType",
+            "resource"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scopeType": {
+              "const": "object"
+            },
+            "resource": {
+              "$ref": "creator-resource-ref.schema.json"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "scopeType",
+            "collection",
+            "parentRef"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scopeType": {
+              "const": "collection"
+            },
+            "collection": {
+              "$ref": "#/$defs/collectionKind"
+            },
+            "parentRef": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "$ref": "creator-resource-ref.schema.json"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "effectScope": {
+      "type": "object",
+      "required": [
+        "scopeKey",
+        "scope",
+        "before",
+        "after",
+        "tombstone"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "scopeKey": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "$ref": "#/$defs/scopeRef"
+        },
+        "before": {
+          "type": "boolean"
+        },
+        "after": {
+          "type": "boolean"
+        },
+        "tombstone": {
+          "type": "boolean"
+        }
+      }
+    },
+    "ownerRefreshState": {
+      "enum": [
+        "refreshed",
+        "pendingRefresh",
+        "notOpen",
+        "failed",
+        "conflict"
+      ]
+    },
+    "ownerResult": {
+      "type": "object",
+      "required": [
+        "windowId",
+        "scopeKey",
+        "state",
+        "failureCode"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "windowId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scopeKey": {
+          "type": "string",
+          "minLength": 1
+        },
+        "state": {
+          "$ref": "#/$defs/ownerRefreshState"
+        },
+        "failureCode": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "refreshSummary": {
+      "type": "object",
+      "description": "Per-effect aggregate. refreshed only when every live matching owner ACKed with a Host render proof; notOpen when no owner holds a matching lease.",
+      "required": [
+        "effectId",
+        "effectSequence",
+        "state",
+        "owners"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "effectId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "effectSequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "state": {
+          "$ref": "#/$defs/ownerRefreshState"
+        },
+        "owners": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ownerResult"
+          }
+        }
+      }
+    },
+    "committedHint": {
+      "type": "object",
+      "description": "Payload of the effect-committed event. Only a hint: receivers re-read the durable effect via effect.get/effect.list; receiving it is never 'refreshed'.",
+      "required": [
+        "effectId",
+        "effectSequence",
+        "scopeKeys"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "effectId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "effectSequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "scopeKeys": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "refreshChangedHint": {
+      "type": "object",
+      "description": "RC39: payload of the refresh-changed event. An ACK or an owner release changed the folded per-window refresh state of this effect; windows showing it re-read ui.view.delivery list {effectId}. Only a hint, never a refresh result.",
+      "required": [
+        "effectId",
+        "effectSequence"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "effectId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "effectSequence": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "renderProofDigest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "algorithm",
+        "digest",
+        "byteLength"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "type": "integer",
+          "const": 1
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "canonicalGraph",
+            "ownerRender"
+          ]
+        },
+        "algorithm": {
+          "type": "string",
+          "const": "sha256"
+        },
+        "digest": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "byteLength": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    }
+  },
+  "x-events": {
+    "effectCommitted": "creator:effect-committed",
+    "refreshChanged": "creator:effect-refresh-changed"
+  },
+  "x-scope-heads": {
+    "fcProjectGraph": {
+      "description": "F10/F12: ACK of a refreshed fcProjectGraph owner must carry canonicalHead equal to the Host's current scoped render head, computed by the single Rust function fc_project_graph_render_head (distinct from the edge-set CAS fc_graph_revision). Verified on the ACK's own SQLite transaction/connection.",
+      "parent": "canvasProject",
+      "algorithm": "fcProjectGraph.render.v1",
+      "headPrefix": "fcr:"
+    },
+    "singingPlan": {
+      "description": "SR39/S1: ACK of a refreshed singingPlan owner must carry canonicalHead equal to srp: + planId@revision from singing.relyrics.plan.get summary (algorithm singingPlan.revision.v1). parentRef is the singingPlan resource ref for that planId. One refresh per terminal; failures stay pendingRefresh for banner/manual retry. Legacy parent=null refresh rows are retained but never matched by the new owner scope.",
+      "parent": "singingPlan",
+      "algorithm": "singingPlan.revision.v1",
+      "headPrefix": "srp:"
+    }
+  },
+  "x-ack-rejections": [
+    "ACK_HEAD_REQUIRED",
+    "ACK_HEAD_STALE",
+    "ACK_HEAD_UNAVAILABLE",
+    "ACK_HEAD_SCOPE_UNSUPPORTED",
+    "ACK_COVERED_BEYOND_HEAD",
+    "ACK_GENERATION_STALE"
+  ],
+  "x-budgets": {
+    "effectListMaxPage": 100,
+    "effectGetMaxScopesPerPage": 200,
+    "pendingCacheMaxEntries": 256,
+    "ownerAckRetentionMs": 604800000
+  }
+}

@@ -1,0 +1,354 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-segment-canvas-actions.schema.json",
+  "title": "CreatorSegmentCanvasActions",
+  "description": "S52: segmentCanvas.change.prepare payload. Applied by change.apply (plan kind segmentCanvas.change) via SegmentCanvasPlanApplier; every action calls the same SegmentCanvasLinkService as the UI IPC segment_canvas_link_* (single semantic owner: edge kind, port numbering, replace/compaction, source prompts, pad refs, dialogue binding). S54: each accepted write returns a durable scope before-image (edge set + rewritten segment bodies); a plan whose writes are all restorable gets a change.undo token and undo refuses with UNDO_CONFLICT when the scope was edited afterwards; a write with a non-restorable side effect issues no token. A running scene generation answers GRAPH_TARGET_BUSY. Rule rejections surface as SEGMENT_LINK_* codes (never a silent no-op). No entitlement gate (IPC twins have none).",
+  "type": "object",
+  "required": [
+    "actions"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "description": "Connect two segment-canvas nodes (IPC segment_canvas_link_connect). Edge kind, source port and side effects are decided by the service; detachedEdgeId = reconnect (old edge removed in the same transaction); allowSharedTargetPort = group fan-out.",
+            "required": [
+              "type",
+              "actionId",
+              "scope",
+              "fromNodeId",
+              "toNodeId",
+              "toPortIndex"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "story.segment.edge.connect"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "scope": {
+                "type": "object",
+                "description": "Same fields as the IPC scope: which segment canvas (scene) the edge lives in. Cross-scene edges are rejected.",
+                "required": [
+                  "storyId",
+                  "canvasScope",
+                  "canvasScopeId"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "storyId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "chapterNodeId": {
+                    "type": "string"
+                  },
+                  "sceneNodeId": {
+                    "type": "string"
+                  },
+                  "canvasScope": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "canvasScopeId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              "fromNodeId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "toNodeId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "toPortIndex": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "detachedEdgeId": {
+                "type": "string"
+              },
+              "allowSharedTargetPort": {
+                "type": "boolean"
+              },
+              "sourcePadRef": {
+                "description": "Reference-image value for an rpad: source (the id only carries a UI fingerprint).",
+                "type": [
+                  "object",
+                  "string"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "Disconnect one edge and compact the target input ports (IPC segment_canvas_link_disconnect); removes the source-prompt entry / pad ref / dialogue binding the edge had created.",
+            "required": [
+              "type",
+              "actionId",
+              "scope",
+              "edgeId"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "story.segment.edge.disconnect"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "scope": {
+                "type": "object",
+                "description": "Same fields as the IPC scope: which segment canvas (scene) the edge lives in. Cross-scene edges are rejected.",
+                "required": [
+                  "storyId",
+                  "canvasScope",
+                  "canvasScopeId"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "storyId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "chapterNodeId": {
+                    "type": "string"
+                  },
+                  "sceneNodeId": {
+                    "type": "string"
+                  },
+                  "canvasScope": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "canvasScopeId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              "edgeId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sourcePadRef": {
+                "type": [
+                  "object",
+                  "string"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "Move one input edge to a free target port of the same node (IPC segment_canvas_link_move_port).",
+            "required": [
+              "type",
+              "actionId",
+              "scope",
+              "edgeId",
+              "toPortIndex"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "story.segment.edge.port.move"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "scope": {
+                "type": "object",
+                "description": "Same fields as the IPC scope: which segment canvas (scene) the edge lives in. Cross-scene edges are rejected.",
+                "required": [
+                  "storyId",
+                  "canvasScope",
+                  "canvasScopeId"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "storyId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "chapterNodeId": {
+                    "type": "string"
+                  },
+                  "sceneNodeId": {
+                    "type": "string"
+                  },
+                  "canvasScope": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "canvasScopeId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              "edgeId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "toPortIndex": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "Swap the target ports of two input edges of the same node (IPC segment_canvas_link_swap_ports).",
+            "required": [
+              "type",
+              "actionId",
+              "scope",
+              "edgeAId",
+              "edgeBId"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "story.segment.edge.ports.swap"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "scope": {
+                "type": "object",
+                "description": "Same fields as the IPC scope: which segment canvas (scene) the edge lives in. Cross-scene edges are rejected.",
+                "required": [
+                  "storyId",
+                  "canvasScope",
+                  "canvasScopeId"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "storyId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "chapterNodeId": {
+                    "type": "string"
+                  },
+                  "sceneNodeId": {
+                    "type": "string"
+                  },
+                  "canvasScope": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "canvasScopeId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              "edgeAId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "edgeBId": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "Replace the occupant of an exclusive input port with a new source (IPC segment_canvas_link_replace_port); rewriteEdgeId = the dragged old edge removed in the same transaction.",
+            "required": [
+              "type",
+              "actionId",
+              "scope",
+              "occupantEdgeId",
+              "incomingFromNodeId",
+              "toNodeId",
+              "toPortIndex"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "story.segment.edge.port.replace"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "scope": {
+                "type": "object",
+                "description": "Same fields as the IPC scope: which segment canvas (scene) the edge lives in. Cross-scene edges are rejected.",
+                "required": [
+                  "storyId",
+                  "canvasScope",
+                  "canvasScopeId"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "storyId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "chapterNodeId": {
+                    "type": "string"
+                  },
+                  "sceneNodeId": {
+                    "type": "string"
+                  },
+                  "canvasScope": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "canvasScopeId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              "occupantEdgeId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "incomingFromNodeId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "toNodeId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "toPortIndex": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "rewriteEdgeId": {
+                "type": "string"
+              },
+              "sourcePadRef": {
+                "type": [
+                  "object",
+                  "string"
+                ]
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

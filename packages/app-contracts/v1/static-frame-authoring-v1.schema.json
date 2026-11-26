@@ -1,0 +1,199 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "static-frame-authoring-v1.schema.json",
+  "schemaVersion": 1,
+  "title": "StaticFrameDraftV1: complete static-frame prompt authored by C (and returned by D revise)",
+  "description": "staticFramePrompt is the complete model-written final text, stored byte-exact. subjectRefs/padRefs/factIds are audit fields only and are NEVER composed into the prompt. Closed sets (entityId, sourceUnitId, pad tokens, fact ids) and the length budget are bound per request at the x-bind positions; the bound schema is what the model sees and what the validator enforces.",
+  "$ref": "#/definitions/draftV1",
+  "definitions": {
+    "subjectRef": {
+      "description": "Known entity (stable entity id) or a source object not yet registered as an asset (source unit id). Exactly one identity field per variant.",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "entityId"
+          ],
+          "properties": {
+            "kind": {
+              "const": "entity"
+            },
+            "entityId": {
+              "type": "string",
+              "minLength": 1,
+              "x-bindEnum": "frozen.entityIds"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "sourceUnitId"
+          ],
+          "properties": {
+            "kind": {
+              "const": "source"
+            },
+            "sourceUnitId": {
+              "type": "string",
+              "minLength": 1,
+              "x-bindEnum": "frozen.sourceUnitIds"
+            }
+          }
+        }
+      ]
+    },
+    "subjectRefList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/subjectRef"
+      },
+      "x-uniqueBy": [
+        "kind",
+        "entityId",
+        "sourceUnitId"
+      ]
+    },
+    "padRefList": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "integer",
+        "minimum": 1,
+        "x-bindEnum": "frozen.padPlan.tokens"
+      },
+      "description": "Strict: must cover requiredPadTokens and stay within required+optional. Descriptive/None: maxItems 0 is bound."
+    },
+    "factIdList": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "x-bindEnum": "frozen.factIds"
+      },
+      "description": "Must cover requiredFactIds; optionalFactIds allowed. Coverage is never proven by searching the prompt text."
+    },
+    "auditV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "subjectRefs",
+        "padRefs",
+        "factIds"
+      ],
+      "properties": {
+        "subjectRefs": {
+          "$ref": "#/definitions/subjectRefList"
+        },
+        "padRefs": {
+          "$ref": "#/definitions/padRefList"
+        },
+        "factIds": {
+          "$ref": "#/definitions/factIdList"
+        }
+      }
+    },
+    "draftV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "staticFramePrompt",
+        "subjectRefs",
+        "padRefs",
+        "factIds"
+      ],
+      "properties": {
+        "staticFramePrompt": {
+          "type": "string",
+          "minLength": 1,
+          "x-bindMaxLength": "request.promptCharBudget",
+          "description": "Complete natural-language final prompt in the frozen output language. No platform flags, no slot composition."
+        },
+        "subjectRefs": {
+          "$ref": "#/definitions/subjectRefList"
+        },
+        "padRefs": {
+          "$ref": "#/definitions/padRefList"
+        },
+        "factIds": {
+          "$ref": "#/definitions/factIdList"
+        }
+      }
+    },
+    "authoringErrorKind": {
+      "type": "string",
+      "enum": [
+        "context_invalid",
+        "schema_invalid",
+        "truncated",
+        "transport_failed",
+        "cancelled",
+        "outcome_unknown",
+        "checkpoint_failed",
+        "stale_input",
+        "cas_conflict"
+      ]
+    },
+    "authoringErrorDetailV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fieldPath",
+        "ruleId",
+        "expected",
+        "actual",
+        "howToFix"
+      ],
+      "properties": {
+        "fieldPath": {
+          "type": "string"
+        },
+        "ruleId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "expected": {
+          "type": "string"
+        },
+        "actual": {
+          "type": "string"
+        },
+        "howToFix": {
+          "type": "string"
+        }
+      }
+    },
+    "authoringErrorV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "errors"
+      ],
+      "description": "Structured failure. rawResponse is never part of this value; it goes only to the controlled diagnostics record.",
+      "properties": {
+        "kind": {
+          "$ref": "#/definitions/authoringErrorKind"
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/authoringErrorDetailV1"
+          }
+        }
+      }
+    }
+  }
+}

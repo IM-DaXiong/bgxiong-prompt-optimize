@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 1,
+  "networkInterruptionWindowMinutes": 30,
+  "backoffBaseMs": 2000,
+  "backoffCapMs": 30000
+}

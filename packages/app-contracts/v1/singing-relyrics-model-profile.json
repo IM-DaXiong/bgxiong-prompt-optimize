@@ -1,0 +1,18 @@
+{
+  "sourceRevision": "baa409c2e7e5e775f09b4e92a220808f4827d2cc",
+  "modelRevision": "9b3f444f2bccd77fbc03e32eb7c334fc96040b8d",
+  "sampleRate": 44100,
+  "latentHopSamples": 2048,
+  "maxTotalLatentFrames": 4096,
+  "referencePaddingMs": 500,
+  "melodyPaddingMs": 1000,
+  "minimumAudioMs": 1,
+  "provenance": {
+    "kind": "pinned-upstream-execution-constraints",
+    "source": "https://github.com/ASLP-lab/YingMusic-Singer-Plus/tree/baa409c2e7e5e775f09b4e92a220808f4827d2cc",
+    "frameLimit": "src/YingMusicSinger/models/model.py: Singer.sample max_duration=4096; clamping violates the later midi-length assertion",
+    "audioGeometry": "src/YingMusicSinger/infer/YingMusicSinger.py: vae_frame_rate=44100/2048; forward reference padding=0.5s and rear_silent_time=1.0s",
+    "minimum": "Positive integer millisecond input, not a minimum timbre quality claim; the upstream wrapper pads each nonempty input before encoding",
+    "tokens": "No independent tokenizer capacity bound published; token limits remain unknown and upstream alignment retains its actual frame-capacity assertion"
+  }
+}

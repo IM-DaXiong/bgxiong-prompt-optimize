@@ -1,0 +1,844 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "hierarchy-outline-v1.schema.json",
+  "$ref": "#/definitions/Outline",
+  "definitions": {
+    "ItemMetadata": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "title",
+            "summary"
+          ],
+          "properties": {
+            "type": {
+              "const": "chapter"
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1
+            },
+            "summary": {
+              "type": "string"
+            },
+            "chapterIntent": {
+              "type": "string"
+            },
+            "actPositionId": {
+              "type": "string",
+              "enum": [
+                "setup",
+                "rising_action",
+                "midpoint",
+                "crisis",
+                "climax",
+                "resolution"
+              ]
+            },
+            "dominantConflictId": {
+              "type": "string",
+              "enum": [
+                "internal",
+                "interpersonal",
+                "external",
+                "dilemma",
+                "revelation"
+              ]
+            },
+            "castIdsPresent": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "x-closedSet": "entityIds"
+              },
+              "minItems": 0
+            },
+            "protagonistCastId": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "x-closedSet": "entityIds"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "keyLocations": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 0
+            },
+            "keyProps": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 0
+            },
+            "transitionFromPrev": {
+              "type": "string"
+            },
+            "transitionToNext": {
+              "type": "string"
+            },
+            "directorialNotes": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "visualTone",
+                "pacingTendency",
+                "keyVisualMotifs"
+              ],
+              "properties": {
+                "visualTone": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "pacingTendency": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "keyVisualMotifs": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "minItems": 0
+                }
+              }
+            },
+            "durationSeconds": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "sourceBackground": {
+              "type": "string",
+              "description": "Host-preserved non-narrative source context; constraints and notes, never dialogue."
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "headline",
+            "sceneIntent"
+          ],
+          "properties": {
+            "type": {
+              "const": "scene"
+            },
+            "headline": {
+              "type": "string",
+              "minLength": 1
+            },
+            "coreMood": {
+              "type": "string"
+            },
+            "castIdsPresent": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "x-closedSet": "entityIds"
+              },
+              "minItems": 0
+            },
+            "intExt": {
+              "type": "string",
+              "enum": [
+                "int",
+                "ext",
+                "int_ext"
+              ]
+            },
+            "dayNight": {
+              "type": "string",
+              "enum": [
+                "day",
+                "night",
+                "dawn",
+                "dusk",
+                "magic_hour"
+              ]
+            },
+            "sceneIntent": {
+              "type": "string"
+            },
+            "pacingTargetId": {
+              "type": "string",
+              "enum": [
+                "slow",
+                "medium",
+                "fast",
+                "staccato"
+              ]
+            },
+            "transitionIn": {
+              "type": "string",
+              "enum": [
+                "cut",
+                "dissolve",
+                "fade_in",
+                "fade_out",
+                "smash_cut",
+                "match_cut",
+                "wipe",
+                "cross_dissolve"
+              ]
+            },
+            "transitionOut": {
+              "type": "string",
+              "enum": [
+                "cut",
+                "dissolve",
+                "fade_in",
+                "fade_out",
+                "smash_cut",
+                "match_cut",
+                "wipe",
+                "cross_dissolve"
+              ]
+            },
+            "conflictId": {
+              "type": "string",
+              "enum": [
+                "internal",
+                "interpersonal",
+                "external",
+                "dilemma",
+                "revelation"
+              ]
+            },
+            "povCastId": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "x-closedSet": "entityIds"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "locationDescription": {
+              "type": "string"
+            },
+            "settingSlug": {
+              "type": "string"
+            },
+            "sceneSequenceKind": {
+              "type": "string",
+              "enum": [
+                "linear",
+                "flashback",
+                "flashforward",
+                "montage",
+                "parallel",
+                "dream"
+              ]
+            },
+            "sourceBackground": {
+              "type": "string",
+              "description": "Host-preserved non-narrative source context; constraints and notes, never dialogue."
+            }
+          }
+        }
+      ]
+    },
+    "ReferenceBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "itemId",
+        "referenceIds"
+      ],
+      "properties": {
+        "itemId": {
+          "type": "string",
+          "minLength": 1,
+          "x-closedSet": "itemIds"
+        },
+        "referenceIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "x-closedSet": "referenceIds"
+          },
+          "minItems": 0
+        }
+      }
+    },
+    "OutlineItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "itemId",
+        "orderKey",
+        "parentItemId",
+        "dependencyIds",
+        "scope",
+        "sourceRanges",
+        "contextRangeRefs",
+        "generationBrief",
+        "plannedState",
+        "metadata",
+        "continuesItemId",
+        "closed",
+        "displayNote"
+      ],
+      "properties": {
+        "itemId": {
+          "type": "string",
+          "minLength": 1,
+          "x-closedSet": "itemIds"
+        },
+        "orderKey": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "parentItemId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "dependencyIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "x-closedSet": "itemIds"
+          },
+          "minItems": 0
+        },
+        "scope": {
+          "$ref": "hierarchy-authoring-request-v1.schema.json#/definitions/Scope"
+        },
+        "sourceRanges": {
+          "type": "array",
+          "items": {
+            "$ref": "hierarchy-source-index-v1.schema.json#/definitions/SourceRange"
+          },
+          "minItems": 0
+        },
+        "contextRangeRefs": {
+          "type": "array",
+          "description": "Read-only extra source context, never ownership. If no additional context is needed, output []. Every present entry must satisfy SourceRange's nonempty half-open interval contract; never use a point range as an empty placeholder.",
+          "items": {
+            "$ref": "hierarchy-source-index-v1.schema.json#/definitions/SourceRange"
+          },
+          "minItems": 0
+        },
+        "generationBrief": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "plannedState": {
+          "type": "array",
+          "items": {
+            "$ref": "hierarchy-continuity-v1.schema.json#/definitions/Fact"
+          },
+          "minItems": 0
+        },
+        "metadata": {
+          "$ref": "#/definitions/ItemMetadata"
+        },
+        "continuesItemId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "x-closedSet": "itemIds"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "closed": {
+          "type": "boolean"
+        },
+        "displayNote": {
+          "type": "string"
+        }
+      }
+    },
+    "ProposalItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "proposalIndex",
+        "parentItemId",
+        "dependencyProposalIndices",
+        "scope",
+        "sourceRanges",
+        "contextRangeRefs",
+        "generationBrief",
+        "plannedState",
+        "metadata",
+        "continuesItemId",
+        "closed",
+        "dependencyItemIds"
+      ],
+      "properties": {
+        "proposalIndex": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "parentItemId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "x-closedSet": "itemIds"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "dependencyProposalIndices": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "minItems": 0
+        },
+        "scope": {
+          "$ref": "hierarchy-authoring-request-v1.schema.json#/definitions/Scope"
+        },
+        "sourceRanges": {
+          "type": "array",
+          "items": {
+            "$ref": "hierarchy-source-index-v1.schema.json#/definitions/SourceRange"
+          },
+          "minItems": 0
+        },
+        "contextRangeRefs": {
+          "type": "array",
+          "description": "Read-only extra source context, never ownership. If no additional context is needed, output []. Every present entry must satisfy SourceRange's nonempty half-open interval contract; never use a point range as an empty placeholder.",
+          "items": {
+            "$ref": "hierarchy-source-index-v1.schema.json#/definitions/SourceRange"
+          },
+          "minItems": 0
+        },
+        "generationBrief": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "plannedState": {
+          "type": "array",
+          "items": {
+            "$ref": "hierarchy-continuity-v1.schema.json#/definitions/Fact"
+          },
+          "minItems": 0
+        },
+        "metadata": {
+          "$ref": "#/definitions/ItemMetadata"
+        },
+        "continuesItemId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "x-closedSet": "itemIds"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "closed": {
+          "type": "boolean"
+        },
+        "dependencyItemIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "x-closedSet": "itemIds"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "ProposalReferenceBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "proposalIndex",
+        "referenceIds"
+      ],
+      "properties": {
+        "proposalIndex": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "referenceIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "x-closedSet": "referenceIds"
+          },
+          "minItems": 0
+        }
+      }
+    },
+    "Outline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "outlineRevision",
+        "sourcePolicy",
+        "scope",
+        "items",
+        "nonNarrativeRanges",
+        "referenceBindings"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "outlineRevision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sourcePolicy": {
+          "$ref": "hierarchy-authoring-request-v1.schema.json#/definitions/SourcePolicy"
+        },
+        "scope": {
+          "$ref": "hierarchy-authoring-request-v1.schema.json#/definitions/Scope"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/OutlineItem"
+          },
+          "minItems": 1
+        },
+        "nonNarrativeRanges": {
+          "type": "array",
+          "items": {
+            "$ref": "hierarchy-source-index-v1.schema.json#/definitions/NonNarrativeRange"
+          },
+          "minItems": 0
+        },
+        "referenceBindings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ReferenceBinding"
+          },
+          "minItems": 0
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "sourcePolicy": {
+                "const": "preserve_source"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "items": {
+                "items": {
+                  "properties": {
+                    "sourceRanges": {
+                      "minItems": 1
+                    },
+                    "generationBrief": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "items": {
+                "items": {
+                  "properties": {
+                    "generationBrief": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "OutlineProposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "sourcePolicy",
+        "scope",
+        "items",
+        "nonNarrativeRanges",
+        "referenceBindings"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "sourcePolicy": {
+          "$ref": "hierarchy-authoring-request-v1.schema.json#/definitions/SourcePolicy"
+        },
+        "scope": {
+          "$ref": "hierarchy-authoring-request-v1.schema.json#/definitions/Scope"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ProposalItem"
+          },
+          "minItems": 1
+        },
+        "nonNarrativeRanges": {
+          "type": "array",
+          "items": {
+            "$ref": "hierarchy-source-index-v1.schema.json#/definitions/NonNarrativeRange"
+          },
+          "minItems": 0
+        },
+        "referenceBindings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ProposalReferenceBinding"
+          },
+          "minItems": 0
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "sourcePolicy": {
+                "const": "preserve_source"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "items": {
+                "items": {
+                  "properties": {
+                    "sourceRanges": {
+                      "minItems": 1
+                    },
+                    "generationBrief": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "items": {
+                "items": {
+                  "properties": {
+                    "generationBrief": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "ProductionParams": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "chapterCount",
+        "durationSeconds",
+        "proposedSceneCount",
+        "proposedShotCount"
+      ],
+      "properties": {
+        "chapterCount": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "durationSeconds": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "proposedSceneCount": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "proposedShotCount": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "SourceDigestEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entryId",
+        "sourceRanges",
+        "childIds",
+        "summary"
+      ],
+      "properties": {
+        "entryId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceRanges": {
+          "type": "array",
+          "items": {
+            "$ref": "hierarchy-source-index-v1.schema.json#/definitions/SourceRange"
+          },
+          "minItems": 1
+        },
+        "childIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "x-closedSet": "childIds"
+          },
+          "minItems": 0
+        },
+        "summary": {
+          "type": "string"
+        }
+      }
+    },
+    "SourceDigestPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "entries",
+        "structuralEvidence",
+        "displayKind",
+        "sourceCharacteristics",
+        "productionParams"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SourceDigestEntry"
+          },
+          "minItems": 1
+        },
+        "structuralEvidence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 0
+        },
+        "displayKind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceCharacteristics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 0
+        },
+        "productionParams": {
+          "$ref": "#/definitions/ProductionParams"
+        }
+      }
+    }
+  }
+}

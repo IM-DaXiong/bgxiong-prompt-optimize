@@ -1,0 +1,1669 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "schemaVersion": 1,
+  "title": "Clip workspace shared read and mutation contracts",
+  "definitions": {
+    "ReadArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "query": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Optional UI node title or exact ID search inside a story/workspace directory. Returns all matching candidates with pagination; never selects one. Not used with target.kind=node or projectionSync."
+        },
+        "target": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "story"
+                },
+                "storyId": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "kind",
+                "storyId"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "workspace"
+                },
+                "workspaceId": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "kind",
+                "workspaceId"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "node"
+                },
+                "workspaceId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "nodeId": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "kind",
+                "workspaceId",
+                "nodeId"
+              ]
+            }
+          ]
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "maxItems": 32
+        },
+        "includeBodies": {
+          "description": "Workspace/story: false returns a paged directory of node titles and matching entry/episode identities, without source/review bodies or graph edges. True reads the complete graph projection for UI/export. For one prompt use target.kind=node; inspect actual submission inputs with canvas.workbench.read.",
+          "type": "boolean"
+        },
+        "pageSize": {
+          "description": "Nodes or episodes in this page. No maximum; a larger request is not shortened.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxBytes": {
+          "type": "integer",
+          "minimum": 1024,
+          "maximum": 1048576
+        },
+        "cursor": {
+          "description": "Copy nextCursor unchanged with the same target, chapterId, layout address, read mode and query. On expiry reopen the read.",
+          "type": "string",
+          "minLength": 1
+        },
+        "projectionSync": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "mode"
+              ],
+              "properties": {
+                "mode": {
+                  "const": "baseline"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "mode",
+                "manifest"
+              ],
+              "properties": {
+                "mode": {
+                  "const": "compare"
+                },
+                "manifest": {
+                  "$ref": "#/definitions/ProjectionManifest"
+                }
+              }
+            }
+          ]
+        },
+        "directory": {
+          "type": "string",
+          "enum": [
+            "nodes",
+            "episodes",
+            "chapterReferences"
+          ],
+          "description": "Use episodes for every ordered episode including empty ones. Use chapterReferences with chapterId for the selected script references and their active media versions. Use nodes (default) for the node directory. Continue with nextCursor."
+        },
+        "chapterId": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Use directory=episodes to discover the stable ID. Alone, chapterId filters the lightweight clip directory. With layoutSurface=chapterImages and layoutScopeKey=episode:<same id>, it selects the episode canvas, with or without node bodies."
+        },
+        "layoutSurface": {
+          "type": "string",
+          "enum": ["clips", "chapterImages"],
+          "description": "Which saved layout to project. Omit only for the existing full clip workspace, which is clips."
+        },
+        "layoutScopeKey": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Viewport scope for layoutSurface. clips accepts all, unassigned, or episode:<id>. chapterImages accepts only episode:<id> and requires the same chapterId."
+        }
+      },
+      "required": [
+        "target"
+      ]
+    },
+    "ProjectionManifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "storyId",
+        "workspaceId",
+        "revision",
+        "blocks",
+        "manifestDigest"
+      ],
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "storyId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "workspaceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "manifestDigest": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64
+        },
+        "blocks": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "items": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "x-creator-null-semantics": "absent",
+                "description": "Node ID for a node block, or null for a workspace-wide block."
+              },
+              {
+                "type": "string",
+                "minLength": 64,
+                "maxLength": 64
+              }
+            ]
+          }
+        }
+      }
+    },
+    "HistoryArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "workspaceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "versionIndex": {
+          "type": "integer"
+        },
+        "historyId": {
+          "type": "integer"
+        },
+        "includeContent": {
+          "type": "boolean"
+        },
+        "pageSize": {
+          "description": "History rows in this page. No maximum; a larger request is not shortened.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxBytes": {
+          "type": "integer",
+          "minimum": 1024,
+          "maximum": 1048576
+        },
+        "cursor": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "workspaceId",
+        "nodeId"
+      ]
+    },
+    "ArtifactsArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "runId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "afterOrdinal": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200
+        }
+      },
+      "required": [
+        "runId"
+      ]
+    },
+    "Layout": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "nodeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "w": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "h": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "z": {
+          "type": "integer"
+        },
+        "orderIdx": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "nodeId",
+        "x",
+        "y",
+        "w",
+        "h",
+        "z",
+        "orderIdx"
+      ]
+    },
+    "View": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "panX": {
+          "type": "number"
+        },
+        "panY": {
+          "type": "number"
+        },
+        "scale": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "required": [
+        "panX",
+        "panY",
+        "scale"
+      ]
+    },
+    "Edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "targetId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "edgeKind": {
+          "enum": [
+            "reference",
+            "groups_with"
+          ]
+        },
+        "sourcePort": {
+          "description": "Only reference edges use this. groups_with must omit it.",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "targetPort": {
+          "description": "Only reference edges use this. groups_with must omit it.",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "sourceId",
+        "targetId",
+        "edgeKind"
+      ]
+    },
+    "FrameReferenceUse": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "clip"
+            },
+            "shotLocalId": {
+              "type": "null"
+            },
+            "usage": {
+              "enum": [
+                "start",
+                "middle",
+                "end"
+              ]
+            }
+          },
+          "required": [
+            "scope",
+            "shotLocalId",
+            "usage"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "shot"
+            },
+            "shotLocalId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "usage": {
+              "enum": [
+                "start",
+                "middle",
+                "end"
+              ]
+            }
+          },
+          "required": [
+            "scope",
+            "shotLocalId",
+            "usage"
+          ]
+        }
+      ]
+    },
+    "FrameReferencePort": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "inputPortIndex": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "kind": {
+          "const": "clipFrameUse"
+        },
+        "version": {
+          "const": 1
+        },
+        "boundaryUses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FrameReferenceUse"
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "kind",
+        "version",
+        "boundaryUses"
+      ]
+    },
+    "CreateChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "create"
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "text",
+            "image",
+            "audio",
+            "video",
+            "group"
+          ]
+        },
+        "promptText": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "chapterId": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Required target episode ID in the same story, for every node kind."
+        },
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "type",
+        "nodeId",
+        "kind",
+        "promptText",
+        "title",
+        "x",
+        "y",
+        "chapterId"
+      ],
+      "description": "Create one explicitly named node with the supplied kind, title and optional draft text. 创建节点；允许先保存空稿，不选择模型、不连线、不生成媒体。生图模型、画幅和分辨率不在这里写，用 canvas.configuration.change 的 model.select。"
+    },
+    "PatchChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "patch"
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedPromptText": {
+          "type": "string"
+        },
+        "expectedPromptState": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "description": "For a single prompt-only edit, use the promptState from this node read. The commit checks this node even when other nodes change."
+        },
+        "promptText": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "paramsJson": {
+          "type": "string"
+        },
+        "payloadJson": {
+          "type": "string"
+        },
+        "videoPromptChannelsJson": {
+          "x-creator-null-semantics": "clear",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sourceFactRef": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Fact returned by a node-scoped clip.workflow.read in this request. For a prompt-only edit the host checks the recorded node and promptState."
+        }
+      },
+      "required": [
+        "type",
+        "nodeId"
+      ],
+      "anyOf": [
+        {
+          "required": [
+            "sourceFactRef"
+          ]
+        },
+        {
+          "required": [
+            "expectedPromptState"
+          ]
+        },
+        {
+          "required": [
+            "expectedPromptText"
+          ]
+        }
+      ],
+      "description": "Patch only the supplied node fields using the observed revision and prompt guard. 修改标题或正文不会生成媒体，也不会选择演员或补齐剧情。不要用 paramsJson 或 payloadJson 写入生图模型、画幅或 imageWorkbenchSubmitV1；那走 canvas.configuration.change。"
+    },
+    "DeleteChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "delete"
+        },
+        "nodeIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "type",
+        "nodeIds"
+      ]
+    },
+    "ConnectChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "connect"
+        },
+        "edge": {
+          "$ref": "#/definitions/Edge"
+        }
+      },
+      "required": [
+        "type",
+        "edge"
+      ],
+      "description": "Connect the exact sourceId to targetId with the declared edge kind and ports. 连接一条有方向的线；不猜选素材、不复制图片、不提交生成。"
+    },
+    "DisconnectChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "disconnect"
+        },
+        "edgeIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "type",
+        "edgeIds"
+      ],
+      "description": "Remove only the listed edgeIds. 断开连线；保留端点节点、源素材和已生成成果。"
+    },
+    "LayoutChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "layout"
+        },
+        "layouts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Layout"
+          }
+        }
+      },
+      "required": [
+        "type",
+        "layouts"
+      ]
+    },
+    "ViewChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "view"
+        },
+        "view": {
+          "$ref": "#/definitions/View"
+        }
+      },
+      "required": [
+        "type",
+        "view"
+      ]
+    },
+    "PlacementOrderChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "placementOrder"
+        },
+        "nodeIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "type",
+        "nodeIds"
+      ]
+    },
+    "AssignEpisodeChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "assignEpisode"
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "chapterId": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Required target episode ID in the same story, for every node kind."
+        }
+      },
+      "required": [
+        "type",
+        "nodeId",
+        "chapterId"
+      ],
+      "description": "Assign any node kind to an episode. A batch commits atomically. No unassignment."
+    },
+    "ReorderChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "reorder"
+        },
+        "nodeIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "type",
+        "nodeIds"
+      ]
+    },
+    "ConfirmChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "confirm"
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedPromptText": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "nodeId",
+        "expectedPromptText"
+      ]
+    },
+    "HistoryAppendChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "historyAppend"
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "content": {
+          "type": "string"
+        },
+        "changeContext": {
+          "type": "string"
+        },
+        "forceDuplicate": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "type",
+        "nodeId",
+        "content",
+        "changeContext",
+        "forceDuplicate"
+      ]
+    },
+    "HistoryRenameChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "historyRename"
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "historyId": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "nodeId",
+        "historyId",
+        "title"
+      ]
+    },
+    "HistoryDeleteChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "historyDelete"
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fromVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "toVersion": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "type",
+        "nodeId",
+        "fromVersion",
+        "toVersion"
+      ]
+    },
+    "MediaVersionSetChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "mediaVersionSet"
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "versionId": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "type",
+        "nodeId",
+        "versionId"
+      ],
+      "description": "Adopt the specified existing media version for this node. 切换当前媒体版本；不重新生成、不删除其他版本。"
+    },
+    "MediaVersionDeleteChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "mediaVersionDelete"
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "versionId": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "type",
+        "nodeId",
+        "versionId"
+      ]
+    },
+    "MediaClearChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "mediaClear"
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "type",
+        "nodeId"
+      ],
+      "description": "Clear the current node media selection. 清除当前媒体采用；不重新生成。"
+    },
+    "GraphChangeRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "workspaceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedRevision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "changes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/CreateChange"
+              },
+              {
+                "$ref": "#/definitions/PatchChange"
+              },
+              {
+                "$ref": "#/definitions/DeleteChange"
+              },
+              {
+                "$ref": "#/definitions/ConnectChange"
+              },
+              {
+                "$ref": "#/definitions/DisconnectChange"
+              },
+              {
+                "$ref": "#/definitions/LayoutChange"
+              },
+              {
+                "$ref": "#/definitions/ViewChange"
+              },
+              {
+                "$ref": "#/definitions/PlacementOrderChange"
+              },
+              {
+                "$ref": "#/definitions/AssignEpisodeChange"
+              },
+              {
+                "$ref": "#/definitions/ReorderChange"
+              },
+              {
+                "$ref": "#/definitions/ConfirmChange"
+              },
+              {
+                "$ref": "#/definitions/HistoryAppendChange"
+              },
+              {
+                "$ref": "#/definitions/HistoryRenameChange"
+              },
+              {
+                "$ref": "#/definitions/HistoryDeleteChange"
+              },
+              {
+                "$ref": "#/definitions/MediaVersionSetChange"
+              },
+              {
+                "$ref": "#/definitions/MediaVersionDeleteChange"
+              },
+              {
+                "$ref": "#/definitions/MediaClearChange"
+              },
+              {
+                "$ref": "#/definitions/RestructureChange"
+              },
+              {
+                "$ref": "#/definitions/UndoRestructureChange"
+              },
+              {
+                "$ref": "#/definitions/ReorderReferenceEdgesChange"
+              },
+              {
+                "$ref": "#/definitions/ResetLayoutChange"
+              },
+              {
+                "$ref": "#/definitions/EnsureSurfaceSlotsChange"
+              },
+              {
+                "$ref": "#/definitions/PasteSubgraphChange"
+              }
+            ]
+          }
+        },
+        "layoutSurface": {
+          "type": "string",
+          "enum": ["clips", "chapterImages"]
+        },
+        "layoutScopeKey": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedLayoutRevision": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "workspaceId",
+        "expectedRevision",
+        "changes"
+      ]
+    },
+    "AdoptRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "workspaceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedRevision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "planArtifactId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifactIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "viewportWidth": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "required": [
+        "workspaceId",
+        "expectedRevision",
+        "planArtifactId",
+        "artifactIds",
+        "viewportWidth"
+      ]
+    },
+    "OpenAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "clip.workspace.open"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "storyId": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "type",
+        "actionId",
+        "storyId"
+      ],
+      "description": "Open or obtain this story clip workspace identity. 获取片段工作区；不规划剧集、不创建分镜或提交生成。"
+    },
+    "AdoptAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "clip.artifacts.adopt"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "request": {
+          "$ref": "#/definitions/AdoptRequest"
+        }
+      },
+      "required": [
+        "type",
+        "actionId",
+        "request"
+      ]
+    },
+    "ChangeAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "clip.graph.change"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "request": {
+          "$ref": "#/definitions/GraphChangeRequest"
+        }
+      },
+      "required": [
+        "type",
+        "actionId",
+        "request"
+      ],
+      "description": "Apply only the caller supplied graph changes with workspace revision protection. 按明确操作创建、修改、连接或断开节点；不推理故事关系或生成后续片段。"
+    },
+    "ViewPreferenceAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Non-history viewport preference for automatic fit or coordinate compensation. Atomic expectedRevision and expectedView CAS; no inverse capability. User pan/zoom uses the reversible view graph change.",
+      "properties": {
+        "type": {
+          "const": "clip.view.preference"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "workspaceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedRevision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "expectedView": {
+          "$ref": "#/definitions/View"
+        },
+        "view": {
+          "$ref": "#/definitions/View"
+        }
+      },
+      "required": [
+        "type",
+        "actionId",
+        "workspaceId",
+        "expectedRevision",
+        "expectedView",
+        "view"
+      ]
+    },
+    "ChangePrepareArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "actions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/OpenAction"
+              },
+              {
+                "$ref": "#/definitions/AdoptAction"
+              },
+              {
+                "$ref": "#/definitions/ChangeAction"
+              },
+              {
+                "$ref": "#/definitions/FrameAdoptAction"
+              },
+              {
+                "$ref": "#/definitions/ViewPreferenceAction"
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "actions"
+      ]
+    },
+    "RestructureReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sourceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourcePort": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "targetPort": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "sourceId"
+      ]
+    },
+    "ReplacementDraft": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "nodeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string"
+        },
+        "promptText": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceNodeIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "references": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RestructureReference"
+          }
+        }
+      },
+      "required": [
+        "nodeId",
+        "title",
+        "promptText",
+        "sourceNodeIds",
+        "references"
+      ]
+    },
+    "RestructureRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "operationId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceNodeIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "expectedPrompts": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "drafts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/ReplacementDraft"
+          }
+        }
+      },
+      "required": [
+        "operationId",
+        "sourceNodeIds",
+        "expectedPrompts",
+        "drafts"
+      ]
+    },
+    "RestructureChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "restructure"
+        },
+        "request": {
+          "$ref": "#/definitions/RestructureRequest"
+        }
+      },
+      "required": [
+        "type",
+        "request"
+      ]
+    },
+    "UndoRestructureChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "undoRestructure"
+        },
+        "receiptNodeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "type",
+        "receiptNodeId",
+        "operationId"
+      ]
+    },
+    "FrameAdoptAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "clip.frames.adopt"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "request": {
+          "$ref": "clip-workflow.schema.json#/definitions/ClipFrameAdoptionRequest"
+        }
+      },
+      "required": [
+        "type",
+        "actionId",
+        "request"
+      ]
+    },
+    "ReorderReferenceEdgesChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "reorderReferenceEdges"
+        },
+        "targetNodeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceKind": {
+          "type": "string",
+          "enum": [
+            "image",
+            "audio",
+            "video"
+          ]
+        },
+        "orderedEdgeIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "type",
+        "targetNodeId",
+        "sourceKind",
+        "orderedEdgeIds"
+      ],
+      "description": "Reorder the exact reference edges of one target/source kind. 调整参考素材顺序；不改变端点或创建新引用。"
+    },
+    "ResetLayoutChange": {
+      "required": [
+        "type",
+        "viewportWidth"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "viewportWidth": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "type": {
+          "const": "resetLayout"
+        }
+      },
+      "type": "object"
+    },
+    "EnsureSurfaceSlotsChange": {
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "ensureSurfaceSlots" }
+      },
+      "type": "object",
+      "description": "Give the requested surface a position only for nodes that do not have one yet."
+    },
+    "BatchReadArgs": {
+      "type": "object",
+      "required": [
+        "workspaceId",
+        "parentTaskId"
+      ],
+      "properties": {
+        "workspaceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "parentTaskId": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "BatchInspectArgs": {
+      "type": "object",
+      "required": [
+        "workspaceId",
+        "nodeIds",
+        "writeMode"
+      ],
+      "properties": {
+        "workspaceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nodeIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "writeMode": {
+          "type": "string",
+          "enum": [
+            "incremental",
+            "overwrite"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "PasteSubgraphChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "pasteSubgraph"
+        },
+        "sourceWorkspaceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nodeIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "chapterId": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Required target episode ID in the same story, for every node kind."
+        },
+        "placements": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "sourceNodeId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "x": {
+                "type": "number"
+              },
+              "y": {
+                "type": "number"
+              },
+              "w": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "h": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "z": {
+                "type": "integer"
+              },
+              "orderIdx": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "sourceNodeId",
+              "x",
+              "y",
+              "w",
+              "h",
+              "z",
+              "orderIdx"
+            ]
+          }
+        }
+      },
+      "required": [
+        "type",
+        "sourceWorkspaceId",
+        "nodeIds",
+        "placements",
+        "chapterId"
+      ]
+    },
+    "ActionResult": {
+      "description": "Exact small result of clip.workspace.open, clip.frames.adopt, clip.artifacts.adopt and clip.graph.change. revision is the operation-produced version and remains stable on replay. Current graph is read through clip.workflow.read with the returned workspaceId; that read is current state, never a historical reconstruction.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "storyId",
+        "workspaceId",
+        "revision"
+      ],
+      "properties": {
+        "storyId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "workspaceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "createdNodeIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "Exact node identities created by this graph operation, frozen in the receipt."
+        },
+        "pastedNodeMaps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "changeIndex",
+              "nodeIdMap"
+            ],
+            "properties": {
+              "changeIndex": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "nodeIdMap": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          },
+          "description": "Exact source-to-created node mapping for each paste, addressed by its change index."
+        },
+        "nodeOutcomes": {
+          "type": "array",
+          "description": "Frozen committed membership of created, pasted, reassigned, edited, deleted, or connected nodes addressed by this action. Null chapterId identifies existing legacy unassigned data; new nodes require an episode.",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "nodeId",
+                  "kind",
+                  "chapterId",
+                  "deleted"
+                ],
+                "properties": {
+                  "nodeId": {
+                    "type": "string"
+                  },
+                  "kind": {
+                    "type": "string"
+                  },
+                  "chapterId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "deleted": {
+                    "const": false
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "nodeId",
+                  "deleted"
+                ],
+                "properties": {
+                  "nodeId": {
+                    "type": "string"
+                  },
+                  "deleted": {
+                    "const": true
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

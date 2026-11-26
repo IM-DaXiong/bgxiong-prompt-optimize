@@ -1,0 +1,41 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "提示词优化",
+  "version": "0.1.0",
+  "identifier": "com.bgxiong.prompt-optimize",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:15183",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "prompt-optimize",
+        "title": "提示词优化",
+        "width": 1180,
+        "height": 860,
+        "minWidth": 900,
+        "minHeight": 640,
+        "resizable": true,
+        "center": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "resources": {
+      "../../../src-tauri/crates/bgx-internal-prompts/resources/internal-prompt-skills/": "internal-prompt-skills/",
+      "../../../src-tauri/resources/builtin-agent-skills/": "builtin-agent-skills/"
+    },
+    "icon": [
+      "../../../src-tauri/icons/icon.ico",
+      "../../../src-tauri/icons/icon.png"
+    ]
+  }
+}

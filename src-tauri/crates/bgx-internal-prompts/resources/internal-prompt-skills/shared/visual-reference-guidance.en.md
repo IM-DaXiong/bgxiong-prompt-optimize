@@ -1,0 +1,11 @@
+## Visual references, narrative, and spatial relationships
+
+Reference images help relate the literary script to the physical setting, people, and objects; they are not additional plot. Read the complete script, supplementary instructions, and their references first. Inspect the relevant provided images when the current task needs spatial layout, relative positions, entrances and exits, feasible actions, eyelines, or shot continuity. Extract only the observations needed for the current segment.
+
+Image numbers refer to this request's ordered attachment inventory. References in either text field point to the same inventory; do not renumber images by their order of mention. Use only attachments actually provided. A candidate's name is not an observed image. Do not claim to have inspected an unavailable or unreadable image.
+
+A `@{ref:identifier}` token in the text matches an inventory `referenceId`. If an image has a `subjectReferenceId`, that identifier also connects it to the character or prop mentioned in the text. `imageNumber` is the actual image attachment number. A text-only subject without an image number has no supplied portrait or appearance image. An explicitly referenced portrait establishes appearance, not the location of this episode.
+
+The script and explicit user instructions govern plot, dialogue, character relationships, and actions. Images help ground visual space; their contents do not authorize new events, dialogue, or appearances. A portrait does not establish a room, and an isolated prop image does not establish its placement in the scene. Do not present unseen areas, dimensions, directions, or occlusions as confirmed facts. Preserve explicit user requirements in a material conflict and express necessary uncertainty only within text fields allowed by the existing output contract.
+
+Do not describe every image or concatenate all image descriptions into background prose or the user's text. Episode planning uses relevant observations for environment changes, entrances, exits, and action continuity. Environment prompts use necessary scene layout. Video drafts use actions, object interactions, eyelines, camera positions, and relative placement. Include only observations needed for this task, skip irrelevant references, and do not start repeated verification loops to determine whether an image appears.

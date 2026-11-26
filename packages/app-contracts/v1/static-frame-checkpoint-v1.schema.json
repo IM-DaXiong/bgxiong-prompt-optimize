@@ -1,0 +1,85 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "static-frame-checkpoint-v1.schema.json",
+  "schemaVersion": 1,
+  "title": "Static-frame run checkpoint manifest (ai_tasks parent payload key storyboardStaticFrameCheckpoint)",
+  "description": "Manifest only: stage/child task ids/digests/status/shot mapping and result references. Full B'/C/Q/D results live in child task results; never N copies of prompt text and never image bytes. No new table. A missing result reference is an explicit checkpoint_failed corruption, never a silent paid re-run. A partial manifest is valid but can never be projected into a complete candidate.",
+  "$ref": "#/definitions/checkpointManifestV1",
+  "definitions": {
+    "checkpointPhase": {
+      "type": "string",
+      "enum": ["structure", "authoring", "upstream_review", "review_edit"]
+    },
+    "callStatus": {
+      "type": "string",
+      "enum": ["claimed", "submitted", "outcome_unknown", "completed", "failed", "cancelled", "archived_stale"]
+    },
+    "resultRefV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["childTaskId", "resultDigest"],
+      "properties": {
+        "childTaskId": { "type": "string", "minLength": 1 },
+        "resultDigest": { "type": "string", "minLength": 1 }
+      }
+    },
+    "shotIdentityV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["shotKey", "shotNumber", "directorShotId", "nodeId"],
+      "properties": {
+        "shotKey": { "type": "string", "minLength": 1, "description": "master_shot_id(shot_number)" },
+        "shotNumber": { "type": "integer", "minimum": 1 },
+        "directorShotId": { "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] },
+        "nodeId": { "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] }
+      }
+    },
+    "checkpointEntryV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["phase", "shotKey", "attempt", "inputDigest", "childTaskId", "status", "resultRef", "errorKind"],
+      "properties": {
+        "phase": { "$ref": "#/definitions/checkpointPhase" },
+        "shotKey": {
+          "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }],
+          "description": "null exactly for scene-level phases (structure, upstream_review); required for authoring/review_edit."
+        },
+        "attempt": { "type": "integer", "minimum": 1 },
+        "inputDigest": { "type": "string", "minLength": 1 },
+        "childTaskId": { "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] },
+        "status": { "$ref": "#/definitions/callStatus" },
+        "resultRef": {
+          "anyOf": [{ "$ref": "#/definitions/resultRefV1" }, { "type": "null" }],
+          "description": "Non-null exactly when status=completed."
+        },
+        "errorKind": {
+          "anyOf": [{ "$ref": "static-frame-authoring-v1.schema.json#/definitions/authoringErrorKind" }, { "type": "null" }],
+          "description": "Non-null exactly when status is failed or outcome_unknown."
+        }
+      }
+    },
+    "checkpointManifestV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "runId", "attempt", "sourceDigest", "shots", "entries"],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "runId": { "type": "string", "minLength": 1 },
+        "attempt": { "type": "integer", "minimum": 1 },
+        "sourceDigest": { "type": "string", "minLength": 1 },
+        "shots": { "type": "array", "items": { "$ref": "#/definitions/shotIdentityV1" }, "x-uniqueBy": ["shotKey"] },
+        "entries": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/checkpointEntryV1" },
+          "x-uniqueBy": ["phase", "shotKey", "attempt"]
+        }
+      }
+    }
+  },
+  "x-hostRules": [
+    "phase structure|upstream_review => shotKey null; authoring|review_edit => shotKey in shots[].shotKey.",
+    "status completed <=> resultRef non-null; status failed|outcome_unknown <=> errorKind non-null.",
+    "entry.attempt <= manifest attempt; entries of an older attempt are read-only and may only be reused when inputDigest matches.",
+    "Completed result type must match phase (structure: StageBStructureWireOutput; authoring: StaticFrameDraftV1; review_edit: StaticFrameReviewEditResultV1)."
+  ]
+}

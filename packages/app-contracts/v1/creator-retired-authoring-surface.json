@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "note": "Current Creator authoring publication boundary. Native historical implementations remain; no legacy data or files are scanned/migrated. Shared visualAsset scene assets, roles, props, free canvas and unrelated editing stay open.",
+  "toolIds": [
+    "creative.context.get",
+    "storyboard.handoff.create",
+    "storyboard.handoff.get",
+    "storyboard.handoff.discover",
+    "storyboard.handoff.read",
+    "storyboard.handoff.submit",
+    "storyboard.handoff.status",
+    "storyboard.handoff.close",
+    "storyboard.change.prepare",
+    "segmentCanvas.change.prepare",
+    "video.span.read",
+    "video.span.change.prepare",
+    "story.creation.scenes.generate",
+    "story.creation.storyboard.generate",
+    "story.creation.storyboard.dialogue.extract",
+    "clips.change.prepare",
+    "clips.twin.prepare"
+  ],
+  "resourceKinds": [
+    "scene",
+    "segment",
+    "storyboardNode",
+    "storyboardEdge",
+    "segmentCanvasNode",
+    "videoSpan"
+  ],
+  "actionTypes": [
+    "scene.content.patch",
+    "scene.delete",
+    "scene.merge",
+    "segment.patch",
+    "segment.modelPick.set",
+    "segment.delete",
+    "segment.restore",
+    "story.scene.storyboard.replace",
+    "content.skill.bind",
+    "content.skill.unbind",
+    "clips.bind",
+    "clips.framework.save",
+    "clips.export",
+    "audio.dialogue.bind",
+    "story.scene.conceptImage.generate",
+    "story.shot.image.generate",
+    "story.shot.prompt.optimize",
+    "sb.batchStill.start",
+    "seg.video.generate",
+    "seg.video.batch.start",
+    "seg.video.batch.run",
+    "seg.dialogue.tts",
+    "seg.dialogue.tts.batch",
+    "clips.generate.video",
+    "segment.videoVersion.setActive",
+    "segment.videoVersion.delete",
+    "segment.manualMedia.persist",
+    "segment.manualMedia.delete",
+    "storyboard.padLocalImage.persist",
+    "segmentCanvas.imageNode.setHead",
+    "segmentCanvas.imageNode.versionImage.delete"
+  ],
+  "generationKinds": [
+    "story.scene.conceptImage.generate",
+    "story.shot.image.generate",
+    "story.shot.prompt.optimize",
+    "sb.batchStill.start",
+    "seg.video.generate",
+    "seg.video.batch.start",
+    "seg.video.batch.run",
+    "seg.dialogue.tts",
+    "seg.dialogue.tts.batch",
+    "clips.generate.video"
+  ],
+  "sourceTargetKinds": [
+    "scene",
+    "shot"
+  ],
+  "storyCreationStages": [
+    "scenes",
+    "storyboard"
+  ],
+  "workbenchKinds": [
+    "storyboardStill",
+    "storyboardShot",
+    "storyboardBatchStill",
+    "segmentDialogue",
+    "segmentVideo"
+  ],
+  "schemaFiles": [
+    "creator-storyboard-actions.schema.json",
+    "creator-segment-canvas-actions.schema.json",
+    "creator-clips-actions.schema.json",
+    "creator-shot-restructure-v1.schema.json",
+    "creator-scene-replan.schema.json",
+    "video-span-v1.schema.json"
+  ]
+}

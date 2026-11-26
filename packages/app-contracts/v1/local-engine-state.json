@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "events": { "changed": "local-engine-state-changed" },
+  "installationStates": ["missing", "resources_present", "preparing", "verifying", "ready", "repair_required", "failed"],
+  "activityPhases": ["idle", "waiting_gpu", "starting_process", "loading_model", "executing", "stopping", "failed", "unknown"],
+  "readEngines": ["comfyui", "tts", "music", "sfx", "clearvoice", "vocalsep", "singing", "asr", "llama", "sdkSpeech"]
+}

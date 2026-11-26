@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "creator-llm-completion.schema.json",
+  "title": "Creator llm.completion describe/start",
+  "x-aiTaskKind": "llm_completion",
+  "$defs": {
+    "nonBlankId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "pattern": "^\\S+$"
+    },
+    "bindingRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bindingId", "modelId", "expectedBindingDigest"],
+      "properties": {
+        "bindingId": { "$ref": "#/$defs/nonBlankId" },
+        "modelId": { "$ref": "#/$defs/nonBlankId" },
+        "expectedBindingDigest": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 128,
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      }
+    },
+    "messagePartText": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "text"],
+      "properties": {
+        "kind": { "const": "text" },
+        "text": { "type": "string", "minLength": 1, "maxLength": 500000 }
+      }
+    },
+    "messagePartImageRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "imageRef"],
+      "properties": {
+        "kind": { "const": "imageRef" },
+        "imageRef": {
+          "type": "object",
+          "description": "CreatorResourceRef (camelCase); resolved only through host-authorized media owners."
+        }
+      }
+    },
+    "messagePart": {
+      "oneOf": [
+        { "$ref": "#/$defs/messagePartText" },
+        { "$ref": "#/$defs/messagePartImageRef" }
+      ]
+    },
+    "completionMessage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "parts"],
+      "properties": {
+        "role": { "type": "string", "enum": ["system", "user", "assistant"] },
+        "parts": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": { "$ref": "#/$defs/messagePart" }
+        }
+      }
+    },
+    "resultFormatText": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {
+        "kind": { "const": "text" }
+      }
+    },
+    "resultFormatJsonSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "schema"],
+      "properties": {
+        "kind": { "const": "jsonSchema" },
+        "schema": {
+          "type": "object",
+          "description": "JSON Schema object for the assistant output body."
+        }
+      }
+    },
+    "resultFormat": {
+      "oneOf": [
+        { "$ref": "#/$defs/resultFormatText" },
+        { "$ref": "#/$defs/resultFormatJsonSchema" }
+      ]
+    },
+    "describeInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "cursor": { "$ref": "#/$defs/nonBlankId" }
+      }
+    },
+    "startInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bindingRef", "messages", "resultFormat"],
+      "properties": {
+        "bindingRef": { "$ref": "#/$defs/bindingRef" },
+        "messages": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 128,
+          "items": { "$ref": "#/$defs/completionMessage" }
+        },
+        "resultFormat": { "$ref": "#/$defs/resultFormat" },
+        "temperature": { "type": "number", "minimum": 0, "maximum": 2 }
+      }
+    }
+  }
+}

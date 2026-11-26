@@ -1,0 +1,5 @@
+{
+  "schemaVersion": 1,
+  "usages": ["voice_timbre", "soundtrack_copy"],
+  "default": "voice_timbre"
+}

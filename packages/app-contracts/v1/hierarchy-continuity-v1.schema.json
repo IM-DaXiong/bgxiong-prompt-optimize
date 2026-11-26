@@ -1,0 +1,166 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "hierarchy-continuity-v1.schema.json",
+  "$ref": "#/definitions/Continuity",
+  "definitions": {
+    "EvidenceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "refId"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "source_range",
+            "item",
+            "fact",
+            "requirement",
+            "reference"
+          ]
+        },
+        "refId": {
+          "type": "string",
+          "minLength": 1,
+          "x-closedSet": "evidenceIds"
+        }
+      }
+    },
+    "Fact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "factId",
+        "entityRef",
+        "statement",
+        "evidenceRefs",
+        "status"
+      ],
+      "properties": {
+        "factId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "entityRef": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "x-closedSet": "entityIds"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "statement": {
+          "type": "string"
+        },
+        "evidenceRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EvidenceRef"
+          },
+          "minItems": 0
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "known",
+            "unknown"
+          ]
+        }
+      }
+    },
+    "DependencyDigest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "itemId",
+        "digest"
+      ],
+      "properties": {
+        "itemId": {
+          "type": "string",
+          "minLength": 1,
+          "x-closedSet": "itemIds"
+        },
+        "digest": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "ContinuityOperation": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "fact"
+          ],
+          "properties": {
+            "type": {
+              "const": "apply"
+            },
+            "fact": {
+              "$ref": "#/definitions/Fact"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "factId"
+          ],
+          "properties": {
+            "type": {
+              "const": "retract"
+            },
+            "factId": {
+              "type": "string",
+              "minLength": 1,
+              "x-closedSet": "factIds"
+            }
+          }
+        }
+      ]
+    },
+    "Continuity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "itemId",
+        "acceptedDetailDigest",
+        "operations"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "itemId": {
+          "type": "string",
+          "minLength": 1,
+          "x-closedSet": "itemIds"
+        },
+        "acceptedDetailDigest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "operations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ContinuityOperation"
+          },
+          "minItems": 0
+        }
+      }
+    }
+  }
+}

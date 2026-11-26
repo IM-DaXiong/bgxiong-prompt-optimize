@@ -1,0 +1,1420 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Story creation model input and output contract",
+  "schemaVersion": 1,
+  "definitions": {
+    "ChapterDraft": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "script",
+        "sourceChapterId"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "script": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceChapterId": {
+          "anyOf": [
+            {
+              "$ref": "story-creation.schema.json#/definitions/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "referenceImageIndices": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "ChaptersReply": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "chapters"
+      ],
+      "properties": {
+        "chapters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ChapterDraft"
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "Candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidateId",
+        "name",
+        "description"
+      ],
+      "properties": {
+        "candidateId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "EntityRef": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "id"
+          ],
+          "properties": {
+            "kind": {
+              "const": "existing"
+            },
+            "id": {
+              "$ref": "story-creation.schema.json#/definitions/Id"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "candidateId"
+          ],
+          "properties": {
+            "kind": {
+              "const": "candidate"
+            },
+            "candidateId": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "Mentions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "roles",
+        "props"
+      ],
+      "properties": {
+        "roles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EntityRef"
+          }
+        },
+        "props": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EntityRef"
+          }
+        }
+      }
+    },
+    "CandidateLists": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "roles",
+        "props"
+      ],
+      "properties": {
+        "roles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Candidate"
+          }
+        },
+        "props": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Candidate"
+          }
+        }
+      }
+    },
+    "SceneDraft": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "localId",
+        "title",
+        "script",
+        "scenePrompt",
+        "storyboardHint",
+        "mentions"
+      ],
+      "properties": {
+        "localId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "script": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scenePrompt": {
+          "type": "string"
+        },
+        "storyboardHint": {
+          "type": "string"
+        },
+        "mentions": {
+          "$ref": "#/definitions/Mentions"
+        }
+      }
+    },
+    "ScenesReply": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scenes",
+        "candidates"
+      ],
+      "properties": {
+        "scenes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SceneDraft"
+          },
+          "minItems": 1
+        },
+        "candidates": {
+          "$ref": "#/definitions/CandidateLists"
+        }
+      }
+    },
+    "ShotDraft": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "localId",
+        "title",
+        "staticFramePrompt",
+        "videoPrompt",
+        "mentions",
+        "dialogue"
+      ],
+      "properties": {
+        "localId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "staticFramePrompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "videoPrompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mentions": {
+          "$ref": "#/definitions/Mentions"
+        },
+        "dialogue": {
+          "$ref": "#/definitions/ShotDialogue"
+        }
+      }
+    },
+    "StoryboardReply": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "shots",
+        "candidates"
+      ],
+      "properties": {
+        "shots": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ShotDraft"
+          },
+          "minItems": 1
+        },
+        "candidates": {
+          "$ref": "#/definitions/CandidateLists"
+        }
+      }
+    },
+    "ExtractionReply": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidates"
+      ],
+      "properties": {
+        "candidates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Candidate"
+          }
+        }
+      }
+    },
+    "EntityDecision": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "op",
+            "candidateIds",
+            "newKey",
+            "name",
+            "description"
+          ],
+          "properties": {
+            "op": {
+              "const": "create"
+            },
+            "candidateIds": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            },
+            "newKey": {
+              "type": "string",
+              "minLength": 1
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "op",
+            "candidateIds",
+            "targetId"
+          ],
+          "properties": {
+            "op": {
+              "const": "reuse"
+            },
+            "candidateIds": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            },
+            "targetId": {
+              "$ref": "story-creation.schema.json#/definitions/Id"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "op",
+            "candidateIds",
+            "targetId",
+            "name",
+            "description"
+          ],
+          "properties": {
+            "op": {
+              "const": "update"
+            },
+            "candidateIds": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "targetId": {
+              "$ref": "story-creation.schema.json#/definitions/Id"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "op",
+            "sourceIds",
+            "targetId",
+            "name",
+            "description"
+          ],
+          "properties": {
+            "op": {
+              "const": "merge"
+            },
+            "sourceIds": {
+              "type": "array",
+              "items": {
+                "$ref": "story-creation.schema.json#/definitions/Id"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            },
+            "targetId": {
+              "$ref": "story-creation.schema.json#/definitions/Id"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "op",
+            "entityId"
+          ],
+          "properties": {
+            "op": {
+              "const": "delete"
+            },
+            "entityId": {
+              "$ref": "story-creation.schema.json#/definitions/Id"
+            }
+          }
+        }
+      ]
+    },
+    "IntegrationReply": {
+      "type": "object",
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "properties": {
+            "decisions": {
+              "items": {
+                "properties": {
+                  "op": {
+                    "enum": [
+                      "create",
+                      "update",
+                      "merge",
+                      "delete"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "required": [
+        "decisions"
+      ],
+      "properties": {
+        "decisions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EntityDecision"
+          }
+        }
+      }
+    },
+    "FieldChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "field",
+        "value"
+      ],
+      "properties": {
+        "field": {
+          "$ref": "story-creation.schema.json#/definitions/OptimizeField"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "OptimizeReply": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "changes"
+      ],
+      "properties": {
+        "changes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FieldChange"
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "CandidateOccurrence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidateId",
+        "chapterId",
+        "sceneId",
+        "shotId"
+      ],
+      "properties": {
+        "candidateId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "chapterId": {
+          "$ref": "story-creation.schema.json#/definitions/Id"
+        },
+        "sceneId": {
+          "anyOf": [
+            {
+              "$ref": "story-creation.schema.json#/definitions/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "shotId": {
+          "anyOf": [
+            {
+              "$ref": "story-creation.schema.json#/definitions/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "ExistingOccurrence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entityId",
+        "chapterId",
+        "sceneId",
+        "shotId"
+      ],
+      "properties": {
+        "entityId": {
+          "$ref": "story-creation.schema.json#/definitions/Id"
+        },
+        "chapterId": {
+          "$ref": "story-creation.schema.json#/definitions/Id"
+        },
+        "sceneId": {
+          "anyOf": [
+            {
+              "$ref": "story-creation.schema.json#/definitions/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "shotId": {
+          "anyOf": [
+            {
+              "$ref": "story-creation.schema.json#/definitions/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "ModelTask": {
+      "type": "string",
+      "enum": [
+        "generate",
+        "optimize"
+      ]
+    },
+    "AvailableReferences": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "roles",
+        "props"
+      ],
+      "properties": {
+        "roles": {
+          "type": "array",
+          "items": {
+            "$ref": "story-creation.schema.json#/definitions/RegistryEntry"
+          }
+        },
+        "props": {
+          "type": "array",
+          "items": {
+            "$ref": "story-creation.schema.json#/definitions/RegistryEntry"
+          }
+        }
+      }
+    },
+    "NormalizedChaptersOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "chapterCountReference",
+        "episodeDurationSecondsReference"
+      ],
+      "properties": {
+        "chapterCountReference": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "episodeDurationSecondsReference": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "ChapterMaterial": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "text"
+      ],
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "attachments": {
+          "anyOf": [
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/definitions/ChapterAttachment"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "referenceImages": {
+          "anyOf": [
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/definitions/ChapterReferenceImage"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "ChapterAttachment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "index",
+        "name",
+        "format",
+        "text"
+      ],
+      "properties": {
+        "index": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "format": {
+          "type": "string",
+          "minLength": 1
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "ChapterReferenceImage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "index",
+        "label"
+      ],
+      "properties": {
+        "index": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "ScriptMaterial": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "script"
+      ],
+      "properties": {
+        "script": {
+          "type": "string"
+        }
+      }
+    },
+    "StoryboardMaterial": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "script",
+        "scenePrompt",
+        "storyboardHint"
+      ],
+      "properties": {
+        "script": {
+          "type": "string"
+        },
+        "scenePrompt": {
+          "type": "string"
+        },
+        "storyboardHint": {
+          "type": "string"
+        }
+      }
+    },
+    "StageModelInput": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "stage",
+            "material",
+            "extraConstraints",
+            "options",
+            "availableReferences",
+            "task",
+            "existingChapters"
+          ],
+          "properties": {
+            "stage": {
+              "const": "chapters"
+            },
+            "material": {
+              "$ref": "#/definitions/ChapterMaterial"
+            },
+            "extraConstraints": {
+              "type": "string"
+            },
+            "options": {
+              "$ref": "#/definitions/NormalizedChaptersOptions"
+            },
+            "availableReferences": {
+              "$ref": "#/definitions/AvailableReferences"
+            },
+            "task": {
+              "$ref": "#/definitions/ModelTask"
+            },
+            "draft": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/FieldChange"
+              },
+              "minItems": 1
+            },
+            "changeRequest": {
+              "type": "string",
+              "minLength": 1
+            },
+            "existingChapters": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ExistingChapter"
+              }
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "task": {
+                    "const": "optimize"
+                  }
+                },
+                "required": [
+                  "task"
+                ]
+              },
+              "then": {
+                "required": [
+                  "draft",
+                  "changeRequest"
+                ]
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "task": {
+                    "const": "generate"
+                  }
+                },
+                "required": [
+                  "task"
+                ]
+              },
+              "then": {
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "draft"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "changeRequest"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "stage",
+            "material",
+            "extraConstraints",
+            "options",
+            "availableReferences",
+            "task"
+          ],
+          "properties": {
+            "stage": {
+              "const": "scenes"
+            },
+            "material": {
+              "$ref": "#/definitions/ScriptMaterial"
+            },
+            "extraConstraints": {
+              "type": "string"
+            },
+            "options": {
+              "$ref": "story-creation.schema.json#/definitions/ScenesOptions"
+            },
+            "availableReferences": {
+              "$ref": "#/definitions/AvailableReferences"
+            },
+            "task": {
+              "$ref": "#/definitions/ModelTask"
+            },
+            "draft": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/FieldChange"
+              },
+              "minItems": 1
+            },
+            "changeRequest": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "task": {
+                    "const": "optimize"
+                  }
+                },
+                "required": [
+                  "task"
+                ]
+              },
+              "then": {
+                "required": [
+                  "draft",
+                  "changeRequest"
+                ]
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "task": {
+                    "const": "generate"
+                  }
+                },
+                "required": [
+                  "task"
+                ]
+              },
+              "then": {
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "draft"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "changeRequest"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "stage",
+            "material",
+            "extraConstraints",
+            "options",
+            "availableReferences",
+            "task"
+          ],
+          "properties": {
+            "stage": {
+              "const": "storyboard"
+            },
+            "material": {
+              "$ref": "#/definitions/StoryboardMaterial"
+            },
+            "extraConstraints": {
+              "type": "string"
+            },
+            "options": {
+              "$ref": "story-creation.schema.json#/definitions/EmptyOptions"
+            },
+            "availableReferences": {
+              "$ref": "#/definitions/AvailableReferences"
+            },
+            "task": {
+              "$ref": "#/definitions/ModelTask"
+            },
+            "draft": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/FieldChange"
+              },
+              "minItems": 1
+            },
+            "changeRequest": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "task": {
+                    "const": "optimize"
+                  }
+                },
+                "required": [
+                  "task"
+                ]
+              },
+              "then": {
+                "required": [
+                  "draft",
+                  "changeRequest"
+                ]
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "task": {
+                    "const": "generate"
+                  }
+                },
+                "required": [
+                  "task"
+                ]
+              },
+              "then": {
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "draft"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "changeRequest"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "stage",
+            "material",
+            "extraConstraints",
+            "options",
+            "availableReferences",
+            "task"
+          ],
+          "properties": {
+            "stage": {
+              "const": "roles"
+            },
+            "material": {
+              "$ref": "#/definitions/ScriptMaterial"
+            },
+            "extraConstraints": {
+              "type": "string"
+            },
+            "options": {
+              "$ref": "story-creation.schema.json#/definitions/EmptyOptions"
+            },
+            "availableReferences": {
+              "$ref": "#/definitions/AvailableReferences"
+            },
+            "task": {
+              "$ref": "#/definitions/ModelTask"
+            },
+            "draft": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/FieldChange"
+              },
+              "minItems": 1
+            },
+            "changeRequest": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "task": {
+                    "const": "optimize"
+                  }
+                },
+                "required": [
+                  "task"
+                ]
+              },
+              "then": {
+                "required": [
+                  "draft",
+                  "changeRequest"
+                ]
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "task": {
+                    "const": "generate"
+                  }
+                },
+                "required": [
+                  "task"
+                ]
+              },
+              "then": {
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "draft"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "changeRequest"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "stage",
+            "material",
+            "extraConstraints",
+            "options",
+            "availableReferences",
+            "task"
+          ],
+          "properties": {
+            "stage": {
+              "const": "props"
+            },
+            "material": {
+              "$ref": "#/definitions/ScriptMaterial"
+            },
+            "extraConstraints": {
+              "type": "string"
+            },
+            "options": {
+              "$ref": "story-creation.schema.json#/definitions/EmptyOptions"
+            },
+            "availableReferences": {
+              "$ref": "#/definitions/AvailableReferences"
+            },
+            "task": {
+              "$ref": "#/definitions/ModelTask"
+            },
+            "draft": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/FieldChange"
+              },
+              "minItems": 1
+            },
+            "changeRequest": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "task": {
+                    "const": "optimize"
+                  }
+                },
+                "required": [
+                  "task"
+                ]
+              },
+              "then": {
+                "required": [
+                  "draft",
+                  "changeRequest"
+                ]
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "task": {
+                    "const": "generate"
+                  }
+                },
+                "required": [
+                  "task"
+                ]
+              },
+              "then": {
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "draft"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "changeRequest"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "IntegrationModelInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entityKind",
+        "existing",
+        "candidates",
+        "occurrences",
+        "existingOccurrences",
+        "extraConstraints"
+      ],
+      "properties": {
+        "entityKind": {
+          "$ref": "story-creation.schema.json#/definitions/EntityKind"
+        },
+        "existing": {
+          "type": "array",
+          "items": {
+            "$ref": "story-creation.schema.json#/definitions/RegistryEntry"
+          }
+        },
+        "candidates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Candidate"
+          }
+        },
+        "occurrences": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CandidateOccurrence"
+          }
+        },
+        "existingOccurrences": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ExistingOccurrence"
+          }
+        },
+        "extraConstraints": {
+          "type": "string"
+        }
+      }
+    },
+    "ExistingChapter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "chapterId",
+        "title",
+        "script"
+      ],
+      "properties": {
+        "chapterId": {
+          "$ref": "story-creation.schema.json#/definitions/Id"
+        },
+        "title": {
+          "type": "string"
+        },
+        "script": {
+          "type": "string"
+        }
+      }
+    },
+    "ShotDialogue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dialogueMode",
+        "dialogueLines"
+      ],
+      "properties": {
+        "dialogueMode": {
+          "type": "string",
+          "enum": [
+            "on_screen",
+            "off_screen",
+            "voice_over",
+            "internal_monologue",
+            "silent"
+          ]
+        },
+        "dialogueLines": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "speaker",
+              "line"
+            ],
+            "properties": {
+              "speaker": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "kind",
+                      "castId"
+                    ],
+                    "properties": {
+                      "kind": {
+                        "const": "cast"
+                      },
+                      "castId": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "kind",
+                      "entityId"
+                    ],
+                    "properties": {
+                      "kind": {
+                        "const": "sceneEntity"
+                      },
+                      "entityId": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "kind",
+                      "narratorId"
+                    ],
+                    "properties": {
+                      "kind": {
+                        "const": "narrator"
+                      },
+                      "narratorId": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "kind",
+                      "sourceUnitId",
+                      "reason"
+                    ],
+                    "properties": {
+                      "kind": {
+                        "const": "unresolved"
+                      },
+                      "sourceUnitId": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "reason": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    }
+                  }
+                ]
+              },
+              "line": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "dialogueMode": {
+                "const": "silent"
+              }
+            },
+            "required": [
+              "dialogueMode"
+            ]
+          },
+          "then": {
+            "properties": {
+              "dialogueLines": {
+                "maxItems": 0
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "dialogueLines": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

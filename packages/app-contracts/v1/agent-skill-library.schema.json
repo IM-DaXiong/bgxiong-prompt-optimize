@@ -1,0 +1,1573 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "agent-skill-library.schema.json",
+  "title": "AgentSkillLibraryV2",
+  "description": "Host installation index authority. This is not an author package format and carries no client-specific request state. Old user data upgrades through the native offline entry only.",
+  "schemaVersion": 2,
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": 2
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "entries": {
+      "type": "array",
+      "items": {},
+      "description": "Raw persisted rows, including corrupt/unknown v1 records preserved verbatim. Host parses each row against storedEntry, reports diagnostics and never drops unreadable rows."
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/storedCategory"
+      }
+    },
+    "entry_tombstones": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "agent-skills.json#/definitions/stableId"
+      },
+      "additionalProperties": {
+        "$ref": "#/definitions/entryTombstone"
+      }
+    },
+    "pending_effect_commits": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "agent-skills.json#/definitions/stableId"
+      },
+      "additionalProperties": {
+        "$ref": "#/definitions/effectCommitMarker"
+      }
+    },
+    "builtin_suppressions": {
+      "type": "object",
+      "propertyNames": {
+        "allOf": [
+          {
+            "$ref": "agent-skills.json#/definitions/stableId"
+          },
+          {
+            "pattern": "^builtin:"
+          }
+        ]
+      },
+      "additionalProperties": {
+        "$ref": "#/definitions/storedBuiltinSuppression"
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "revision",
+    "entries",
+    "categories",
+    "entry_tombstones",
+    "pending_effect_commits",
+    "builtin_suppressions"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "entryToken": {
+      "type": "object",
+      "properties": {
+        "entryId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "packageDigest": {
+          "$ref": "agent-skills.json#/definitions/packageDigest"
+        }
+      },
+      "required": [
+        "entryId",
+        "revision",
+        "packageDigest"
+      ],
+      "additionalProperties": false
+    },
+    "storedEntryToken": {
+      "type": "object",
+      "properties": {
+        "entry_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "package_digest": {
+          "$ref": "agent-skills.json#/definitions/packageDigest"
+        }
+      },
+      "required": [
+        "entry_id",
+        "revision",
+        "package_digest"
+      ],
+      "additionalProperties": false
+    },
+    "categoryId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable builtin IDs or user:<UUID>; unknown author declarations are retained separately, never auto-created."
+    },
+    "category": {
+      "type": "object",
+      "properties": {
+        "categoryId": {
+          "$ref": "#/definitions/categoryId"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "origin": {
+          "enum": [
+            "builtin",
+            "user"
+          ]
+        }
+      },
+      "required": [
+        "categoryId",
+        "label",
+        "origin"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "origin": {
+                "const": "builtin"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "categoryId": {
+                "enum": [
+                  "story-writing",
+                  "review-rewrite",
+                  "character-design",
+                  "storyboard",
+                  "visual-style",
+                  "audio-music",
+                  "research-reference",
+                  "project-workflow"
+                ]
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "categoryId": {
+                "type": "string",
+                "pattern": "^user:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "storedCategory": {
+      "type": "object",
+      "properties": {
+        "category_id": {
+          "$ref": "#/definitions/categoryId"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "origin": {
+          "enum": [
+            "builtin",
+            "user"
+          ]
+        }
+      },
+      "required": [
+        "category_id",
+        "label",
+        "origin"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "origin": {
+                "const": "builtin"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "category_id": {
+                "enum": [
+                  "story-writing",
+                  "review-rewrite",
+                  "character-design",
+                  "storyboard",
+                  "visual-style",
+                  "audio-music",
+                  "research-reference",
+                  "project-workflow"
+                ]
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "category_id": {
+                "type": "string",
+                "pattern": "^user:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "categoryDeclarations": {
+      "type": "object",
+      "properties": {
+        "categories": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "categoryLabels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "categories",
+        "tags",
+        "categoryLabels"
+      ],
+      "additionalProperties": false,
+      "description": "Projection of optional metadata.bgx-categories / bgx-tags / bgx-category-labels. Metadata values remain strings in author YAML; invalid extensions are diagnosed without rejecting generic activation."
+    },
+    "storedOrigin": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "minLength": 1
+        },
+        "import_digest": {
+          "anyOf": [
+            {
+              "$ref": "agent-skills.json#/definitions/packageDigest"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "public_source_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "derived_from": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "stable_id": {
+                  "$ref": "agent-skills.json#/definitions/stableId"
+                },
+                "package_digest": {
+                  "$ref": "agent-skills.json#/definitions/packageDigest"
+                }
+              },
+              "required": [
+                "stable_id",
+                "package_digest"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "builtin_baseline_digest": {
+          "anyOf": [
+            {
+              "$ref": "agent-skills.json#/definitions/packageDigest"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "method",
+        "import_digest",
+        "public_source_ref",
+        "derived_from",
+        "builtin_baseline_digest"
+      ],
+      "additionalProperties": false,
+      "description": "Source method is descriptive provenance, not a permission or vendor enum. Public references never contain credentials or local source paths. Unknown official baselines remain null."
+    },
+    "projectionProfileId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "description": "Projection profile id declared by a target adapter capability (vendor-adapter promptProjection.profileId). Opaque to the host: never a vendor/model enum and never inferred from names or SKILL.md text."
+    },
+    "projectionInputMode": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "description": "Neutral mode id owned by vendor-adapter runtime-caps implementedModeIds; the service validates it against the target caps. Not mirrored as a closed set here (VS00 CF-03)."
+    },
+    "projectionBinding": {
+      "type": "object",
+      "properties": {
+        "profileId": {
+          "$ref": "#/definitions/projectionProfileId"
+        },
+        "profileVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "inputModes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/definitions/projectionInputMode"
+          }
+        },
+        "resourceRefs": {
+          "type": "array",
+          "maxItems": 64,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "agent-skills.json#/definitions/resourceRef"
+          }
+        }
+      },
+      "required": [
+        "profileId",
+        "profileVersion",
+        "inputModes",
+        "resourceRefs"
+      ],
+      "additionalProperties": false,
+      "description": "Library application config that declares a format skill compatible with one target projection profile version for the listed input modes. resourceRefs name package files read for this binding (empty = SKILL.md body only); the host checks they exist in the package manifest. Not package metadata and never an install requirement."
+    },
+    "storedProjectionBinding": {
+      "type": "object",
+      "properties": {
+        "profile_id": {
+          "$ref": "#/definitions/projectionProfileId"
+        },
+        "profile_version": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "input_modes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/definitions/projectionInputMode"
+          }
+        },
+        "resource_refs": {
+          "type": "array",
+          "maxItems": 64,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "agent-skills.json#/definitions/resourceRef"
+          }
+        }
+      },
+      "required": [
+        "profile_id",
+        "profile_version",
+        "input_modes",
+        "resource_refs"
+      ],
+      "additionalProperties": false,
+      "description": "Persisted form of projectionBinding inside a v2 installation row."
+    },
+    "projectionBindingState": {
+      "enum": [
+        "bound",
+        "needsBinding",
+        "hostScopeMissing",
+        "skillDisabled",
+        "resourceMissing",
+        "profileVersionMismatch",
+        "inputModeUnsupported"
+      ],
+      "description": "Closed compatibility state of one installed skill for one target profile/version/mode. needsBinding = no binding for the profile (including third-party format skills that only enabled the video-prompt-projection host); hostScopeMissing = effective hosts exclude video-prompt-projection; skillDisabled = entry disabled; resourceMissing = a bound resourceRef is absent from the package manifest; profileVersionMismatch = bound only to other versions of the profile; inputModeUnsupported = binding does not list the requested mode. Only bound is usable; there is no all-models wildcard."
+    },
+    "storedEntry": {
+      "type": "object",
+      "properties": {
+        "stable_id": {
+          "$ref": "agent-skills.json#/definitions/stableId"
+        },
+        "source": {
+          "$ref": "agent-skills.json#/definitions/source"
+        },
+        "name": {
+          "$ref": "agent-skills.json#/definitions/skillName"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "package_digest": {
+          "$ref": "agent-skills.json#/definitions/packageDigest"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "installed_at": {
+          "type": "string",
+          "minLength": 1
+        },
+        "updated_at": {
+          "type": "string",
+          "minLength": 1
+        },
+        "file_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "total_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "format_status": {
+          "$ref": "agent-skills.json#/definitions/formatStatus"
+        },
+        "retained_digests": {
+          "type": "array",
+          "items": {
+            "$ref": "agent-skills.json#/definitions/packageDigest"
+          },
+          "uniqueItems": true
+        },
+        "declared_hosts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "host_override": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "uniqueItems": true
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "declared_display_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "display_name_override": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "entry_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "entry_revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "declared_categories": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "declared_tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "declared_category_labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "category_override": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "uniqueItems": true
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "tag_override": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "uniqueItems": true
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "origin": {
+          "$ref": "#/definitions/storedOrigin"
+        },
+        "projection_bindings": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "$ref": "#/definitions/storedProjectionBinding"
+          },
+          "description": "Optional application config (VS04). Absent in every pre-existing row and absent when the entry has no binding; never required by install/import. Each (profile_id, profile_version) appears at most once (host-validated)."
+        }
+      },
+      "required": [
+        "stable_id",
+        "source",
+        "name",
+        "description",
+        "package_digest",
+        "enabled",
+        "installed_at",
+        "updated_at",
+        "file_count",
+        "total_bytes",
+        "format_status",
+        "retained_digests",
+        "declared_hosts",
+        "host_override",
+        "declared_display_name",
+        "display_name_override",
+        "entry_id",
+        "entry_revision",
+        "declared_categories",
+        "declared_tags",
+        "declared_category_labels",
+        "category_override",
+        "tag_override",
+        "origin"
+      ],
+      "additionalProperties": false,
+      "description": "Valid v2 installation row. IDs/revisions are regenerated on undo or reinstall. Package bytes and declared metadata remain separate from local overrides; null follows declarations, [] explicitly clears."
+    },
+    "entryTombstone": {
+      "type": "object",
+      "properties": {
+        "deletion_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "deleted_entry_token": {
+          "$ref": "#/definitions/storedEntryToken"
+        }
+      },
+      "required": [
+        "deletion_id",
+        "deleted_entry_token"
+      ],
+      "additionalProperties": false,
+      "description": "Latest deletion generation per stableId. Undo requires this exact generation plus current absence; matching digest alone never authorizes restoration."
+    },
+    "effectCommitMarker": {
+      "type": "object",
+      "properties": {
+        "effect_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "before_token": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/storedEntryToken"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "after_token": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/storedEntryToken"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "result_summary": {
+          "type": "object",
+          "properties": {
+            "stable_id": {
+              "$ref": "agent-skills.json#/definitions/stableId"
+            },
+            "outcome": {
+              "enum": [
+                "installed",
+                "unchanged",
+                "updated",
+                "uninstalled",
+                "restored"
+              ]
+            },
+            "package_digest": {
+              "anyOf": [
+                {
+                  "$ref": "agent-skills.json#/definitions/packageDigest"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "stable_id",
+            "outcome",
+            "package_digest"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "effect_ref",
+        "before_token",
+        "after_token",
+        "result_summary"
+      ],
+      "additionalProperties": false,
+      "description": "Atomic FS commit evidence, not a request journal. Scoped by stableId; reject further same-target writes until the public coordinator persists its receipt. Cleanup changes no business revision."
+    },
+    "storedBuiltinSuppression": {
+      "type": "object",
+      "properties": {
+        "official_source_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "entry_before": {
+          "$ref": "#/definitions/storedEntry"
+        },
+        "previous_anchor": {
+          "anyOf": [
+            {
+              "$ref": "agent-skills.json#/definitions/stableId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "next_anchor": {
+          "anyOf": [
+            {
+              "$ref": "agent-skills.json#/definitions/stableId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "order_position": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "official_source_id",
+        "entry_before",
+        "previous_anchor",
+        "next_anchor",
+        "order_position"
+      ],
+      "additionalProperties": false,
+      "description": "Explicit builtin uninstall preserves local business state and placement. Prefer surviving adjacent anchors; if both were removed, restore at min(original order_position,current length), preserving every other current row order. Corrupt anchors fail explicitly."
+    },
+    "storedDraftFile": {
+      "type": "object",
+      "required": [
+        "sha256",
+        "bytes",
+        "kind"
+      ],
+      "properties": {
+        "sha256": {
+          "$ref": "agent-skills.json#/definitions/sha256Hex"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "kind": {
+          "$ref": "agent-skills.json#/definitions/resourceKind"
+        }
+      },
+      "additionalProperties": false
+    },
+    "storedDraftOperation": {
+      "type": "object",
+      "required": [
+        "kind",
+        "path",
+        "from",
+        "before_sha256",
+        "after_sha256"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "putText",
+            "putBinary",
+            "delete",
+            "rename"
+          ]
+        },
+        "path": {
+          "$ref": "agent-skills.json#/definitions/resourceRef"
+        },
+        "from": {
+          "anyOf": [
+            {
+              "$ref": "agent-skills.json#/definitions/resourceRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "before_sha256": {
+          "anyOf": [
+            {
+              "$ref": "agent-skills.json#/definitions/sha256Hex"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "after_sha256": {
+          "anyOf": [
+            {
+              "$ref": "agent-skills.json#/definitions/sha256Hex"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "storedDraft": {
+      "type": "object",
+      "required": [
+        "draft_id",
+        "draft_revision",
+        "name",
+        "target_stable_id",
+        "base_skill_ref",
+        "base_entry_token",
+        "state",
+        "files",
+        "previous_manifest_sha256",
+        "operations",
+        "expected_target_entry_token"
+      ],
+      "properties": {
+        "draft_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "draft_revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "name": {
+          "$ref": "agent-skills.json#/definitions/skillName"
+        },
+        "target_stable_id": {
+          "$ref": "agent-skills.json#/definitions/stableId"
+        },
+        "base_skill_ref": {
+          "anyOf": [
+            {
+              "type": "object",
+              "required": [
+                "stable_id",
+                "package_digest"
+              ],
+              "properties": {
+                "stable_id": {
+                  "$ref": "agent-skills.json#/definitions/stableId"
+                },
+                "package_digest": {
+                  "$ref": "agent-skills.json#/definitions/packageDigest"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "base_entry_token": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/storedEntryToken"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "state": {
+          "enum": [
+            "editing",
+            "orphaned"
+          ]
+        },
+        "files": {
+          "type": "object",
+          "propertyNames": {
+            "$ref": "agent-skills.json#/definitions/resourceRef"
+          },
+          "additionalProperties": {
+            "$ref": "#/definitions/storedDraftFile"
+          }
+        },
+        "previous_manifest_sha256": {
+          "anyOf": [
+            {
+              "$ref": "agent-skills.json#/definitions/sha256Hex"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "operations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/storedDraftOperation"
+          }
+        },
+        "expected_target_entry_token": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/storedEntryToken"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "description": "Durable editing state, not an installation or request journal. Each revision is immutable/content addressed; previous_manifest_sha256 retains the full edit history. The current pointer switches atomically, binary bytes stay in content-addressed blobs, and draft references protect base/version/blob bytes until explicit discard."
+    },
+    "storedDraftPointer": {
+      "type": "object",
+      "required": [
+        "draft_id",
+        "draft_revision",
+        "manifest_sha256",
+        "pending_effect_ref"
+      ],
+      "properties": {
+        "draft_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "draft_revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "manifest_sha256": {
+          "$ref": "agent-skills.json#/definitions/sha256Hex"
+        },
+        "pending_effect_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "description": "Atomic current-draft pointer plus public resource-adapter commit evidence. pending_effect_ref identifies the exact public effect until its receipt is confirmed, without another request state machine. Clearing it keeps revision and manifest bytes unchanged."
+    },
+    "movePlacement": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "anchorStableId"
+          ],
+          "properties": {
+            "kind": {
+              "const": "before"
+            },
+            "anchorStableId": {
+              "$ref": "agent-skills.json#/definitions/stableId"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "anchorStableId"
+          ],
+          "properties": {
+            "kind": {
+              "const": "after"
+            },
+            "anchorStableId": {
+              "$ref": "agent-skills.json#/definitions/stableId"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "const": "first"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "const": "last"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "patchAction": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "stableId",
+            "enabled"
+          ],
+          "properties": {
+            "kind": {
+              "const": "setEnabled"
+            },
+            "stableId": {
+              "$ref": "agent-skills.json#/definitions/stableId"
+            },
+            "enabled": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "stableId",
+            "value"
+          ],
+          "properties": {
+            "kind": {
+              "const": "setDisplayName"
+            },
+            "stableId": {
+              "$ref": "agent-skills.json#/definitions/stableId"
+            },
+            "value": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "stableId",
+            "value"
+          ],
+          "properties": {
+            "kind": {
+              "const": "setHosts"
+            },
+            "stableId": {
+              "$ref": "agent-skills.json#/definitions/stableId"
+            },
+            "value": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "uniqueItems": true
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "stableId",
+            "value"
+          ],
+          "properties": {
+            "kind": {
+              "const": "setCategories"
+            },
+            "stableId": {
+              "$ref": "agent-skills.json#/definitions/stableId"
+            },
+            "value": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "uniqueItems": true
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "stableId",
+            "value"
+          ],
+          "properties": {
+            "kind": {
+              "const": "setTags"
+            },
+            "stableId": {
+              "$ref": "agent-skills.json#/definitions/stableId"
+            },
+            "value": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "uniqueItems": true
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "stableId",
+            "value"
+          ],
+          "properties": {
+            "kind": {
+              "const": "setProjectionBindings"
+            },
+            "stableId": {
+              "$ref": "agent-skills.json#/definitions/stableId"
+            },
+            "value": {
+              "type": "array",
+              "maxItems": 32,
+              "items": {
+                "$ref": "#/definitions/projectionBinding"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "stableId",
+            "fields"
+          ],
+          "properties": {
+            "kind": {
+              "const": "resetOverrides"
+            },
+            "stableId": {
+              "$ref": "agent-skills.json#/definitions/stableId"
+            },
+            "fields": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "displayName",
+                  "hosts",
+                  "categories",
+                  "tags",
+                  "projectionBindings"
+                ]
+              },
+              "uniqueItems": true
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "stableId"
+          ],
+          "properties": {
+            "kind": {
+              "const": "restoreBuiltin"
+            },
+            "stableId": {
+              "$ref": "agent-skills.json#/definitions/stableId"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "label"
+          ],
+          "properties": {
+            "kind": {
+              "const": "createCategory"
+            },
+            "label": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "categoryId",
+            "label"
+          ],
+          "properties": {
+            "kind": {
+              "const": "renameCategory"
+            },
+            "categoryId": {
+              "$ref": "#/definitions/categoryId"
+            },
+            "label": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "categoryId"
+          ],
+          "properties": {
+            "kind": {
+              "const": "deleteCategory"
+            },
+            "categoryId": {
+              "$ref": "#/definitions/categoryId"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "stableId",
+            "placement"
+          ],
+          "properties": {
+            "kind": {
+              "const": "move"
+            },
+            "stableId": {
+              "$ref": "agent-skills.json#/definitions/stableId"
+            },
+            "placement": {
+              "$ref": "#/definitions/movePlacement"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "patchInput": {
+      "type": "object",
+      "required": [
+        "expectedLibraryRevision",
+        "actions"
+      ],
+      "properties": {
+        "expectedLibraryRevision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/patchAction"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "libraryFilters": {
+      "type": "object",
+      "required": [
+        "categoryIds",
+        "tags",
+        "hosts"
+      ],
+      "properties": {
+        "query": {
+          "type": "string"
+        },
+        "categoryIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "hosts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "source": {
+          "$ref": "agent-skills.json#/definitions/source"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "formatStatus": {
+          "$ref": "agent-skills.json#/definitions/formatStatus"
+        },
+        "readiness": {
+          "type": "object",
+          "required": [
+            "operation",
+            "state"
+          ],
+          "properties": {
+            "operation": {
+              "type": "string",
+              "minLength": 1
+            },
+            "state": {
+              "$ref": "agent-skills.json#/definitions/executionReadiness"
+            }
+          },
+          "additionalProperties": false
+        },
+        "uncategorized": {
+          "type": "boolean",
+          "description": "S08: true = only rows whose effective categories are empty. Mutually exclusive with categoryIds (Host rejects both)."
+        }
+      },
+      "additionalProperties": false
+    },
+    "libraryListInput": {
+      "type": "object",
+      "required": [
+        "filters"
+      ],
+      "properties": {
+        "filters": {
+          "$ref": "#/definitions/libraryFilters"
+        },
+        "cursor": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "libraryCursor": {
+      "type": "object",
+      "required": [
+        "library_revision",
+        "filters_sha256",
+        "permission_sha256",
+        "sort_identity",
+        "next_offset"
+      ],
+      "properties": {
+        "library_revision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "filters_sha256": {
+          "$ref": "agent-skills.json#/definitions/sha256Hex"
+        },
+        "permission_sha256": {
+          "$ref": "agent-skills.json#/definitions/sha256Hex"
+        },
+        "sort_identity": {
+          "const": "indexOrder"
+        },
+        "next_offset": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "storedPreparedPackage": {
+      "type": "object",
+      "required": [
+        "candidate_digest",
+        "name",
+        "description",
+        "container_name",
+        "profile",
+        "files",
+        "declared_classification"
+      ],
+      "properties": {
+        "candidate_digest": {
+          "$ref": "agent-skills.json#/definitions/packageDigest"
+        },
+        "name": {
+          "$ref": "agent-skills.json#/definitions/skillName"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "container_name": {
+          "type": "string"
+        },
+        "profile": {
+          "$ref": "agent-skills.json#/definitions/profile"
+        },
+        "files": {
+          "type": "object",
+          "propertyNames": {
+            "$ref": "agent-skills.json#/definitions/resourceRef"
+          },
+          "additionalProperties": {
+            "$ref": "#/definitions/storedDraftFile"
+          }
+        },
+        "declared_classification": {
+          "$ref": "#/definitions/categoryDeclarations"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Immutable complete byte snapshot of an authorized candidate; author package files and names unchanged. Candidate SHA verifies all paths/content. Apply reads this prepared manifest/blobs only, never a later source path."
+    }
+  },
+  "builtinCategories": [
+    {
+      "categoryId": "story-writing",
+      "label": "故事写作",
+      "origin": "builtin"
+    },
+    {
+      "categoryId": "review-rewrite",
+      "label": "审稿改写",
+      "origin": "builtin"
+    },
+    {
+      "categoryId": "character-design",
+      "label": "人物设计",
+      "origin": "builtin"
+    },
+    {
+      "categoryId": "storyboard",
+      "label": "分镜编排",
+      "origin": "builtin"
+    },
+    {
+      "categoryId": "visual-style",
+      "label": "视觉风格",
+      "origin": "builtin"
+    },
+    {
+      "categoryId": "audio-music",
+      "label": "音频音乐",
+      "origin": "builtin"
+    },
+    {
+      "categoryId": "research-reference",
+      "label": "资料研究",
+      "origin": "builtin"
+    },
+    {
+      "categoryId": "project-workflow",
+      "label": "项目流程",
+      "origin": "builtin"
+    }
+  ],
+  "metadataExtensions": {
+    "categories": {
+      "key": "bgx-categories",
+      "encoding": "spaceSeparatedCategoryIds"
+    },
+    "tags": {
+      "key": "bgx-tags",
+      "encoding": "jsonStringArrayInString"
+    },
+    "categoryLabels": {
+      "key": "bgx-category-labels",
+      "encoding": "jsonStringMapInString"
+    }
+  },
+  "precedence": {
+    "categories": [
+      "category_override",
+      "declared_categories"
+    ],
+    "tags": [
+      "tag_override",
+      "declared_tags"
+    ],
+    "nullOverride": "followPackage",
+    "emptyOverride": "explicitClear",
+    "uncategorized": "emptyMembershipProjection"
+  },
+  "migration": {
+    "fromSchemaVersion": 1,
+    "mode": "nativeOfflineOnly",
+    "preserve": [
+      "rawEntries",
+      "recordOrder",
+      "enabled",
+      "hostOverride",
+      "displayNameOverride",
+      "oldDigests"
+    ],
+    "unknownOfficialBaseline": "retainUnverified",
+    "tokenRestoration": "newIdentityAndCurrentRevision",
+    "maximumInstalledPackages": null
+  }
+}

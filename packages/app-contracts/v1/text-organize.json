@@ -1,0 +1,123 @@
+{
+  "$schema": "./text-organize.schema.json",
+  "contractId": "text-organize",
+  "enabled": true,
+  "aiTaskKind": "text_organize",
+  "creatorToolId": "text.organize",
+  "formats": [
+    "sentence_per_line",
+    "paragraphs"
+  ],
+  "joiners": {
+    "sentence_per_line": "\n",
+    "paragraphs": "\n\n"
+  },
+  "presets": [
+    {
+      "presetId": "voiceover",
+      "labelKey": "textOrganize.preset.voiceover",
+      "templateKeys": {
+        "zh-CN": "textOrganize.template.voiceover",
+        "en": "textOrganize.template.voiceover"
+      },
+      "defaultFormat": "sentence_per_line"
+    },
+    {
+      "presetId": "episode",
+      "labelKey": "textOrganize.preset.episode",
+      "templateKeys": {
+        "zh-CN": "textOrganize.template.episode",
+        "en": "textOrganize.template.episode"
+      },
+      "defaultFormat": "paragraphs"
+    },
+    {
+      "presetId": "storyboard",
+      "labelKey": "textOrganize.preset.storyboard",
+      "templateKeys": {
+        "zh-CN": "textOrganize.template.storyboard",
+        "en": "textOrganize.template.storyboard"
+      },
+      "defaultFormat": "sentence_per_line"
+    },
+    {
+      "presetId": "prompt",
+      "labelKey": "textOrganize.preset.prompt",
+      "templateKeys": {
+        "zh-CN": "textOrganize.template.prompt",
+        "en": "textOrganize.template.prompt"
+      },
+      "defaultFormat": "paragraphs"
+    },
+    {
+      "presetId": "story",
+      "labelKey": "textOrganize.preset.story",
+      "templateKeys": {
+        "zh-CN": "textOrganize.template.story",
+        "en": "textOrganize.template.story"
+      },
+      "defaultFormat": "paragraphs"
+    }
+  ],
+  "defaults": {
+    "presetId": "voiceover"
+  },
+  "chunking": {
+    "contextSourceUnitsBefore": 2,
+    "contextSourceUnitsAfter": 2,
+    "outputSafetyRatio": 0.15,
+    "conservativeEstimateMarker": "conservativeEstimate"
+  },
+  "coverageDispositions": [
+    "represented",
+    "removed_filler"
+  ],
+  "reviewSeverities": [
+    "pass",
+    "minor",
+    "blocking"
+  ],
+  "phases": [
+    "preparing",
+    "generating",
+    "reviewing",
+    "completed",
+    "failed",
+    "cancelled"
+  ],
+  "errors": [
+    "featureDisabled",
+    "noModel",
+    "contextOverflow",
+    "outputTruncated",
+    "outputSchemaInvalid",
+    "unknownId",
+    "reviewBlocking",
+    "vendorFailed",
+    "authFailed",
+    "taskWriteFailed",
+    "cancelled",
+    "surfaceBusy",
+    "surfaceConflict",
+    "emptySource",
+    "promptConfigInvalid"
+  ],
+  "errorLocaleKeys": {
+    "featureDisabled": "textOrganize.err.featureDisabled",
+    "noModel": "textOrganize.err.noModel",
+    "contextOverflow": "textOrganize.err.contextOverflow",
+    "outputTruncated": "textOrganize.err.outputTruncated",
+    "outputSchemaInvalid": "textOrganize.err.outputSchemaInvalid",
+    "unknownId": "textOrganize.err.unknownId",
+    "reviewBlocking": "textOrganize.err.reviewBlocking",
+    "vendorFailed": "textOrganize.err.vendorFailed",
+    "authFailed": "textOrganize.err.authFailed",
+    "taskWriteFailed": "textOrganize.err.taskWriteFailed",
+    "cancelled": "textOrganize.err.cancelled",
+    "surfaceBusy": "textOrganize.err.surfaceBusy",
+    "surfaceConflict": "textOrganize.err.surfaceConflict",
+    "emptySource": "textOrganize.err.emptySource",
+    "promptConfigInvalid": "textOrganize.err.promptConfigInvalid"
+  },
+  "versionTitleKey": "textOrganize.versionTitle"
+}

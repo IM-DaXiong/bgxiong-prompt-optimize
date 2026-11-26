@@ -1,0 +1,156 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-local-canvas-import-v1.schema.json",
+  "title": "Creator local canvas import (proposal/review/prepare/receipt) v1",
+  "definitions": {
+    "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[A-Za-z0-9_.:-]+$" },
+    "fileRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fileId", "revision"],
+      "properties": { "fileId": { "$ref": "#/definitions/id" }, "revision": { "$ref": "#/definitions/id" } }
+    },
+    "promptVerbatim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "unitIds"],
+      "properties": {
+        "mode": { "type": "string", "enum": ["verbatim"] },
+        "unitIds": { "type": "array", "minItems": 1, "maxItems": 1000, "items": { "$ref": "#/definitions/id" } }
+      }
+    },
+    "promptCompose": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "promptText"],
+      "properties": {
+        "mode": { "type": "string", "enum": ["compose"] },
+        "promptText": { "type": "string", "minLength": 1 }
+      }
+    },
+    "prompt": { "oneOf": [ { "$ref": "#/definitions/promptVerbatim" }, { "$ref": "#/definitions/promptCompose" } ] },
+    "placement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y"],
+      "properties": { "x": { "type": "number" }, "y": { "type": "number" } }
+    },
+    "proposalItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["itemId", "imageRefs", "sourceUnitIds", "prompt", "placement"],
+      "properties": {
+        "itemId": { "$ref": "#/definitions/id" },
+        "imageRefs": { "type": "array", "maxItems": 12, "items": { "$ref": "#/definitions/fileRef" } },
+        "sourceUnitIds": { "type": "array", "minItems": 1, "maxItems": 1000, "items": { "$ref": "#/definitions/id" } },
+        "prompt": { "$ref": "#/definitions/prompt" },
+        "placement": { "$ref": "#/definitions/placement" }
+      }
+    },
+    "proposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "items"],
+      "properties": {
+        "schemaVersion": { "type": "integer", "enum": [1] },
+        "items": { "type": "array", "minItems": 1, "maxItems": 100, "items": { "$ref": "#/definitions/proposalItem" } }
+      }
+    },
+    "reviewRuleId": { "type": "string", "enum": ["image_mapping", "source_coverage", "prompt_fidelity", "user_goal"] },
+    "reviewSeverity": { "type": "string", "enum": ["pass", "minor", "blocking"] },
+    "reviewVerification": { "type": "string", "enum": ["sourceDocument", "vision", "unverified"] },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["itemId", "ruleId", "score", "severity", "verification", "sourceUnitIds", "message"],
+      "properties": {
+        "itemId": { "$ref": "#/definitions/id" },
+        "ruleId": { "$ref": "#/definitions/reviewRuleId" },
+        "score": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "severity": { "$ref": "#/definitions/reviewSeverity" },
+        "verification": { "$ref": "#/definitions/reviewVerification" },
+        "sourceUnitIds": { "type": "array", "maxItems": 1000, "items": { "$ref": "#/definitions/id" } },
+        "message": { "type": "string" }
+      }
+    },
+    "reviewModelOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "findings"],
+      "properties": {
+        "schemaVersion": { "type": "integer", "enum": [1] },
+        "findings": { "type": "array", "minItems": 1, "maxItems": 400, "items": { "$ref": "#/definitions/finding" } }
+      }
+    },
+    "promptMode": { "type": "string", "enum": ["verbatim", "compose"] },
+    "proposeInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["projectId", "snapshotId", "sourceUnitIds", "imageRefs", "instruction", "promptMode", "hostIdempotencyKey"],
+      "properties": {
+        "projectId": { "$ref": "#/definitions/id" },
+        "snapshotId": { "$ref": "#/definitions/id" },
+        "sourceUnitIds": { "type": "array", "minItems": 1, "maxItems": 1000, "items": { "$ref": "#/definitions/id" } },
+        "imageRefs": { "type": "array", "maxItems": 1200, "items": { "$ref": "#/definitions/fileRef" } },
+        "instruction": { "type": "string", "minLength": 1 },
+        "promptMode": { "$ref": "#/definitions/promptMode" },
+        "hostIdempotencyKey": { "$ref": "#/definitions/id" },
+        "candidateProposal": { "$ref": "#/definitions/proposal" },
+        "resumeOf": { "$ref": "#/definitions/id" }
+      }
+    },
+    "reviewInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["proposalId", "expectedProposalFingerprint", "hostIdempotencyKey"],
+      "properties": {
+        "proposalId": { "$ref": "#/definitions/id" },
+        "expectedProposalFingerprint": { "$ref": "#/definitions/id" },
+        "hostIdempotencyKey": { "$ref": "#/definitions/id" }
+      }
+    },
+    "prepareInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["proposalId", "expectedProposalFingerprint", "reviewId", "expectedGraphRevision", "hostIdempotencyKey"],
+      "properties": {
+        "proposalId": { "$ref": "#/definitions/id" },
+        "expectedProposalFingerprint": { "$ref": "#/definitions/id" },
+        "reviewId": { "$ref": "#/definitions/id" },
+        "expectedGraphRevision": { "type": "integer", "minimum": 0 },
+        "hostIdempotencyKey": { "$ref": "#/definitions/id" },
+        "resumeOf": { "$ref": "#/definitions/id" }
+      }
+    },
+    "itemStatus": { "type": "string", "enum": ["pending", "preparing", "committed", "failed", "interrupted", "cancelled", "undone"] },
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["changeSetId", "itemId", "status", "imageNodeIds", "edgeIds", "committedGraphRevision", "sourceRevisions", "transactionUnit"],
+      "properties": {
+        "changeSetId": { "$ref": "#/definitions/id" },
+        "itemId": { "$ref": "#/definitions/id" },
+        "status": { "$ref": "#/definitions/itemStatus" },
+        "imageNodeIds": { "type": "array", "items": { "$ref": "#/definitions/id" } },
+        "videoNodeId": { "$ref": "#/definitions/id" },
+        "edgeIds": { "type": "array", "items": { "$ref": "#/definitions/id" } },
+        "promptRevision": { "type": "integer", "minimum": 0 },
+        "committedGraphRevision": { "type": "integer", "minimum": 0 },
+        "sourceRevisions": { "type": "array", "items": { "$ref": "#/definitions/fileRef" } },
+        "transactionUnit": { "type": "string", "enum": ["item"] }
+      }
+    },
+    "inverse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["changeSetId", "itemId", "createdNodeIds", "createdEdgeIds", "expectedGraphRevision"],
+      "properties": {
+        "changeSetId": { "$ref": "#/definitions/id" },
+        "itemId": { "$ref": "#/definitions/id" },
+        "createdNodeIds": { "type": "array", "items": { "$ref": "#/definitions/id" } },
+        "createdEdgeIds": { "type": "array", "items": { "$ref": "#/definitions/id" } },
+        "expectedGraphRevision": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}

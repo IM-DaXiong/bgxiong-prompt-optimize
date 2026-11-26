@@ -1,0 +1,494 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "creator-tool-discovery.schema.json",
+  "definitions": {
+    "searchInput": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "mode": {
+              "enum": [
+                "search"
+              ]
+            },
+            "query": {
+              "type": "string",
+              "minLength": 1
+            },
+            "searchScope": {
+              "enum": [
+                "loadedThenAll",
+                "all"
+              ]
+            },
+            "loadedToolIds": {
+              "type": "array",
+              "maxItems": 256,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "cursor": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "mode",
+            "query",
+            "searchScope"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "mode": {
+              "enum": [
+                "browse"
+              ]
+            },
+            "cursor": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "mode"
+          ]
+        }
+      ]
+    },
+    "getInput": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "cursor": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": []
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaToolIds": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "maxItems": 32
+            },
+            "schemasCursor": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "schemaToolIds"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "versionOnly": {
+              "const": true,
+              "description": "Read the catalog revision and connection/cache guidance without downloading tool schemas or index pages."
+            }
+          },
+          "required": [
+            "versionOnly"
+          ]
+        }
+      ]
+    },
+    "rulesInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ruleIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "asr",
+              "core",
+              "request_calls",
+              "canvas_edges",
+              "scene_replan",
+              "runtime_intake",
+              "text_edit",
+              "request_stop",
+              "external_image_delivery"
+            ]
+          },
+          "maxItems": 32
+        },
+        "catalogRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "cursor": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "ruleIds",
+        "catalogRevision"
+      ]
+    },
+    "configuration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "bootstrapToolIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "navigationReadTools": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "coreRuleIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "ruleIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "maxPageBytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxSchemaToolIds": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxLoadedToolIds": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxCacheBytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxCacheEntries": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "bm25": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "k1": {
+              "type": "number",
+              "minimum": 0.01,
+              "maximum": 100
+            },
+            "b": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "toolIdWeight": {
+              "type": "number",
+              "minimum": 0.01,
+              "maximum": 100
+            },
+            "aliasesWeight": {
+              "type": "number",
+              "minimum": 0.01,
+              "maximum": 100
+            },
+            "summaryWeight": {
+              "type": "number",
+              "minimum": 0.01,
+              "maximum": 100
+            },
+            "descriptionWeight": {
+              "type": "number",
+              "minimum": 0.01,
+              "maximum": 100
+            }
+          },
+          "required": [
+            "k1",
+            "b",
+            "toolIdWeight",
+            "aliasesWeight",
+            "summaryWeight",
+            "descriptionWeight"
+          ]
+        },
+        "cursorVersion": {
+          "const": 1
+        },
+        "revisionDomains": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "errorCodes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "maxActiveToolBytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxActiveRuleBytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxRulePageBytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxSearchPageBytes": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "bootstrapToolIds",
+        "coreRuleIds",
+        "ruleIds",
+        "maxPageBytes",
+        "maxSchemaToolIds",
+        "maxLoadedToolIds",
+        "maxCacheBytes",
+        "maxCacheEntries",
+        "bm25",
+        "cursorVersion",
+        "revisionDomains",
+        "errorCodes",
+        "maxActiveToolBytes",
+        "maxActiveRuleBytes",
+        "maxRulePageBytes",
+        "maxSearchPageBytes"
+      ]
+    },
+    "searchData": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "catalogRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "matchStatus": {
+          "enum": [
+            "matches",
+            "noMatch",
+            "browse"
+          ]
+        },
+        "scopeUsed": {
+          "enum": [
+            "loaded",
+            "all"
+          ]
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "toolId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "summary": {
+                "type": "string",
+                "minLength": 1
+              },
+              "group": {
+                "type": "string",
+                "minLength": 1
+              },
+              "schemaDigest": {
+                "type": "string",
+                "minLength": 1
+              },
+              "ruleRefs": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "relatedToolIds": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "exactMatch": {
+                "const": true
+              },
+              "actionHints": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "actionType",
+                    "schemaPointer"
+                  ],
+                  "properties": {
+                    "actionType": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "schemaPointer": {
+                      "type": "string",
+                      "pattern": "^/properties/actions/items/"
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "toolId",
+              "summary",
+              "group",
+              "schemaDigest",
+              "ruleRefs",
+              "relatedToolIds"
+            ]
+          }
+        },
+        "hasMore": {
+          "type": "boolean"
+        },
+        "nextCursor": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nextDiscovery": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "mode": {
+              "const": "browse"
+            }
+          },
+          "required": [
+            "mode"
+          ]
+        }
+      },
+      "required": [
+        "catalogRevision",
+        "matchStatus",
+        "scopeUsed",
+        "tools",
+        "hasMore"
+      ]
+    },
+    "ruleData": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "catalogRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "ruleId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "revision": {
+                "type": "string",
+                "minLength": 1
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1
+              },
+              "exampleRefs": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "required": [
+              "ruleId",
+              "revision",
+              "text",
+              "exampleRefs"
+            ]
+          }
+        },
+        "hasMore": {
+          "type": "boolean"
+        },
+        "nextCursor": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "catalogRevision",
+        "rules",
+        "hasMore"
+      ]
+    }
+  }
+}

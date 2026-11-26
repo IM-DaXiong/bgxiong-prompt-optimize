@@ -1,0 +1,103 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creative-run-v1.schema.json",
+  "title": "CreativeRunV1",
+  "description": "S15: one execution record of a creative recipe. It owns no result blobs: each step points at the EXISTING ledger objects (taskId from the task port, changeSetId/journal entry from change.apply, costGrantId from the cost gate). Run status is derived from step statuses.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "runId",
+    "recipeId",
+    "recipeVersion",
+    "status",
+    "steps"
+  ],
+  "definitions": {
+    "status": {
+      "enum": [
+        "pending",
+        "running",
+        "waitingApproval",
+        "succeeded",
+        "failed",
+        "cancelled",
+        "skipped"
+      ]
+    },
+    "ref": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "\\S"
+    },
+    "step": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stepId",
+        "status"
+      ],
+      "properties": {
+        "stepId": {
+          "type": "string",
+          "pattern": "^[a-z][a-zA-Z0-9_]{0,63}$"
+        },
+        "status": {
+          "$ref": "#/definitions/status"
+        },
+        "taskId": {
+          "$ref": "#/definitions/ref"
+        },
+        "changeSetId": {
+          "$ref": "#/definitions/ref"
+        },
+        "journalEntryId": {
+          "$ref": "#/definitions/ref"
+        },
+        "costGrantId": {
+          "$ref": "#/definitions/ref"
+        },
+        "errorCode": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]+$"
+        }
+      }
+    }
+  },
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "runId": {
+      "$ref": "#/definitions/ref"
+    },
+    "recipeId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_.-]{2,63}$"
+    },
+    "recipeVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "status": {
+      "enum": [
+        "pending",
+        "running",
+        "waitingApproval",
+        "succeeded",
+        "failed",
+        "cancelled",
+        "partial"
+      ]
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 16,
+      "items": {
+        "$ref": "#/definitions/step"
+      }
+    }
+  }
+}

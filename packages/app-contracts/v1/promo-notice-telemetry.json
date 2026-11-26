@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "eventKinds": ["received", "shown"],
+  "sources": ["network", "cache"],
+  "maxBatch": 32,
+  "maxBytes": 32768,
+  "maxQueue": 500,
+  "maxQueueBytes": 262144,
+  "maxAgeSeconds": 604800,
+  "dedupRetentionDays": 14,
+  "maxAttempts": 8,
+  "timeoutSeconds": 5,
+  "flushSeconds": 300,
+  "debounceSeconds": 5,
+  "retrySeconds": [30, 120, 600, 1800],
+  "receivedMarkLimit": 256,
+  "receivedMarkSeconds": 7776000
+}

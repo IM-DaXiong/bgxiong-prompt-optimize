@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "bgxiong://contracts/story-skill-evaluation-run-v1",
+  "title": "StorySkillEvaluationRunV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "runId", "caseId", "variant", "model", "environment", "skillSha256", "sourceSha256", "startedAt", "status", "formatRepairRounds", "editorialRewriteRounds", "userRequestedRevisionRounds", "usage", "artifacts"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "runId": { "type": "string", "minLength": 1 },
+    "caseId": { "type": "string", "minLength": 1 },
+    "variant": { "enum": ["A_legacy_skill", "A_plain_prompt", "B_standalone_full", "C_standalone_without_bgx", "D_client_same_source"] },
+    "model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["family", "name", "version", "settingsKnown"],
+      "properties": {
+        "family": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "version": { "type": ["string", "null"] },
+        "settingsKnown": { "type": "boolean" }
+      }
+    },
+    "environment": { "enum": ["externalChat", "clientConfiguredService", "clientLocalModel", "offlineFixture"] },
+    "skillSha256": { "type": ["string", "null"], "pattern": "^[a-fA-F0-9]{64}$" },
+    "sourceSha256": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" },
+    "startedAt": { "type": "string", "format": "date-time" },
+    "finishedAt": { "type": ["string", "null"], "format": "date-time" },
+    "status": { "enum": ["pending", "complete", "failed", "cancelled", "interrupted"] },
+    "formatRepairRounds": { "type": "integer", "minimum": 0 },
+    "editorialRewriteRounds": { "type": "integer", "minimum": 0 },
+    "userRequestedRevisionRounds": { "type": "integer", "minimum": 0 },
+    "usage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["promptTokens", "completionTokens", "cost", "elapsedMs"],
+      "properties": {
+        "promptTokens": { "type": ["integer", "null"], "minimum": 0 },
+        "completionTokens": { "type": ["integer", "null"], "minimum": 0 },
+        "cost": { "type": ["number", "null"], "minimum": 0 },
+        "elapsedMs": { "type": ["integer", "null"], "minimum": 0 }
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["request", "rawResponse", "finalWork", "editorialFindings"],
+      "properties": {
+        "request": { "type": "string", "minLength": 1 },
+        "rawResponse": { "type": "string", "minLength": 1 },
+        "finalWork": { "type": ["string", "null"] },
+        "editorialFindings": { "type": ["string", "null"] }
+      }
+    },
+    "failure": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["category", "detail"],
+      "properties": {
+        "category": { "enum": ["contract", "semantic", "transport", "storage", "conflict", "budget", "unknown"] },
+        "detail": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

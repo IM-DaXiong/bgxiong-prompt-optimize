@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "protocolVersion": 2,
+  "bridgeFeature": "asrSelectionV1",
+  "catalogChangedEvent": "asr-catalog-changed",
+  "endpoints": {
+    "health": "/health",
+    "prepare": "/v1/asr/prepare",
+    "transcribe": "/v1/asr/transcribe",
+    "cancel": "/v1/asr/cancel",
+    "release": "/v1/asr/release"
+  },
+  "budgets": {
+    "preparedMaxEntries": 64,
+    "preparedTtlMs": 86400000,
+    "cloudBindingMaxEntries": 64,
+    "cloudBindingTtlMs": 1800000,
+    "controlPayloadMaxBytes": 1048576,
+    "stderrTailMaxBytes": 65536,
+    "residentIdleTtlMs": 600000,
+    "residentSweepMaxIntervalMs": 5000,
+    "prepareTimeoutMs": 86400000
+  },
+  "defaultLanguage": "zh",
+  "normalizedAudio": {
+    "sampleRateHz": 16000,
+    "channels": 1,
+    "bitsPerSample": 16
+  }
+}

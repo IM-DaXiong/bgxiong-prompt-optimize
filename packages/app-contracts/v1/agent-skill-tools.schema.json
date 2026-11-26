@@ -1,0 +1,581 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "agent-skill-tools.schema.json",
+  "title": "AgentSkillTools",
+  "description": "本应用发布给模型的 SKILL 工具（activate / list_resources / read_resource / run_helper）的输入输出 JSON Schema。属于应用 IPC 合同，不是行业协议；共享类型引用 agent-skills.json。所有对象闭集（additionalProperties=false）；正文与资源内容为不受约束的字符串。",
+  "schemaVersion": 1,
+  "tools": {
+    "skills.activate": {
+      "input": {
+        "$ref": "#/definitions/activateInput"
+      },
+      "output": {
+        "$ref": "#/definitions/activateOutput"
+      },
+      "error": {
+        "$ref": "#/definitions/toolError"
+      },
+      "purpose": "激活一个 SKILL：返回正文、资源清单（不读内容）、compatibility 原文与执行就绪。"
+    },
+    "skills.list_resources": {
+      "input": {
+        "$ref": "#/definitions/listResourcesInput"
+      },
+      "output": {
+        "$ref": "#/definitions/listResourcesOutput"
+      },
+      "error": {
+        "$ref": "#/definitions/toolError"
+      },
+      "purpose": "分页列出某次激活快照的资源清单。"
+    },
+    "skills.read_resource": {
+      "input": {
+        "$ref": "#/definitions/readResourceInput"
+      },
+      "output": {
+        "$ref": "#/definitions/readResourceOutput"
+      },
+      "error": {
+        "$ref": "#/definitions/toolError"
+      },
+      "purpose": "按字符分页读取激活快照中的文本资源；二进制只返回元数据。"
+    },
+    "skills.run_helper": {
+      "input": {
+        "$ref": "#/definitions/runHelperInput"
+      },
+      "output": {
+        "$ref": "#/definitions/runHelperOutput"
+      },
+      "error": {
+        "$ref": "#/definitions/helperToolError"
+      },
+      "purpose": "显式运行某次激活快照中的一个 .wasm 程序资源（helper）：只在隔离的 SKILL worker 中执行，返回通过应用验收的 Plan，不写入任何作品；脚本与本机程序不执行，失败给出明确错误码，不静默回退。"
+    }
+  },
+  "definitions": {
+    "skillSummary": {
+      "type": "object",
+      "required": [
+        "stableId",
+        "packageDigest",
+        "name",
+        "description"
+      ],
+      "properties": {
+        "stableId": {
+          "$ref": "agent-skills.json#/definitions/stableId"
+        },
+        "packageDigest": {
+          "$ref": "agent-skills.json#/definitions/packageDigest"
+        },
+        "name": {
+          "$ref": "agent-skills.json#/definitions/skillName"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        }
+      },
+      "additionalProperties": false
+    },
+    "resourcePage": {
+      "type": "object",
+      "required": [
+        "items",
+        "nextCursor",
+        "total"
+      ],
+      "properties": {
+        "items": {
+          "type": "array",
+          "maxItems": 200,
+          "items": {
+            "$ref": "agent-skills.json#/definitions/resourceEntry"
+          }
+        },
+        "nextCursor": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2000
+        }
+      },
+      "additionalProperties": false
+    },
+    "activateInput": {
+      "type": "object",
+      "required": [
+        "skillId"
+      ],
+      "properties": {
+        "skillId": {
+          "allOf": [
+            {
+              "$ref": "agent-skills.json#/definitions/stableId"
+            }
+          ],
+          "description": "当前目录中的 stableId；L02/L03 在运行时把它收窄为目录 enum，模型不能编造。"
+        }
+      },
+      "additionalProperties": false
+    },
+    "activateOutput": {
+      "type": "object",
+      "required": [
+        "activationId",
+        "skill",
+        "source",
+        "activationSource",
+        "alreadyActive",
+        "body",
+        "bodyTruncated",
+        "bodyTotalChars",
+        "compatibility",
+        "allowedToolsDeclared",
+        "resources",
+        "executionReadiness",
+        "limitations"
+      ],
+      "properties": {
+        "activationId": {
+          "$ref": "agent-skills.json#/definitions/activationId"
+        },
+        "skill": {
+          "$ref": "#/definitions/skillSummary"
+        },
+        "source": {
+          "$ref": "agent-skills.json#/definitions/source"
+        },
+        "activationSource": {
+          "$ref": "agent-skills.json#/definitions/activationSource"
+        },
+        "alreadyActive": {
+          "type": "boolean",
+          "description": "同一运行内重复激活：返回既有 activationId，不重复注入。"
+        },
+        "body": {
+          "type": "string",
+          "maxLength": 100000,
+          "description": "SKILL.md 正文（已去 frontmatter）；正文格式不受约束；长度上限 = activationBodyMaxChars。"
+        },
+        "bodyTruncated": {
+          "type": "boolean"
+        },
+        "bodyTotalChars": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "compatibility": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 100000,
+          "description": "frontmatter compatibility 原文；不解析。"
+        },
+        "allowedToolsDeclared": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 100000,
+          "description": "frontmatter allowed-tools 原文；只是声明，不授予权限。"
+        },
+        "resources": {
+          "$ref": "#/definitions/resourcePage"
+        },
+        "executionReadiness": {
+          "$ref": "agent-skills.json#/definitions/executionReadiness"
+        },
+        "limitations": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "$ref": "agent-skills.json#/definitions/limitation"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "listResourcesInput": {
+      "type": "object",
+      "required": [
+        "activationId"
+      ],
+      "properties": {
+        "activationId": {
+          "$ref": "agent-skills.json#/definitions/activationId"
+        },
+        "cursor": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "additionalProperties": false
+    },
+    "listResourcesOutput": {
+      "type": "object",
+      "required": [
+        "activationId",
+        "items",
+        "nextCursor",
+        "total"
+      ],
+      "properties": {
+        "activationId": {
+          "$ref": "agent-skills.json#/definitions/activationId"
+        },
+        "items": {
+          "type": "array",
+          "maxItems": 200,
+          "items": {
+            "$ref": "agent-skills.json#/definitions/resourceEntry"
+          }
+        },
+        "nextCursor": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2000
+        }
+      },
+      "additionalProperties": false
+    },
+    "readResourceInput": {
+      "type": "object",
+      "required": [
+        "activationId",
+        "resourceRef"
+      ],
+      "properties": {
+        "activationId": {
+          "$ref": "agent-skills.json#/definitions/activationId"
+        },
+        "resourceRef": {
+          "$ref": "agent-skills.json#/definitions/resourceRef"
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "按 Unicode 标量计的起始字符位置。"
+        },
+        "maxChars": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 32000,
+          "description": "缺省 readResourceDefaultChars；上限 readResourceMaxChars。"
+        }
+      },
+      "additionalProperties": false
+    },
+    "readResourceTextOutput": {
+      "type": "object",
+      "required": [
+        "activationId",
+        "resourceRef",
+        "kind",
+        "sha256",
+        "totalChars",
+        "offset",
+        "content",
+        "nextOffset"
+      ],
+      "properties": {
+        "activationId": {
+          "$ref": "agent-skills.json#/definitions/activationId"
+        },
+        "resourceRef": {
+          "$ref": "agent-skills.json#/definitions/resourceRef"
+        },
+        "kind": {
+          "const": "text"
+        },
+        "sha256": {
+          "$ref": "agent-skills.json#/definitions/sha256Hex"
+        },
+        "totalChars": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "content": {
+          "type": "string",
+          "maxLength": 32000,
+          "description": "资源文本片段；内容格式不受约束；长度上限 = readResourceMaxChars。"
+        },
+        "nextOffset": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "readResourceBinaryOutput": {
+      "type": "object",
+      "required": [
+        "activationId",
+        "resourceRef",
+        "kind",
+        "sha256",
+        "bytes",
+        "mediaType"
+      ],
+      "properties": {
+        "activationId": {
+          "$ref": "agent-skills.json#/definitions/activationId"
+        },
+        "resourceRef": {
+          "$ref": "agent-skills.json#/definitions/resourceRef"
+        },
+        "kind": {
+          "const": "binary"
+        },
+        "sha256": {
+          "$ref": "agent-skills.json#/definitions/sha256Hex"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mediaType": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 255
+        }
+      },
+      "additionalProperties": false,
+      "description": "二进制资源只返回元数据与 hash，不返回内容。"
+    },
+    "readResourceOutput": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/readResourceTextOutput"
+        },
+        {
+          "$ref": "#/definitions/readResourceBinaryOutput"
+        }
+      ]
+    },
+    "runHelperInput": {
+      "type": "object",
+      "required": [
+        "activationId",
+        "resourceRef",
+        "input"
+      ],
+      "properties": {
+        "activationId": {
+          "$ref": "agent-skills.json#/definitions/activationId"
+        },
+        "resourceRef": {
+          "allOf": [
+            {
+              "$ref": "agent-skills.json#/definitions/resourceRef"
+            }
+          ],
+          "description": "该激活快照资源清单中的 .wasm 程序资源；只有技能说明明确要求运行时才选用，不得猜测。"
+        },
+        "input": {
+          "type": "object",
+          "description": "交给 helper 的输入 JSON 对象；形状由技能说明定义，应用不解释也不补默认值；序列化后的字节数上限 = content-skill-limits.json 的 maxSnapshotBytes，由 worker 校验。"
+        }
+      },
+      "additionalProperties": false
+    },
+    "helperPlan": {
+      "type": "object",
+      "required": [
+        "protocol",
+        "protocolVersion",
+        "steps",
+        "coverage",
+        "meta"
+      ],
+      "properties": {
+        "protocol": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "protocolVersion": {
+          "type": "string",
+          "maxLength": 32
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "步骤形状与条数上限见 content-skill-public-operations.json / content-skill-limits.json；已通过应用公开验收。"
+        },
+        "coverage": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "meta": {
+          "description": "任意 JSON；helper 未给出时为 null。"
+        }
+      },
+      "additionalProperties": false,
+      "description": "helper 返回并通过 accept_public_plan 的应用 Plan；调用方只能把它交给正常的 prepare/accept/apply 路径，本工具不应用它。"
+    },
+    "runHelperOutput": {
+      "type": "object",
+      "required": [
+        "activationId",
+        "resourceRef",
+        "skillRef",
+        "sha256",
+        "plan"
+      ],
+      "properties": {
+        "activationId": {
+          "$ref": "agent-skills.json#/definitions/activationId"
+        },
+        "resourceRef": {
+          "$ref": "agent-skills.json#/definitions/resourceRef"
+        },
+        "skillRef": {
+          "allOf": [
+            {
+              "$ref": "agent-skills.json#/definitions/skillRef"
+            }
+          ],
+          "description": "本次激活冻结的版本（stableId + packageDigest）；helper 取自该版本，不随包更新而变。"
+        },
+        "sha256": {
+          "allOf": [
+            {
+              "$ref": "agent-skills.json#/definitions/sha256Hex"
+            }
+          ],
+          "description": "实际运行的 .wasm 字节的 sha256（冻结清单 pin，已与激活快照和 worker 回显核对）。"
+        },
+        "plan": {
+          "$ref": "#/definitions/helperPlan"
+        }
+      },
+      "additionalProperties": false
+    },
+    "helperErrorCode": {
+      "anyOf": [
+        {
+          "enum": [
+            "AGENT_SKILL_TOOL_UNAVAILABLE",
+            "AGENT_SKILL_ACTIVATION_NOT_FOUND",
+            "AGENT_SKILL_RESOURCE_REF_INVALID",
+            "AGENT_SKILL_PERMISSION_DENIED",
+            "AGENT_SKILL_RUNTIME_UNAVAILABLE",
+            "AGENT_SKILL_HELPER_LANGUAGE_UNSUPPORTED",
+            "AGENT_SKILL_HELPER_NOT_PROGRAM",
+            "AGENT_SKILL_HELPER_NOT_IN_ACTIVATION",
+            "AGENT_SKILL_RESOURCE_UNAVAILABLE",
+            "AGENT_SKILL_PLAN_INVALID",
+            "AGENT_SKILL_PLAN_REJECTED"
+          ]
+        },
+        {
+          "pattern": "^AGENT_SKILL_WORKER_[A-Z_]+$"
+        }
+      ],
+      "description": "skills.run_helper 的错误码闭集：agent-skills.json 诊断码的子集 + helper 专有码 + agent-skill-worker.json 的 worker/传输错误码（AGENT_SKILL_WORKER_*）。"
+    },
+    "helperToolError": {
+      "type": "object",
+      "required": [
+        "error"
+      ],
+      "properties": {
+        "error": {
+          "type": "object",
+          "required": [
+            "code",
+            "phase",
+            "message"
+          ],
+          "properties": {
+            "code": {
+              "$ref": "#/definitions/helperErrorCode"
+            },
+            "phase": {
+              "$ref": "agent-skills.json#/definitions/phase"
+            },
+            "message": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2000,
+              "description": "用户可读人话；机码与细节进日志。"
+            },
+            "details": {
+              "type": "object"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "toolError": {
+      "type": "object",
+      "required": [
+        "error"
+      ],
+      "properties": {
+        "error": {
+          "type": "object",
+          "required": [
+            "code",
+            "phase",
+            "message"
+          ],
+          "properties": {
+            "code": {
+              "$ref": "agent-skills.json#/definitions/diagnosticCode"
+            },
+            "phase": {
+              "$ref": "agent-skills.json#/definitions/phase"
+            },
+            "message": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2000,
+              "description": "用户可读人话；机码与细节进日志。"
+            },
+            "details": {
+              "type": "object"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

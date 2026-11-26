@@ -1,0 +1,177 @@
+{
+  "vendors": [
+    {
+      "id": "ltx",
+      "labels": {
+        "zh-CN": "LTX",
+        "en": "LTX"
+      },
+      "order": 0,
+      "aliases": [
+        "ltx"
+      ]
+    },
+    {
+      "id": "minimax",
+      "labels": {
+        "zh-CN": "MiniMax",
+        "en": "MiniMax"
+      },
+      "order": 1,
+      "aliases": [
+        "minimax"
+      ]
+    },
+    {
+      "id": "wan",
+      "labels": {
+        "zh-CN": "Wan",
+        "en": "Wan"
+      },
+      "order": 2,
+      "aliases": [
+        "wan"
+      ]
+    },
+    {
+      "id": "kling",
+      "labels": {
+        "zh-CN": "Kling",
+        "en": "Kling"
+      },
+      "order": 3,
+      "aliases": [
+        "kling"
+      ]
+    },
+    {
+      "id": "qwen",
+      "labels": {
+        "zh-CN": "QWEN",
+        "en": "QWEN"
+      },
+      "order": 4,
+      "aliases": [
+        "qwen"
+      ]
+    },
+    {
+      "id": "flux",
+      "labels": {
+        "zh-CN": "Flux",
+        "en": "Flux"
+      },
+      "order": 5,
+      "aliases": [
+        "flux"
+      ]
+    },
+    {
+      "id": "seedvr2",
+      "labels": {
+        "zh-CN": "SeedVR2",
+        "en": "SeedVR2"
+      },
+      "order": 6,
+      "aliases": [
+        "seedvr2"
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "id": "image",
+      "bucket": "image",
+      "labels": {
+        "zh-CN": "生图",
+        "en": "Text to image"
+      },
+      "order": 0
+    },
+    {
+      "id": "image-to-image",
+      "bucket": "imageToImage",
+      "labels": {
+        "zh-CN": "图生图",
+        "en": "Image to image"
+      },
+      "order": 1
+    },
+    {
+      "id": "video",
+      "bucket": "video",
+      "labels": {
+        "zh-CN": "生视频",
+        "en": "Generate video"
+      },
+      "order": 2
+    },
+    {
+      "id": "video-upscale",
+      "bucket": "videoUpscale",
+      "labels": {
+        "zh-CN": "视频超分",
+        "en": "Video upscale"
+      },
+      "order": 3
+    },
+    {
+      "id": "video-face-refine",
+      "bucket": "videoFaceRefine",
+      "labels": {
+        "zh-CN": "人脸精修",
+        "en": "Face refinement"
+      },
+      "order": 4
+    },
+    {
+      "id": "image-upscale",
+      "bucket": "imageUpscale",
+      "labels": {
+        "zh-CN": "图片超分",
+        "en": "Image upscale"
+      },
+      "order": 5
+    }
+  ],
+  "guidance": {
+    "messages": {
+      "endpointUnconfigured": {
+        "zh-CN": {
+          "title": "指定 ComfyUI 地址",
+          "body": "已安装工作流。配置地址后可检查运行状态。",
+          "actionLabel": "指定地址"
+        },
+        "en": {
+          "title": "Set ComfyUI address",
+          "body": "The workflow is installed. Set an address to check runtime readiness.",
+          "actionLabel": "Set address"
+        }
+      },
+      "endpointUnavailable": {
+        "zh-CN": {
+          "title": "ComfyUI 未连接",
+          "body": "已安装工作流。连接恢复后可检查运行状态。",
+          "actionLabel": "刷新状态"
+        },
+        "en": {
+          "title": "ComfyUI is disconnected",
+          "body": "The workflow is installed. Check runtime readiness after reconnecting.",
+          "actionLabel": "Refresh status"
+        }
+      },
+      "missingModels": {
+        "zh-CN": {
+          "title": "缺少模型",
+          "body": "可从已解压的离线包安装缺少的模型。",
+          "actionLabel": "选择离线包"
+        },
+        "en": {
+          "title": "Models missing",
+          "body": "Install the missing models from an extracted offline package.",
+          "actionLabel": "Choose offline package"
+        }
+      }
+    }
+  }
+}

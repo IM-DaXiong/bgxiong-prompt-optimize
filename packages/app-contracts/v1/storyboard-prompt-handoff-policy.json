@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "policyVersion": "1",
+  "formatVersion": "bgx-shot-update/1",
+  "fileKinds": {
+    "input": { "kind": "input", "suffix": ".bgx-shot-update.json" },
+    "result": { "kind": "result", "suffix": ".bgx-shot-result.json" },
+    "contextRequest": { "kind": "contextRequest", "suffix": ".bgx-context-request.json" },
+    "contextSupplement": { "kind": "contextSupplement", "suffix": ".bgx-context-supplement.json" },
+    "contextPart": { "kind": "contextPart", "suffix": ".bgx-context-part.json" }
+  },
+  "editableFields": ["title", "stillPrompt", "videoPrompt"],
+  "handoffStates": ["open", "closed"],
+  "candidateStates": ["collecting", "sealed", "applied", "discarded"],
+  "presence": ["present", "missing", "unavailable", "unverified"],
+  "submitModes": ["begin", "append", "seal"],
+  "submitItemKinds": ["shot", "fieldFragment"],
+  "receiptPageKinds": ["canonical", "summary"],
+  "events": {
+    "committed": "storyboard-prompt-handoff-committed",
+    "candidateReady": "storyboard-prompt-handoff-candidate-ready"
+  },
+  "budgetRef": {
+    "file": "creator-control-plane.json",
+    "pageBytes": "maxPageBytes",
+    "jsonBytes": "maxJsonBytes",
+    "leaseTtlMs": "pageTokenTtlMs"
+  },
+  "refKeyPrefix": "SHOT-",
+  "mediaLeasePathPrefix": "/mcp/handoff-media/"
+}

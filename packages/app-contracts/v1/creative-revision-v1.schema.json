@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creative-revision-v1.schema.json",
+  "title": "CreativeRevisionV1",
+  "description": "S12: one proposed revision produced by optimize/review. Carries the intent snapshot, the proposedChanges, and the review outcome. Hosts decide rewrite solely from review.blockingCount / findings[].severity — never from free-text search.",
+  "definitions": {
+    "nonBlank": { "type": "string", "minLength": 1, "maxLength": 512, "pattern": "\\S" }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "revisionId", "intent", "proposedChanges", "review", "createdAtMs"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "revisionId": { "$ref": "#/definitions/nonBlank" },
+    "intent": { "$ref": "creative-intent-v1.schema.json" },
+    "proposedChanges": {
+      "type": "array",
+      "maxItems": 64,
+      "items": { "$ref": "creative-intent-v1.schema.json#/definitions/proposedChange" }
+    },
+    "review": { "$ref": "creative-review-v1.schema.json" },
+    "createdAtMs": { "type": "integer", "minimum": 0 },
+    "modelBindingSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "providerKind": { "type": "string" },
+        "modelId": { "type": "string" },
+        "bindingId": { "type": "string" }
+      }
+    },
+    "schemaRepairRounds": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 0,
+      "description": "S12 first ship: must be 0. Structural failures stay as fixtures; no LLM schema-repair loop."
+    },
+    "semanticRewriteRounds": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Count of rewrites triggered only by blocking findings. minor must not increment this."
+    }
+  }
+}

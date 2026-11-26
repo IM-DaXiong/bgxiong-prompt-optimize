@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "endpointKinds": ["managedLocal", "lanExternal"],
+  "defaultManagedLocalBaseUrl": "http://127.0.0.1:8188",
+  "healthTimeoutSecsManagedLocal": 5,
+  "healthTimeoutSecsLanExternal": 15,
+  "healthConnectTimeoutMsManagedLocal": 500,
+  "healthConnectTimeoutMsLanExternal": 3000,
+  "metadataTimeoutSecs": 120,
+  "snapshotTimeoutSecs": 30,
+  "submitTimeoutSecs": 120,
+  "mediaByteXferTimeoutSecs": 7200,
+  "networkRecoveryThresholdSecs": 60
+}

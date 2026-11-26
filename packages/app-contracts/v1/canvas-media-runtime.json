@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "$comment": "Canvas media runtime shared closed sets, size policy and budgets (PLAN 20261005 canvas media runtime S02, section 6.3/6.4). Rust: src-tauri/build.rs -> OUT_DIR/app_contracts_canvas_media_runtime.rs; TS imports this JSON. 2026-10-24: maxSourceNaturalPixels null removes the product pixel ceiling; shared decode reserve is 1 GiB for measured large-image previews. Memory reservation and decoder allocation limits remain bounded.",
+  "purposes": ["layoutMetadata", "imageDisplay", "videoPoster"],
+  "presences": ["visible", "nearby", "hidden"],
+  "sourceKinds": ["localImage", "localVideo"],
+  "eventStates": ["queued", "working", "metadataReady", "ready", "failed", "invalidated", "released"],
+  "variantKinds": ["preview", "originalSmall", "full", "poster"],
+  "errorCategories": [
+    "sourceMissing",
+    "sourceUnreadable",
+    "unsupportedFormat",
+    "corruptImage",
+    "sourceTooLarge",
+    "budgetExceeded",
+    "capacityExceeded",
+    "sourceChanged",
+    "ffmpegUnavailable",
+    "ioFailure",
+    "internal"
+  ],
+  "sizePolicy": {
+    "previewEdgeBucketsPx": [128, 256, 384, 512, 768, 1024, 1536, 2048],
+    "devicePixelRatioCap": 2,
+    "fullLodThresholdPercent": 180,
+    "downgradeDwellMs": 300,
+    "downgradeRatioPermille": 750
+  },
+  "budgets": {
+    "metadataWorkers": 4,
+    "imageWorkers": 2,
+    "posterFfmpegWorkers": 1,
+    "cpuDecodeReserveBytes": 1073741824,
+    "maxSourceNaturalPixels": null,
+    "maxActiveDemandsPerSession": 2048,
+    "maxPendingUniqueJobs": 4096,
+    "diskPreviewBytes": 2147483648,
+    "frontendReadyEntriesPerWebview": 2048,
+    "browserConcurrentDecodesPerWebview": 2,
+    "nearbyPrefetchMaxPerSession": 16
+  },
+  "imageEstimate": {
+    "naturalBytesPerPixel": 8,
+    "previewBytesPerPixel": 4
+  }
+}

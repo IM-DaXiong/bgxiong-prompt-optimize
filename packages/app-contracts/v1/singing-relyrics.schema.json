@@ -1,0 +1,3116 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "singing-relyrics.schema.json",
+  "title": "Singing Relyrics Public Contract",
+  "description": "Closed public payload contract shared by UI, Creator, F1 and MCP clients.",
+  "oneOf": [
+    {
+      "$ref": "#/definitions/catalogGetInput"
+    },
+    {
+      "$ref": "#/definitions/planPrepareInput"
+    },
+    {
+      "$ref": "#/definitions/planGetInput"
+    },
+    {
+      "$ref": "#/definitions/planLookupBySourceInput"
+    },
+    {
+      "$ref": "#/definitions/planReviseInput"
+    },
+    {
+      "$ref": "#/definitions/alignmentStartInput"
+    },
+    {
+      "$ref": "#/definitions/preflightRunInput"
+    },
+    {
+      "$ref": "#/definitions/executionStartInput"
+    },
+    {
+      "$ref": "#/definitions/executionGetInput"
+    },
+    {
+      "$ref": "#/definitions/sourceSeparateInput"
+    },
+    {
+      "$ref": "#/definitions/mixStartInput"
+    }
+  ],
+  "definitions": {
+    "callContext": {
+      "$ref": "creator-call-context-v4.generated.schema.json"
+    },
+    "planRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "planId"
+      ],
+      "properties": {
+        "planId": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "pageRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "cursor": {
+          "type": "string",
+          "minLength": 1
+        },
+        "budget": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "resourceRef": {
+      "$ref": "creator-resource-ref.schema.json"
+    },
+    "audioInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "resourceRef"
+      ],
+      "properties": {
+        "resourceRef": {
+          "$ref": "#/definitions/resourceRef"
+        }
+      }
+    },
+    "lyricsInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "resourceRef"
+      ],
+      "properties": {
+        "resourceRef": {
+          "$ref": "#/definitions/resourceRef"
+        }
+      }
+    },
+    "externalTimbreInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "audio",
+        "lyrics"
+      ],
+      "properties": {
+        "audio": {
+          "$ref": "#/definitions/resourceRef"
+        },
+        "lyrics": {
+          "$ref": "#/definitions/resourceRef"
+        }
+      }
+    },
+    "voiceReference": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode"
+          ],
+          "properties": {
+            "mode": {
+              "const": "source"
+            },
+            "referenceRows": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "firstRowId",
+                "lastRowId"
+              ],
+              "properties": {
+                "firstRowId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "lastRowId": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "audio",
+            "lyrics"
+          ],
+          "properties": {
+            "mode": {
+              "const": "external"
+            },
+            "audio": {
+              "$ref": "#/definitions/resourceRef"
+            },
+            "lyrics": {
+              "$ref": "#/definitions/resourceRef"
+            }
+          }
+        }
+      ]
+    },
+    "outputTarget": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "projectId",
+            "sourceNodeId"
+          ],
+          "properties": {
+            "kind": {
+              "const": "canvas"
+            },
+            "projectId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sourceNodeId": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "const": "media"
+            }
+          }
+        }
+      ]
+    },
+    "sourceRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rowId",
+        "text",
+        "startMs",
+        "endMs",
+        "provenance"
+      ],
+      "properties": {
+        "rowId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "startMs": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "endMs": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "provenance": {
+          "enum": [
+            "imported",
+            "aligned",
+            "manual"
+          ]
+        }
+      }
+    },
+    "targetCue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cueId",
+        "originRowId",
+        "text",
+        "startMs",
+        "endMs",
+        "derivedFromCueId"
+      ],
+      "properties": {
+        "cueId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "originRowId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "startMs": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "endMs": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "derivedFromCueId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "range": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "startMs",
+        "endMs"
+      ],
+      "properties": {
+        "startMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "endMs": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "referenceSelection": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "rowIds",
+            "range",
+            "text"
+          ],
+          "properties": {
+            "mode": {
+              "const": "source"
+            },
+            "rowIds": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "range": {
+              "$ref": "#/definitions/range"
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "rowIds",
+            "range",
+            "text"
+          ],
+          "properties": {
+            "mode": {
+              "const": "external"
+            },
+            "rowIds": {
+              "type": "array",
+              "maxItems": 0
+            },
+            "range": {
+              "$ref": "#/definitions/range"
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "planSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "planId",
+        "revision",
+        "state",
+        "sourceRowCount",
+        "targetCueCount",
+        "editedCueRevision",
+        "confirmedRevision",
+        "blockingIssues",
+        "initialNewLyricsStatus",
+        "snapshotRef",
+        "canonicalHead"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "planId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "state": {
+          "enum": [
+            "alignmentRequired",
+            "alignmentDraft",
+            "ready",
+            "confirmed",
+            "stale"
+          ]
+        },
+        "sourceRowCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "targetCueCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "editedCueRevision": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "confirmedRevision": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "blockingIssues": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "initialNewLyricsStatus": {
+          "enum": [
+            "unchanged",
+            "changed",
+            "unavailable"
+          ]
+        },
+        "snapshotRef": {
+          "type": "string",
+          "minLength": 1,
+          "description": "planId@revision; shared by summary and plan pages."
+        },
+        "canonicalHead": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^srp:",
+          "description": "srp: + snapshotRef (singingPlan.revision.v1)."
+        }
+      }
+    },
+    "engineCapabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "supportsCrossLanguage",
+        "supportsExternalTimbre",
+        "referenceMinMs",
+        "referenceMaxMs",
+        "referenceMinTokens",
+        "referenceMaxTokens",
+        "phraseMaxTokens",
+        "phraseMaxMs"
+      ],
+      "properties": {
+        "supportsCrossLanguage": {
+          "type": "boolean"
+        },
+        "supportsExternalTimbre": {
+          "type": "boolean"
+        },
+        "referenceMinMs": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "referenceMaxMs": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "referenceMinTokens": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "description": "BE62: measured engine min reference token capacity. null = unmeasured; never invent a default."
+        },
+        "referenceMaxTokens": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "description": "BE62: measured engine max reference token capacity. null = unmeasured; never invent a default."
+        },
+        "phraseMaxTokens": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "description": "SR29/cue capacity: measured max tokens per target cue/phrase. null = unmeasured."
+        },
+        "phraseMaxMs": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "description": "SR29/cue capacity: measured max duration (ms) per target cue/phrase. null = unmeasured."
+        }
+      }
+    },
+    "runtimeAvailability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "runtimeRef",
+        "detailCode"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "notInstalled",
+            "offlinePresent",
+            "environmentReady",
+            "modelReady",
+            "busy",
+            "unhealthy"
+          ]
+        },
+        "runtimeRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "detailCode": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "catalogEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "moduleId",
+        "runtimeRef",
+        "displayName",
+        "capabilities",
+        "availability",
+        "installActionRef",
+        "sourceRevision",
+        "modelRevision"
+      ],
+      "properties": {
+        "moduleId": {
+          "const": "singing-relyrics"
+        },
+        "runtimeRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "capabilities": {
+          "$ref": "#/definitions/engineCapabilities"
+        },
+        "availability": {
+          "$ref": "#/definitions/runtimeAvailability"
+        },
+        "installActionRef": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sourceRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "modelRevision": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "page": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "items",
+        "nextCursor",
+        "snapshotRef"
+      ],
+      "properties": {
+        "items": {
+          "type": "array"
+        },
+        "nextCursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "snapshotRef": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "commandBase": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "reviseCommand": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "cueId",
+            "startMs"
+          ],
+          "properties": {
+            "type": {
+              "const": "targetCue.move"
+            },
+            "cueId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "startMs": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "cueId",
+            "edge",
+            "atMs"
+          ],
+          "properties": {
+            "type": {
+              "const": "targetCue.resize"
+            },
+            "cueId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "edge": {
+              "enum": [
+                "start",
+                "end"
+              ]
+            },
+            "atMs": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "cueId",
+            "startMs",
+            "endMs"
+          ],
+          "properties": {
+            "type": {
+              "const": "targetCue.setRange"
+            },
+            "cueId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "startMs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "endMs": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "cueId",
+            "atMs",
+            "leftText",
+            "rightText"
+          ],
+          "properties": {
+            "type": {
+              "const": "targetCue.split"
+            },
+            "cueId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "atMs": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "leftText": {
+              "type": "string",
+              "minLength": 1
+            },
+            "rightText": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "cueId",
+            "text"
+          ],
+          "properties": {
+            "type": {
+              "const": "targetCue.setText"
+            },
+            "cueId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "leftCueId",
+            "rightCueId",
+            "text"
+          ],
+          "properties": {
+            "type": {
+              "const": "targetCue.merge"
+            },
+            "leftCueId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "rightCueId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "ranges"
+          ],
+          "properties": {
+            "type": {
+              "const": "sourceRows.setRanges"
+            },
+            "ranges": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "rowId",
+                  "startMs",
+                  "endMs"
+                ],
+                "properties": {
+                  "rowId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "startMs": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "endMs": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "candidateRef"
+          ],
+          "properties": {
+            "type": {
+              "const": "alignment.applyCandidate"
+            },
+            "candidateRef": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "const": "timeline.undo"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "const": "timeline.redo"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "referenceSelection"
+          ],
+          "properties": {
+            "type": {
+              "const": "confirmAlignment"
+            },
+            "referenceSelection": {
+              "$ref": "#/definitions/referenceSelection"
+            }
+          }
+        }
+      ]
+    },
+    "catalogGetInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "callContext"
+      ],
+      "properties": {
+        "callContext": {
+          "$ref": "#/definitions/callContext"
+        },
+        "cursor": {
+          "type": "string",
+          "minLength": 1
+        },
+        "runtimeRef": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "planPrepareInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "callContext",
+        "sourceAudio",
+        "originalLyrics",
+        "newLyrics",
+        "voiceReference",
+        "outputTarget"
+      ],
+      "properties": {
+        "callContext": {
+          "$ref": "#/definitions/callContext"
+        },
+        "sourceAudio": {
+          "$ref": "#/definitions/resourceRef"
+        },
+        "originalLyrics": {
+          "$ref": "#/definitions/resourceRef"
+        },
+        "newLyrics": {
+          "$ref": "#/definitions/resourceRef"
+        },
+        "voiceReference": {
+          "$ref": "#/definitions/voiceReference"
+        },
+        "outputTarget": {
+          "$ref": "#/definitions/outputTarget"
+        }
+      }
+    },
+    "planGetInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "callContext",
+        "planRef",
+        "section"
+      ],
+      "properties": {
+        "callContext": {
+          "$ref": "#/definitions/callContext"
+        },
+        "planRef": {
+          "$ref": "#/definitions/planRef"
+        },
+        "section": {
+          "enum": [
+            "summary",
+            "sourceRows",
+            "targetCues",
+            "waveform",
+            "activity",
+            "history"
+          ]
+        },
+        "cursor": {
+          "type": "string",
+          "minLength": 1
+        },
+        "snapshotRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "budget": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "planReviseInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "callContext",
+        "planRef",
+        "expectedRevision",
+        "command"
+      ],
+      "properties": {
+        "callContext": {
+          "$ref": "#/definitions/callContext"
+        },
+        "planRef": {
+          "$ref": "#/definitions/planRef"
+        },
+        "expectedRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "command": {
+          "$ref": "#/definitions/reviseCommand"
+        }
+      }
+    },
+    "alignmentStartInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "callContext",
+        "planRef",
+        "expectedRevision",
+        "analyzeMode"
+      ],
+      "properties": {
+        "callContext": {
+          "$ref": "#/definitions/callContext"
+        },
+        "planRef": {
+          "$ref": "#/definitions/planRef"
+        },
+        "expectedRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "analyzeMode": {
+          "enum": [
+            "visualOnly",
+            "full"
+          ]
+        }
+      }
+    },
+    "preflightRunInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "callContext",
+        "planRef",
+        "expectedRevision"
+      ],
+      "properties": {
+        "callContext": {
+          "$ref": "#/definitions/callContext"
+        },
+        "planRef": {
+          "$ref": "#/definitions/planRef"
+        },
+        "expectedRevision": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "executionStartInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "callContext",
+        "planRef",
+        "expectedRevision",
+        "seed"
+      ],
+      "properties": {
+        "callContext": {
+          "$ref": "#/definitions/callContext"
+        },
+        "planRef": {
+          "$ref": "#/definitions/planRef"
+        },
+        "expectedRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "seed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "baseExecutionRef": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "executionId"
+          ],
+          "properties": {
+            "executionId": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "phraseIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "executionGetInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "callContext",
+        "executionRef",
+        "section"
+      ],
+      "properties": {
+        "callContext": {
+          "$ref": "#/definitions/callContext"
+        },
+        "executionRef": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "executionId"
+          ],
+          "properties": {
+            "executionId": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "section": {
+          "enum": [
+            "summary",
+            "phrases",
+            "result"
+          ]
+        },
+        "cursor": {
+          "type": "string",
+          "minLength": 1
+        },
+        "snapshotRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "budget": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "taskAcceptedResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "taskRef",
+        "receipt"
+      ],
+      "properties": {
+        "taskRef": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "taskId"
+          ],
+          "properties": {
+            "taskId": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "receipt": {
+          "$ref": "creator-effect-receipt.schema.json"
+        }
+      }
+    },
+    "catalogGetResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "items",
+        "nextCursor",
+        "snapshotRef"
+      ],
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/catalogEntry"
+          }
+        },
+        "nextCursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "snapshotRef": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "planPrepareResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "planRef",
+        "revision",
+        "sourceRowCount",
+        "targetCueCount",
+        "blockingIssues",
+        "nextActions"
+      ],
+      "properties": {
+        "planRef": {
+          "$ref": "#/definitions/planRef"
+        },
+        "revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceRowCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "targetCueCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "blockingIssues": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "nextActions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "planReviseResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "planRef",
+        "revision",
+        "changedCueRefs",
+        "receipt"
+      ],
+      "properties": {
+        "planRef": {
+          "$ref": "#/definitions/planRef"
+        },
+        "revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "changedCueRefs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "receipt": {
+          "$ref": "creator-effect-receipt.schema.json"
+        }
+      }
+    },
+    "planGetResult": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/planSummary"
+        },
+        {
+          "$ref": "#/definitions/sourceRowsPage"
+        },
+        {
+          "$ref": "#/definitions/targetCuesPage"
+        },
+        {
+          "$ref": "#/definitions/waveformPage"
+        },
+        {
+          "$ref": "#/definitions/activityPage"
+        },
+        {
+          "$ref": "#/definitions/historyPage"
+        }
+      ]
+    },
+    "alignmentStartResult": {
+      "$ref": "#/definitions/taskAcceptedResult"
+    },
+    "preflightRunResult": {
+      "$ref": "#/definitions/taskAcceptedResult"
+    },
+    "executionStartResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "executionRef",
+        "taskRef",
+        "taskAccepted"
+      ],
+      "properties": {
+        "executionRef": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "executionId"
+          ],
+          "properties": {
+            "executionId": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "taskRef": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "taskId"
+          ],
+          "properties": {
+            "taskId": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "taskAccepted": {
+          "const": true
+        }
+      }
+    },
+    "executionGetResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "executionRef",
+        "state",
+        "stage",
+        "completedCues",
+        "totalCues",
+        "items",
+        "nextCursor",
+        "snapshotRef",
+        "resultRef",
+        "errorCode",
+        "section"
+      ],
+      "properties": {
+        "executionRef": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "executionId"
+          ],
+          "properties": {
+            "executionId": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "state": {
+          "enum": [
+            "queued",
+            "running",
+            "succeeded",
+            "partiallySucceeded",
+            "failed",
+            "cancelled"
+          ]
+        },
+        "stage": {
+          "enum": [
+            "resolvingInputs",
+            "aligning",
+            "needsManualEdit",
+            "loadingModel",
+            "singing",
+            "assembling",
+            "finalizing"
+          ]
+        },
+        "completedCues": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "totalCues": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/cueExecutionResult"
+          }
+        },
+        "nextCursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "snapshotRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "resultRef": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/resourceRef"
+            }
+          ]
+        },
+        "errorCode": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            null,
+            "SINGING_RUNTIME_NOT_INSTALLED",
+            "SINGING_ENVIRONMENT_NOT_READY",
+            "SINGING_HEALTH_TIMEOUT",
+            "SINGING_HEALTH_REJECTED",
+            "SINGING_START_CANCELLED",
+            "SINGING_STOP_FAILED",
+            "SINGING_PORT_IN_USE",
+            "SINGING_MODEL_NOT_READY",
+            "SINGING_GPU_BUSY",
+            "SINGING_LYRICS_EMPTY",
+            "SINGING_LYRICS_BLANK_LINE",
+            "SINGING_LYRICS_ROW_COUNT_MISMATCH",
+            "SINGING_LYRICS_RESOURCE_CONFLICT",
+            "SINGING_VOICE_LYRICS_REQUIRED",
+            "SINGING_ALIGNMENT_REQUIRED",
+            "SINGING_ALIGNMENT_INCOMPLETE",
+            "SINGING_TIMELINE_INVALID",
+            "SINGING_PLAN_STALE",
+            "SINGING_ENGINE_CAPACITY_EXCEEDED",
+            "SINGING_PHRASE_OVERFLOW",
+            "SINGING_INFERENCE_FAILED",
+            "SINGING_INVALID_INPUT",
+            "SINGING_ASSET_FAILED",
+            "SINGING_STORAGE_FAILED",
+            "SINGING_OUTPUT_INVALID",
+            "SINGING_JOB_CONFLICT"
+          ]
+        },
+        "section": {
+          "enum": [
+            "summary",
+            "phrases",
+            "result"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "section": {
+                "enum": [
+                  "summary",
+                  "result"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "items": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "succeeded"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "resultRef": {
+                "$ref": "#/definitions/resourceRef"
+              },
+              "errorCode": {
+                "const": null
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "failed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "errorCode": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "sidecarJobRequest": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/sidecarAlignmentJob"
+        },
+        {
+          "$ref": "#/definitions/sidecarPreflightJob"
+        },
+        {
+          "$ref": "#/definitions/sidecarSynthesisJob"
+        }
+      ]
+    },
+    "sidecarJobStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "jobId",
+        "kind",
+        "state",
+        "stage",
+        "progress",
+        "errorCode"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "jobId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "alignment",
+            "preflight",
+            "synthesis"
+          ]
+        },
+        "state": {
+          "enum": [
+            "queued",
+            "running",
+            "succeeded",
+            "partiallySucceeded",
+            "failed",
+            "cancelled"
+          ]
+        },
+        "stage": {
+          "enum": [
+            "resolvingInputs",
+            "aligning",
+            "needsManualEdit",
+            "loadingModel",
+            "singing",
+            "assembling",
+            "finalizing"
+          ]
+        },
+        "progress": {
+          "$ref": "#/definitions/sidecarProgress"
+        },
+        "errorCode": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            null,
+            "SINGING_RUNTIME_NOT_INSTALLED",
+            "SINGING_ENVIRONMENT_NOT_READY",
+            "SINGING_HEALTH_TIMEOUT",
+            "SINGING_HEALTH_REJECTED",
+            "SINGING_START_CANCELLED",
+            "SINGING_STOP_FAILED",
+            "SINGING_PORT_IN_USE",
+            "SINGING_MODEL_NOT_READY",
+            "SINGING_GPU_BUSY",
+            "SINGING_LYRICS_EMPTY",
+            "SINGING_LYRICS_BLANK_LINE",
+            "SINGING_LYRICS_ROW_COUNT_MISMATCH",
+            "SINGING_LYRICS_RESOURCE_CONFLICT",
+            "SINGING_VOICE_LYRICS_REQUIRED",
+            "SINGING_ALIGNMENT_REQUIRED",
+            "SINGING_ALIGNMENT_INCOMPLETE",
+            "SINGING_TIMELINE_INVALID",
+            "SINGING_PLAN_STALE",
+            "SINGING_ENGINE_CAPACITY_EXCEEDED",
+            "SINGING_PHRASE_OVERFLOW",
+            "SINGING_INFERENCE_FAILED",
+            "SINGING_INVALID_INPUT",
+            "SINGING_ASSET_FAILED",
+            "SINGING_STORAGE_FAILED",
+            "SINGING_OUTPUT_INVALID",
+            "SINGING_JOB_CONFLICT"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "alignment"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "progress": {
+                "properties": {
+                  "unit": {
+                    "const": "sourceRow"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "preflight"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "progress": {
+                "properties": {
+                  "unit": {
+                    "const": "preflight"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "synthesis"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "progress": {
+                "properties": {
+                  "unit": {
+                    "const": "targetCue"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "failed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "errorCode": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "initialLyricRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rowId",
+        "text"
+      ],
+      "properties": {
+        "rowId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "sourceReferenceRows": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "firstRowId",
+        "lastRowId"
+      ],
+      "properties": {
+        "firstRowId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "lastRowId": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "externalTimbreSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "audioDigest",
+        "lyricsDigest",
+        "durationMs",
+        "sampleCount",
+        "sampleRate",
+        "text"
+      ],
+      "properties": {
+        "audioDigest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "lyricsDigest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "durationMs": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sampleCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sampleRate": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "canonicalInputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceAudio",
+        "originalLyrics",
+        "newLyrics",
+        "timbreMode",
+        "externalTimbre",
+        "sourceReferenceRows",
+        "outputTarget"
+      ],
+      "properties": {
+        "sourceAudio": {
+          "$ref": "#/definitions/audioInput"
+        },
+        "originalLyrics": {
+          "$ref": "#/definitions/lyricsInput"
+        },
+        "newLyrics": {
+          "$ref": "#/definitions/lyricsInput"
+        },
+        "timbreMode": {
+          "enum": [
+            "source",
+            "external"
+          ]
+        },
+        "externalTimbre": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "audio",
+                "lyrics"
+              ],
+              "properties": {
+                "audio": {
+                  "$ref": "#/definitions/audioInput"
+                },
+                "lyrics": {
+                  "$ref": "#/definitions/lyricsInput"
+                }
+              }
+            }
+          ]
+        },
+        "sourceReferenceRows": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/sourceReferenceRows"
+            }
+          ]
+        },
+        "outputTarget": {
+          "$ref": "#/definitions/outputTarget"
+        }
+      }
+    },
+    "canonicalPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "planId",
+        "revision",
+        "state",
+        "sourceDurationMs",
+        "sourceSampleCount",
+        "sourceSampleRate",
+        "sourceDigest",
+        "originalLyricsDigest",
+        "initialNewLyricsDigest",
+        "inputDigest",
+        "externalTimbreDigest",
+        "externalTimbreSnapshot",
+        "inputs",
+        "sourceRows",
+        "initialNewRows",
+        "targetCues",
+        "referenceSelection",
+        "editedCueRevision",
+        "confirmedRevision",
+        "historyCursor",
+        "redoStack",
+        "createdAtMs",
+        "updatedAtMs"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "planId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "state": {
+          "enum": [
+            "alignmentRequired",
+            "alignmentDraft",
+            "ready",
+            "confirmed",
+            "stale"
+          ]
+        },
+        "sourceDurationMs": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sourceSampleCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sourceSampleRate": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sourceDigest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "originalLyricsDigest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "initialNewLyricsDigest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "inputDigest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "externalTimbreDigest": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "externalTimbreSnapshot": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/externalTimbreSnapshot"
+            }
+          ]
+        },
+        "inputs": {
+          "$ref": "#/definitions/canonicalInputs"
+        },
+        "sourceRows": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/sourceRow"
+          }
+        },
+        "initialNewRows": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/initialLyricRow"
+          }
+        },
+        "targetCues": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/targetCue"
+          }
+        },
+        "referenceSelection": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/referenceSelection"
+            }
+          ]
+        },
+        "editedCueRevision": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "confirmedRevision": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "historyCursor": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "redoStack": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "createdAtMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "updatedAtMs": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "timelineEdit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "editId",
+        "planId",
+        "parentEditId",
+        "revisionAfter",
+        "inputDigest",
+        "beforePatchJson",
+        "afterPatchJson",
+        "createdAtMs"
+      ],
+      "properties": {
+        "editId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "planId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "parentEditId": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "revisionAfter": {
+          "type": "string",
+          "minLength": 1
+        },
+        "inputDigest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "beforePatchJson": {
+          "type": "string",
+          "minLength": 1
+        },
+        "afterPatchJson": {
+          "type": "string",
+          "minLength": 1
+        },
+        "createdAtMs": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "targetCueSplice": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "startIndex",
+        "expectedCurrent",
+        "replacement"
+      ],
+      "properties": {
+        "startIndex": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "expectedCurrent": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/targetCue"
+          }
+        },
+        "replacement": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/targetCue"
+          }
+        }
+      }
+    },
+    "sourceRowReplacement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rowId",
+        "expectedCurrent",
+        "replacement"
+      ],
+      "properties": {
+        "rowId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedCurrent": {
+          "$ref": "#/definitions/sourceRow"
+        },
+        "replacement": {
+          "$ref": "#/definitions/sourceRow"
+        }
+      }
+    },
+    "timelinePatch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "targetCueSplice",
+        "sourceRowReplacements",
+        "referenceSelection",
+        "editedCueRevision"
+      ],
+      "properties": {
+        "targetCueSplice": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/targetCueSplice"
+            }
+          ]
+        },
+        "sourceRowReplacements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/sourceRowReplacement"
+          }
+        },
+        "referenceSelection": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "expectedCurrent",
+                "replacement"
+              ],
+              "properties": {
+                "expectedCurrent": {
+                  "oneOf": [
+                    {
+                      "type": "null"
+                    },
+                    {
+                      "$ref": "#/definitions/referenceSelection"
+                    }
+                  ]
+                },
+                "replacement": {
+                  "oneOf": [
+                    {
+                      "type": "null"
+                    },
+                    {
+                      "$ref": "#/definitions/referenceSelection"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "editedCueRevision": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "expectedCurrent",
+                "replacement"
+              ],
+              "properties": {
+                "expectedCurrent": {
+                  "oneOf": [
+                    {
+                      "type": "null"
+                    },
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  ]
+                },
+                "replacement": {
+                  "oneOf": [
+                    {
+                      "type": "null"
+                    },
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "waveformBucket": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "index",
+        "min",
+        "max"
+      ],
+      "properties": {
+        "index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "min": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1
+        },
+        "max": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1
+        }
+      }
+    },
+    "activityHint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "range",
+        "hasVoice",
+        "source"
+      ],
+      "properties": {
+        "range": {
+          "$ref": "#/definitions/range"
+        },
+        "hasVoice": {
+          "type": "boolean"
+        },
+        "source": {
+          "const": "audioActivity"
+        }
+      }
+    },
+    "sourceRowsPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "section",
+        "items",
+        "nextCursor",
+        "snapshotRef"
+      ],
+      "properties": {
+        "section": {
+          "const": "sourceRows"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/sourceRow"
+          }
+        },
+        "nextCursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "snapshotRef": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "targetCuesPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "section",
+        "items",
+        "nextCursor",
+        "snapshotRef"
+      ],
+      "properties": {
+        "section": {
+          "const": "targetCues"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/targetCue"
+          }
+        },
+        "nextCursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "snapshotRef": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "waveformPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "section",
+        "items",
+        "nextCursor",
+        "snapshotRef",
+        "sourceDigest",
+        "durationMs",
+        "bucketMs"
+      ],
+      "properties": {
+        "section": {
+          "const": "waveform"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/waveformBucket"
+          }
+        },
+        "nextCursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "snapshotRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceDigest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "durationMs": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "bucketMs": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "activityPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "section",
+        "items",
+        "nextCursor",
+        "snapshotRef"
+      ],
+      "properties": {
+        "section": {
+          "const": "activity"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/activityHint"
+          }
+        },
+        "nextCursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "snapshotRef": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "historyPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "section",
+        "items",
+        "nextCursor",
+        "snapshotRef"
+      ],
+      "properties": {
+        "section": {
+          "const": "history"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/timelineEdit"
+          }
+        },
+        "nextCursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "snapshotRef": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "engineRevisions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceRevision",
+        "modelRevision",
+        "profileRevision"
+      ],
+      "properties": {
+        "sourceRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "modelRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "profileRevision": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "enginePhraseRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cueId",
+        "startSample",
+        "melodyPath",
+        "targetText",
+        "referenceAudioPath",
+        "referenceText",
+        "seed"
+      ],
+      "properties": {
+        "cueId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "melodyPath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "targetText": {
+          "type": "string",
+          "minLength": 1
+        },
+        "referenceAudioPath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "referenceText": {
+          "type": "string",
+          "minLength": 1
+        },
+        "seed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "startSample": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Output timeline start index at 44100 Hz (host converts cue startMs with integer rounding). Required for original-timeline assemble (SR17)."
+        }
+      }
+    },
+    "confirmedCue": {
+      "$ref": "#/definitions/targetCue",
+      "properties": {
+        "startMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "endMs": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "sidecarAlignmentJob": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "jobId",
+        "inputDigest",
+        "kind",
+        "jobDir",
+        "sourceAudioPath",
+        "sourceRows"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "jobId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "inputDigest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "const": "alignment"
+        },
+        "jobDir": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceAudioPath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceRows": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/sourceRow"
+          }
+        }
+      }
+    },
+    "sidecarPreflightJob": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "jobId",
+        "inputDigest",
+        "kind",
+        "jobDir",
+        "engineRevisions",
+        "sourceAudioPath",
+        "referenceAudioPath",
+        "referenceText",
+        "targetCues"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "jobId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "inputDigest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "const": "preflight"
+        },
+        "jobDir": {
+          "type": "string",
+          "minLength": 1
+        },
+        "engineRevisions": {
+          "$ref": "#/definitions/engineRevisions"
+        },
+        "sourceAudioPath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "referenceAudioPath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "referenceText": {
+          "type": "string",
+          "minLength": 1
+        },
+        "targetCues": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/confirmedCue"
+          }
+        }
+      }
+    },
+    "sidecarSynthesisJob": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "jobId",
+        "inputDigest",
+        "kind",
+        "jobDir",
+        "engineRevisions",
+        "sourceSampleCount",
+        "sourceSampleRate",
+        "phrases"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "jobId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "inputDigest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "const": "synthesis"
+        },
+        "jobDir": {
+          "type": "string",
+          "minLength": 1
+        },
+        "engineRevisions": {
+          "$ref": "#/definitions/engineRevisions"
+        },
+        "sourceSampleCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sourceSampleRate": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "phrases": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/enginePhraseRequest"
+          }
+        },
+        "reusedPhrases": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/reusedPhrase"
+          }
+        }
+      }
+    },
+    "sidecarProgress": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "unit",
+        "completed",
+        "total",
+        "currentId"
+      ],
+      "properties": {
+        "unit": {
+          "enum": [
+            "sourceRow",
+            "targetCue",
+            "preflight"
+          ]
+        },
+        "completed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "currentId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "cueExecutionResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cueId",
+        "state",
+        "mediaRef",
+        "sampleCount",
+        "sampleRate",
+        "errorCode"
+      ],
+      "properties": {
+        "cueId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "state": {
+          "enum": [
+            "queued",
+            "running",
+            "succeeded",
+            "failed",
+            "needsAdjustment",
+            "cancelled"
+          ]
+        },
+        "mediaRef": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/resourceRef"
+            }
+          ]
+        },
+        "sampleCount": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "sampleRate": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "errorCode": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            null,
+            "SINGING_RUNTIME_NOT_INSTALLED",
+            "SINGING_ENVIRONMENT_NOT_READY",
+            "SINGING_HEALTH_TIMEOUT",
+            "SINGING_HEALTH_REJECTED",
+            "SINGING_START_CANCELLED",
+            "SINGING_STOP_FAILED",
+            "SINGING_PORT_IN_USE",
+            "SINGING_MODEL_NOT_READY",
+            "SINGING_GPU_BUSY",
+            "SINGING_LYRICS_EMPTY",
+            "SINGING_LYRICS_BLANK_LINE",
+            "SINGING_LYRICS_ROW_COUNT_MISMATCH",
+            "SINGING_LYRICS_RESOURCE_CONFLICT",
+            "SINGING_VOICE_LYRICS_REQUIRED",
+            "SINGING_ALIGNMENT_REQUIRED",
+            "SINGING_ALIGNMENT_INCOMPLETE",
+            "SINGING_TIMELINE_INVALID",
+            "SINGING_PLAN_STALE",
+            "SINGING_ENGINE_CAPACITY_EXCEEDED",
+            "SINGING_PHRASE_OVERFLOW",
+            "SINGING_INFERENCE_FAILED",
+            "SINGING_INVALID_INPUT",
+            "SINGING_ASSET_FAILED",
+            "SINGING_STORAGE_FAILED",
+            "SINGING_OUTPUT_INVALID",
+            "SINGING_JOB_CONFLICT"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "succeeded"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "mediaRef": {
+                "$ref": "#/definitions/resourceRef"
+              },
+              "sampleCount": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "sampleRate": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "errorCode": {
+                "const": null
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "failed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "errorCode": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "reusedPhrase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cueId",
+        "path",
+        "sha256",
+        "frames",
+        "sampleRate",
+        "startSample"
+      ],
+      "properties": {
+        "cueId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "frames": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sampleRate": {
+          "const": 44100
+        },
+        "startSample": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "planLookupBySourceInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "callContext",
+        "projectId",
+        "sourceAudioNodeId"
+      ],
+      "properties": {
+        "callContext": {
+          "$ref": "#/definitions/callContext"
+        },
+        "projectId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceAudioNodeId": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Free-canvas source audio node id"
+        },
+        "cursor": {
+          "type": "string",
+          "minLength": 1
+        },
+        "budget": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "planLookupBySourceItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "planRef",
+        "revision",
+        "state",
+        "updatedAt",
+        "inputDigest"
+      ],
+      "properties": {
+        "planRef": {
+          "$ref": "#/definitions/planRef"
+        },
+        "revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "state": {
+          "enum": [
+            "alignmentRequired",
+            "alignmentDraft",
+            "ready",
+            "confirmed",
+            "stale"
+          ]
+        },
+        "updatedAt": {
+          "type": "integer"
+        },
+        "inputDigest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceDigest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceDurationMs": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "latestExecutionRef": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "executionId"
+          ],
+          "properties": {
+            "executionId": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "latestTaskId": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "planLookupBySourceResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "items"
+      ],
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/planLookupBySourceItem"
+          }
+        },
+        "nextCursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "sourceSeparateInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "callContext",
+        "projectId",
+        "sourceNodeId",
+        "quality"
+      ],
+      "properties": {
+        "callContext": {
+          "$ref": "#/definitions/callContext"
+        },
+        "projectId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceNodeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "quality": {
+          "enum": [
+            "standard",
+            "fine"
+          ]
+        }
+      }
+    },
+    "sourceSeparateResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "taskRef",
+        "vocalsNodeId",
+        "instrumentalNodeId",
+        "receipt"
+      ],
+      "properties": {
+        "taskRef": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "taskId"
+          ],
+          "properties": {
+            "taskId": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "vocalsNodeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "instrumentalNodeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "receipt": {
+          "$ref": "creator-effect-receipt.schema.json"
+        }
+      }
+    },
+    "mixStartInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "callContext",
+        "executionRef",
+        "instrumental"
+      ],
+      "properties": {
+        "callContext": {
+          "$ref": "#/definitions/callContext"
+        },
+        "executionRef": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "executionId"
+          ],
+          "properties": {
+            "executionId": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "instrumental": {
+          "$ref": "#/definitions/resourceRef"
+        }
+      }
+    },
+    "mixStartResult": {
+      "$ref": "#/definitions/taskAcceptedResult"
+    }
+  }
+}

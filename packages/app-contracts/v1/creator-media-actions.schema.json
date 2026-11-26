@@ -1,0 +1,1683 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-media-actions.schema.json",
+  "title": "CreatorMediaActions",
+  "description": "Current shared media versions, role/actor/visual-asset images and free-canvas import/delivery. Legacy scene/storyboard/segment media operations are not public.",
+  "type": "object",
+  "required": [
+    "actions"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "description": "IPC save_actor_cast_pad_image core (SegmentService::append_actor_cast_pad_decoded: file + DB row). No kernel inverse → must be alone.",
+            "required": [
+              "type",
+              "actionId",
+              "actorNodeId",
+              "base64Image"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "story.actor.castPad.save"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "actorNodeId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "base64Image": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "IPC delete_actor_cast_pad_file (resolve_actor_cast_pad_path + remove_file). Irreversible: alone + confirm.",
+            "required": [
+              "type",
+              "actionId",
+              "actorNodeId",
+              "relPath",
+              "confirm"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "story.actor.castPad.delete"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "actorNodeId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "relPath": {
+                "type": "string",
+                "minLength": 1
+              },
+              "confirm": {
+                "const": true
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "IPC delete_node_image_version_image (NodeService). Irreversible: alone + confirm.",
+            "required": [
+              "type",
+              "actionId",
+              "nodeId",
+              "versionId",
+              "imageId",
+              "confirm"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "story.role.portraitVersion.delete"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "nodeId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "versionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "imageId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "confirm": {
+                "const": true
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "IPC append_visual_asset_portrait_import (VisualAssetService::append_portrait_import). Compensation restores image_versions JSON + removes the imported file.",
+            "required": [
+              "type",
+              "actionId",
+              "assetKind",
+              "assetId",
+              "bytesBase64"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "story.visualAsset.portrait.import"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "assetKind": {
+                "enum": [
+                  "scene",
+                  "prop"
+                ]
+              },
+              "assetId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "bytesBase64": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "IPC delete_visual_asset_portrait_image (JSON-only; file kept). Compensation restores image_versions JSON.",
+            "required": [
+              "type",
+              "actionId",
+              "assetKind",
+              "assetId",
+              "versionId",
+              "imageId"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "story.visualAsset.portrait.delete"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "assetKind": {
+                "enum": [
+                  "scene",
+                  "prop"
+                ]
+              },
+              "assetId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "versionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "imageId": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "S72 · IPC fc_persist_import_staging (free_canvas::media_fs::persist_import_staging): pad-picker image → free_canvas/{projectId}/refs/ (no node; effect=fileImport). Compensation deletes the staging file.",
+            "required": [
+              "type",
+              "actionId",
+              "projectId",
+              "imageBase64"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "fc.importStaging.persist"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "projectId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "imageBase64": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "Deliver a staged artifact as a new image version on a role, actor, scene, visual asset, segment still, or image node. activateImported also sets that host's existing default pointer; historyOnly keeps it; acceptRolePortraitResult is legal only for a role target and accepts the import as that role's new current portrait result (card display ref) without claiming model generation. metadataRef omitted = the one metadata frozen with artifactRef at prepare (an explicit value must equal that binding, else IMAGE_METADATA_NOT_OF_ARTIFACT before any write). expectedRevision omitted = the Host captures the real target revision at prepare; it never means apply without CAS. targetField omitted = imageVersions.",
+            "required": [
+              "type",
+              "actionId",
+              "targetRef",
+              "artifactRef",
+              "versionPolicy",
+              "activePolicy"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "image.deliver"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "targetRef": {
+                "type": "object"
+              },
+              "expectedRevision": {
+                "$ref": "#/definitions/imageResourceRevisionToken"
+              },
+              "artifactRef": {
+                "type": "string",
+                "minLength": 1
+              },
+              "metadataRef": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "versionPolicy": {
+                "type": "string",
+                "enum": [
+                  "appendVersion"
+                ]
+              },
+              "activePolicy": {
+                "type": "string",
+                "enum": [
+                  "activateImported",
+                  "historyOnly",
+                  "acceptRolePortraitResult"
+                ]
+              },
+              "targetField": {
+                "$ref": "#/definitions/imageTargetField"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "Point the target's existing default image at an image it already owns. Does not import, copy, or create a version. expectedRevision has the image.deliver semantics (omitted = Host-captured at prepare, compared at apply).",
+            "required": [
+              "type",
+              "actionId",
+              "targetRef",
+              "imageRef"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "image.setDefault"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "targetRef": {
+                "type": "object"
+              },
+              "expectedRevision": {
+                "$ref": "#/definitions/imageResourceRevisionToken"
+              },
+              "imageRef": {
+                "type": "object",
+                "required": [
+                  "versionId",
+                  "imageId"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "versionId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "imageId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "imageTargetField": {
+      "type": "string",
+      "enum": [
+        "imageVersions"
+      ],
+      "description": "Closed set of image action target fields. imageVersions = the target's image version slot; not a text prompt slot, a video main media or a JSON path."
+    },
+    "imageResourceRevisionToken": {
+      "type": "string",
+      "pattern": "^irv1:[0-9a-f]{64}$",
+      "description": "Opaque Host token irv1:<sha256 hex> over the canonical JSON imageResourceRevisionBasisV1 of the target: targetRef, the ordered version set (versionId + ordered imageIds) and the real default pointer, including the file revision of a file-backed pointer. Produced only by Rust (resource read / prepare); clients copy it, never compute it."
+    },
+    "imageDefaultPointerSnapshotV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "storage"
+      ],
+      "properties": {
+        "storage": {
+          "type": "string",
+          "enum": [
+            "sqliteRow",
+            "portraitDisplayDefaultsFile"
+          ]
+        },
+        "versionId": {
+          "type": "string"
+        },
+        "imageId": {
+          "type": "string"
+        },
+        "fileRevision": {
+          "type": "string",
+          "description": "sha256 hex of portrait_display_defaults_v1.json bytes read under the pointer write lock (omitted for sqliteRow or a missing file). A corrupt or unreadable file is DEFAULT_POINTER_UNREADABLE, never an empty store."
+        }
+      }
+    },
+    "imageResourceRevisionBasisV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "targetRef",
+        "versions",
+        "defaultPointer"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "targetRef": {
+          "type": "object"
+        },
+        "versions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "versionId",
+              "imageIds"
+            ],
+            "properties": {
+              "versionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "imageIds": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        },
+        "defaultPointer": {
+          "$ref": "#/definitions/imageDefaultPointerSnapshotV1"
+        }
+      }
+    },
+    "imageActionInverseV1": {
+      "description": "Durable typed inverse stored in ApplyEffects.domain_inverse (receipt-internal) for change.undo. Never a closure.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "items"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type",
+                  "actionId",
+                  "targetRef",
+                  "createdVersionId",
+                  "createdImageIds",
+                  "createdFiles",
+                  "defaultBefore",
+                  "defaultAfter",
+                  "revisionAfter"
+                ],
+                "properties": {
+                  "type": {
+                    "const": "image.deliver"
+                  },
+                  "actionId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "targetRef": {
+                    "type": "object"
+                  },
+                  "createdVersionId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "createdImageIds": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "createdFiles": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "relPath",
+                        "sha256"
+                      ],
+                      "properties": {
+                        "relPath": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      }
+                    }
+                  },
+                  "defaultBefore": {
+                    "$ref": "#/definitions/imageDefaultPointerSnapshotV1"
+                  },
+                  "defaultAfter": {
+                    "$ref": "#/definitions/imageDefaultPointerSnapshotV1"
+                  },
+                  "revisionAfter": {
+                    "$ref": "#/definitions/imageResourceRevisionToken"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type",
+                  "actionId",
+                  "targetRef",
+                  "defaultBefore",
+                  "defaultAfter",
+                  "revisionAfter"
+                ],
+                "properties": {
+                  "type": {
+                    "const": "image.setDefault"
+                  },
+                  "actionId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "targetRef": {
+                    "type": "object"
+                  },
+                  "defaultBefore": {
+                    "$ref": "#/definitions/imageDefaultPointerSnapshotV1"
+                  },
+                  "defaultAfter": {
+                    "$ref": "#/definitions/imageDefaultPointerSnapshotV1"
+                  },
+                  "revisionAfter": {
+                    "$ref": "#/definitions/imageResourceRevisionToken"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type",
+                  "actionId",
+                  "targetRef",
+                  "createdVersionId",
+                  "createdImageId",
+                  "previousPinned",
+                  "revisionAfter"
+                ],
+                "description": "Undo acceptRolePortraitResult: CAS-restore the previous role card display and keep the new history/files. Refuses if the current display is no longer the imported result.",
+                "properties": {
+                  "type": {
+                    "const": "image.acceptRolePortraitResult"
+                  },
+                  "actionId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "targetRef": {
+                    "type": "object"
+                  },
+                  "createdVersionId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "createdImageId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "previousVersionId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "previousImageId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "previousPinned": {
+                    "type": "boolean"
+                  },
+                  "revisionAfter": {
+                    "$ref": "#/definitions/imageResourceRevisionToken"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "imageVersionListItemV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "versionId",
+        "imageIds",
+        "isDefault"
+      ],
+      "properties": {
+        "versionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "imageIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "isDefault": {
+          "type": "boolean",
+          "description": "True only for the version holding the real Host default pointer (never array order)."
+        }
+      }
+    },
+    "imageVersionPageRequestV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ref"
+      ],
+      "description": "D18 verification-phase contract supplement (A32): continue the imageVersions page of one ref already listed in resource.get refs.",
+      "properties": {
+        "ref": {
+          "type": "object",
+          "description": "CreatorResourceRef, identical to one entry of resource.get refs"
+        },
+        "cursor": {
+          "type": "string"
+        }
+      }
+    },
+    "imageVersionsPageV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "D18 verification-phase contract supplement (A32): resource.get items[].imageVersions for every image-capable target (x-imageActionCapabilities kinds). Page size = creator-agent-turn-contract budgets.maxRequestPageItems.",
+      "required": [
+        "items",
+        "hasMore",
+        "snapshotRevision",
+        "revisionToken"
+      ],
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/imageVersionListItemV1"
+          }
+        },
+        "nextCursor": {
+          "type": "string"
+        },
+        "hasMore": {
+          "type": "boolean"
+        },
+        "snapshotRevision": {
+          "type": "string"
+        },
+        "revisionToken": {
+          "$ref": "#/definitions/imageResourceRevisionToken"
+        },
+        "default": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "versionId",
+            "imageId"
+          ],
+          "properties": {
+            "versionId": {
+              "type": "string"
+            },
+            "imageId": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "canvas.image.setProjection": {
+      "type": "object",
+      "description": "Mark or restore canvas image version imageProjection (flat|equirectangular360).",
+      "required": [
+        "workspaceKind",
+        "workspaceId",
+        "nodeId",
+        "sourceVersionId",
+        "imageProjection"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "workspaceKind": {
+          "type": "string",
+          "enum": [
+            "freeCanvas",
+            "clips"
+          ]
+        },
+        "workspaceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceVersionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "imageProjection": {
+          "type": "string",
+          "enum": [
+            "flat",
+            "equirectangular180",
+            "equirectangular360"
+          ]
+        },
+        "expectedMediaRel": {
+          "type": "string"
+        }
+      }
+    },
+    "canvas.image.createPanoramaPreview": {
+      "type": "object",
+      "description": "Create an independent panorama preview node from a 2:1 image version explicitly chosen as a panorama.",
+      "required": [
+        "workspaceKind",
+        "workspaceId",
+        "nodeId",
+        "sourceVersionId",
+        "idempotencyKey"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "workspaceKind": {
+          "type": "string",
+          "enum": [
+            "freeCanvas",
+            "clips"
+          ]
+        },
+        "workspaceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceVersionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedMediaRel": {
+          "type": "string"
+        },
+        "idempotencyKey": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "canvas.image.extractViewport": {
+      "type": "object",
+      "description": "Extract flat still from equirectangular360 version into a new ordinary image node.",
+      "required": [
+        "workspaceKind",
+        "workspaceId",
+        "nodeId",
+        "sourceVersionId",
+        "panoramaViewport",
+        "idempotencyKey"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "workspaceKind": {
+          "type": "string",
+          "enum": [
+            "freeCanvas",
+            "clips"
+          ]
+        },
+        "workspaceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceVersionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedMediaRel": {
+          "type": "string"
+        },
+        "idempotencyKey": {
+          "type": "string",
+          "minLength": 1
+        },
+        "panoramaViewport": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "yawDeg",
+            "pitchDeg",
+            "hFovDeg",
+            "viewportAspect",
+            "crop",
+            "outputWidth",
+            "outputHeight"
+          ],
+          "properties": {
+            "yawDeg": {
+              "type": "number"
+            },
+            "pitchDeg": {
+              "type": "number"
+            },
+            "hFovDeg": {
+              "type": "number"
+            },
+            "viewportAspect": {
+              "type": "number"
+            },
+            "crop": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "x",
+                "y",
+                "w",
+                "h"
+              ],
+              "properties": {
+                "x": {
+                  "type": "number"
+                },
+                "y": {
+                  "type": "number"
+                },
+                "w": {
+                  "type": "number"
+                },
+                "h": {
+                  "type": "number"
+                }
+              }
+            },
+            "outputWidth": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "outputHeight": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        }
+      }
+    },
+    "canvas.audio.applyEdit": {
+      "type": "object",
+      "description": "Export media|silence segments from a frozen canvas audio source and append one version on that node. Free canvas and clips share the same export and version writer.",
+      "additionalProperties": false,
+      "required": [
+        "workspaceKind",
+        "workspaceId",
+        "nodeId",
+        "expectedSource",
+        "segments"
+      ],
+      "properties": {
+        "workspaceKind": {
+          "type": "string",
+          "enum": [
+            "freeCanvas",
+            "clips"
+          ]
+        },
+        "workspaceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedSource": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mediaRel"
+          ],
+          "properties": {
+            "mediaRel": {
+              "type": "string"
+            },
+            "activeVersionId": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        },
+        "segments": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "kind",
+                  "startMs",
+                  "endMs"
+                ],
+                "properties": {
+                  "kind": {
+                    "const": "media"
+                  },
+                  "startMs": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "endMs": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "kind",
+                  "durationMs"
+                ],
+                "properties": {
+                  "kind": {
+                    "const": "silence"
+                  },
+                  "durationMs": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "canvas.editor.read": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "workspaceKind",
+        "workspaceId",
+        "nodeId"
+      ],
+      "properties": {
+        "workspaceKind": {
+          "type": "string",
+          "enum": [
+            "freeCanvas",
+            "clips"
+          ]
+        },
+        "workspaceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "canvas.editor.save": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "expectedRevision",
+        "document"
+      ],
+      "properties": {
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "workspaceKind",
+            "workspaceId",
+            "nodeId"
+          ],
+          "properties": {
+            "workspaceKind": {
+              "type": "string",
+              "enum": [
+                "freeCanvas",
+                "clips"
+              ]
+            },
+            "workspaceId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "nodeId": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "expectedRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedInputDigest": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Input digest returned by canvas.editor.read; refuses a save when connected documents or links changed."
+        },
+        "document": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schemaVersion",
+            "pluginId",
+            "pluginVersion",
+            "stateText",
+            "assets"
+          ],
+          "properties": {
+            "schemaVersion": {
+              "type": "integer",
+              "const": 1
+            },
+            "pluginId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "pluginVersion": {
+              "type": "string",
+              "minLength": 1
+            },
+            "stateText": {
+              "type": "string",
+              "minLength": 1
+            },
+            "assets": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "name",
+                  "mediaRel",
+                  "sha256",
+                  "mimeType"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "mediaRel": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "mimeType": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "canvas.editor.asset.import": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "expectedRevision",
+        "pluginId",
+        "pluginVersion",
+        "name",
+        "mimeType",
+        "bytesB64"
+      ],
+      "properties": {
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "workspaceKind",
+            "workspaceId",
+            "nodeId"
+          ],
+          "properties": {
+            "workspaceKind": {
+              "type": "string",
+              "enum": [
+                "freeCanvas",
+                "clips"
+              ]
+            },
+            "workspaceId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "nodeId": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "expectedRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pluginId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pluginVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mimeType": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bytesB64": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "canvas.editor.asset.read": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "name",
+        "expectedRevision"
+      ],
+      "properties": {
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "workspaceKind",
+            "workspaceId",
+            "nodeId"
+          ],
+          "properties": {
+            "workspaceKind": {
+              "type": "string",
+              "enum": [
+                "freeCanvas",
+                "clips"
+              ]
+            },
+            "workspaceId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "nodeId": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedRevision": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "canvas.editor.open": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target"
+      ],
+      "properties": {
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "workspaceKind",
+            "workspaceId",
+            "nodeId"
+          ],
+          "properties": {
+            "workspaceKind": {
+              "type": "string",
+              "enum": [
+                "freeCanvas",
+                "clips"
+              ]
+            },
+            "workspaceId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "nodeId": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "canvas.editor.inspect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target"
+      ],
+      "properties": {
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "workspaceKind",
+            "workspaceId",
+            "nodeId"
+          ],
+          "properties": {
+            "workspaceKind": {
+              "type": "string",
+              "enum": [
+                "freeCanvas",
+                "clips"
+              ]
+            },
+            "workspaceId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "nodeId": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "canvas.editor.act": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "expectedRevision",
+        "expectedStateDigest",
+        "action",
+        "argumentsJson"
+      ],
+      "properties": {
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "workspaceKind",
+            "workspaceId",
+            "nodeId"
+          ],
+          "properties": {
+            "workspaceKind": {
+              "type": "string",
+              "enum": [
+                "freeCanvas",
+                "clips"
+              ]
+            },
+            "workspaceId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "nodeId": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "expectedRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedStateDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "action": {
+          "type": "string",
+          "minLength": 1
+        },
+        "argumentsJson": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 1048576
+        }
+      }
+    },
+    "canvas.editor.operation.run": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "workspaceKind",
+            "workspaceId",
+            "nodeId"
+          ],
+          "properties": {
+            "workspaceKind": {
+              "type": "string",
+              "enum": [
+                "freeCanvas",
+                "clips"
+              ]
+            },
+            "workspaceId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "nodeId": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "expectedRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "serviceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "input": {
+          "type": "object"
+        },
+        "sourceNames": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "target",
+        "expectedRevision",
+        "serviceId",
+        "input",
+        "sourceNames"
+      ]
+    },
+    "canvas.editor.operation.collect": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "workspaceKind",
+            "workspaceId",
+            "nodeId"
+          ],
+          "properties": {
+            "workspaceKind": {
+              "type": "string",
+              "enum": [
+                "freeCanvas",
+                "clips"
+              ]
+            },
+            "workspaceId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "nodeId": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "expectedRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "taskId": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "target",
+        "expectedRevision",
+        "taskId"
+      ]
+    },
+    "canvas.editor.asset.publish": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "name",
+        "expectedRevision"
+      ],
+      "properties": {
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "workspaceKind",
+            "workspaceId",
+            "nodeId"
+          ],
+          "properties": {
+            "workspaceKind": {
+              "type": "string",
+              "enum": [
+                "freeCanvas",
+                "clips"
+              ]
+            },
+            "workspaceId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "nodeId": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedRevision": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "canvas.editor.asset.transfer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "expectedRevision",
+        "transfer"
+      ],
+      "properties": {
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "workspaceKind",
+            "workspaceId",
+            "nodeId"
+          ],
+          "properties": {
+            "workspaceKind": {
+              "type": "string",
+              "enum": [
+                "freeCanvas",
+                "clips"
+              ]
+            },
+            "workspaceId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "nodeId": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "expectedRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "transfer": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "action",
+                "name"
+              ],
+              "properties": {
+                "action": {
+                  "const": "beginRead"
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "action",
+                "pluginId",
+                "pluginVersion",
+                "name",
+                "mimeType",
+                "byteLength"
+              ],
+              "properties": {
+                "action": {
+                  "const": "beginWrite"
+                },
+                "pluginId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "pluginVersion": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 4096
+                },
+                "mimeType": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                "byteLength": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "action",
+                "lease",
+                "offset"
+              ],
+              "properties": {
+                "action": {
+                  "const": "read"
+                },
+                "lease": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "offset": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "action",
+                "lease",
+                "offset",
+                "bytesB64",
+                "sha256"
+              ],
+              "properties": {
+                "action": {
+                  "const": "write"
+                },
+                "lease": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "offset": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "bytesB64": {
+                  "type": "string",
+                  "minLength": 4,
+                  "maxLength": 349528
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "action",
+                "lease"
+              ],
+              "properties": {
+                "action": {
+                  "const": "commit"
+                },
+                "lease": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "action",
+                "lease"
+              ],
+              "properties": {
+                "action": {
+                  "const": "close"
+                },
+                "lease": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  "x-imageActionCapabilities": {
+    "description": "Capabilities enforced by MediaPlanApplier::required_caps for image.deliver / image.setDefault, per targetRef.kind; mirrors the IPC twin of each host. A kind not listed is not an image target (IMAGE_TARGET_INCOMPATIBLE).",
+    "byTargetKind": {
+      "role": [],
+      "actor": [],
+      "visualAsset": [],
+      "canvasNode": []
+    }
+  },
+  "x-imageActionErrors": [
+    "IMAGE_METADATA_NOT_OF_ARTIFACT",
+    "IMAGE_TARGET_FIELD_UNSUPPORTED",
+    "IMAGE_RESOURCE_REVISION_INVALID",
+    "REVISION_STALE",
+    "DEFAULT_POINTER_UNREADABLE",
+    "PLAN_INTENT_SUPERSEDED",
+    "IMAGE_DELIVERY_FILE_PERSIST_FAILED",
+    "UNDO_CONFLICT"
+  ],
+  "x-imageVersionPaging": {
+    "carrierTool": "resource.get",
+    "requestField": "imageVersionPages",
+    "resultField": "imageVersions",
+    "pageBudget": "maxRequestPageItems",
+    "note": "D18 verification-phase contract supplement (A32/D04). Budget key lives in creator-agent-turn-contract.json budgets."
+  }
+}

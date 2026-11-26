@@ -1,0 +1,17 @@
+[package]
+name = "bgx-video-prompt-contract"
+version = "0.1.0"
+edition = "2021"
+publish = false
+description = "Neutral video-prompt contracts (PLAN 20261013 R14+R17): validate_draft, lock/compile, ClosedSet/dual_slot, project-format compiler, mother_view. No host/Tauri/DB."
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+regex = "1"
+serde_path_to_error = "0.1"
+bgx-creator-contract = { path = "../bgx-creator-contract" }
+
+[build-dependencies]
+bgx-contract-gen = { path = "../bgx-contract-gen" }
+serde_json = "1"

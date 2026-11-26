@@ -1,0 +1,314 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Refine prompt assistant frozen business input",
+  "definitions": {
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sessionId",
+        "focusNodeId",
+        "originalPrompt",
+        "prompt",
+        "target",
+        "images",
+        "skill"
+      ],
+      "properties": {
+        "sessionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "focusNodeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "originalPrompt": {
+          "type": "string"
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "pickKey",
+            "providerKind",
+            "modelId"
+          ],
+          "properties": {
+            "pickKey": {
+              "type": "string",
+              "minLength": 1
+            },
+            "providerKind": {
+              "type": "string",
+              "minLength": 1
+            },
+            "modelId": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "images": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "nodeId",
+              "role",
+              "imageBase64"
+            ],
+            "properties": {
+              "nodeId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "role": {
+                "enum": [
+                  "base",
+                  "reference",
+                  "guide"
+                ]
+              },
+              "imageBase64": {
+                "type": "string",
+                "minLength": 1
+              },
+              "localPixels": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "opId",
+                      "schemaVersion",
+                      "intrinsic",
+                      "normRect"
+                    ],
+                    "properties": {
+                      "opId": {
+                        "const": "crop"
+                      },
+                      "schemaVersion": {
+                        "const": 1
+                      },
+                      "intrinsic": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "width",
+                          "height"
+                        ],
+                        "properties": {
+                          "width": {
+                            "type": "integer",
+                            "minimum": 1
+                          },
+                          "height": {
+                            "type": "integer",
+                            "minimum": 1
+                          }
+                        }
+                      },
+                      "normRect": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "x",
+                          "y",
+                          "w",
+                          "h"
+                        ],
+                        "properties": {
+                          "x": {
+                            "type": "number"
+                          },
+                          "y": {
+                            "type": "number"
+                          },
+                          "w": {
+                            "type": "number"
+                          },
+                          "h": {
+                            "type": "number"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "opId",
+                      "schemaVersion",
+                      "intrinsic",
+                      "rotateAngle"
+                    ],
+                    "properties": {
+                      "opId": {
+                        "const": "rotate"
+                      },
+                      "schemaVersion": {
+                        "const": 1
+                      },
+                      "intrinsic": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "width",
+                          "height"
+                        ],
+                        "properties": {
+                          "width": {
+                            "type": "integer",
+                            "minimum": 1
+                          },
+                          "height": {
+                            "type": "integer",
+                            "minimum": 1
+                          }
+                        }
+                      },
+                      "rotateAngle": {
+                        "type": "number"
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "opId",
+                      "schemaVersion",
+                      "intrinsic",
+                      "normRect",
+                      "strokes"
+                    ],
+                    "properties": {
+                      "opId": {
+                        "const": "brush_crop_merge"
+                      },
+                      "schemaVersion": {
+                        "const": 1
+                      },
+                      "intrinsic": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "width",
+                          "height"
+                        ],
+                        "properties": {
+                          "width": {
+                            "type": "integer",
+                            "minimum": 1
+                          },
+                          "height": {
+                            "type": "integer",
+                            "minimum": 1
+                          }
+                        }
+                      },
+                      "normRect": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "x",
+                          "y",
+                          "w",
+                          "h"
+                        ],
+                        "properties": {
+                          "x": {
+                            "type": "number"
+                          },
+                          "y": {
+                            "type": "number"
+                          },
+                          "w": {
+                            "type": "number"
+                          },
+                          "h": {
+                            "type": "number"
+                          }
+                        }
+                      },
+                      "strokes": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "points",
+                            "size",
+                            "feather",
+                            "color"
+                          ],
+                          "properties": {
+                            "points": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "required": [
+                                  "x",
+                                  "y"
+                                ],
+                                "properties": {
+                                  "x": {
+                                    "type": "number"
+                                  },
+                                  "y": {
+                                    "type": "number"
+                                  }
+                                }
+                              }
+                            },
+                            "size": {
+                              "type": "number"
+                            },
+                            "feather": {
+                              "type": "number"
+                            },
+                            "color": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "skill": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "stableId",
+            "packageDigest"
+          ],
+          "properties": {
+            "stableId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "packageDigest": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    }
+  }
+}

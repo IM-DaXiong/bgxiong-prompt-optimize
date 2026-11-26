@@ -1,0 +1,3223 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://bgxiong.ai/contracts/v1/creator-comfy-workflow-actions.schema.json",
+  "title": "Creator comfy.workflow.* tool business schemas",
+  "description": "CW79: input/output definitions of the published comfy.workflow.* creator tools, read by tool_schemas.rs via definitions.<name>. Import DTO shapes mirror comfy-workflow-import-v1.schema.json (inlined because cross-file refs are not resolved by the tool-schema inliner).",
+  "schemaVersion": 1,
+  "definitions": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "cursor": {
+      "type": "string",
+      "minLength": 1
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "endpointIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "instanceId",
+        "userScope"
+      ],
+      "properties": {
+        "instanceId": {
+          "$ref": "#/definitions/id"
+        },
+        "userScope": {
+          "$ref": "#/definitions/id"
+        }
+      }
+    },
+    "sourceKind": {
+      "type": "string",
+      "enum": [
+        "localFile",
+        "localFolder",
+        "remoteUserdata",
+        "libraryReanalyze",
+        "onlinePackage"
+      ]
+    },
+    "sourceIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "endpoint",
+        "sourceKind",
+        "path"
+      ],
+      "properties": {
+        "endpoint": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/endpointIdentity"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sourceKind": {
+          "$ref": "#/definitions/sourceKind"
+        },
+        "path": {
+          "$ref": "#/definitions/id"
+        }
+      }
+    },
+    "importSource": {
+      "description": "MCP input source: endpoint omitted for local files (published input schemas carry no null).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceKind",
+        "path"
+      ],
+      "properties": {
+        "endpoint": {
+          "$ref": "#/definitions/endpointIdentity"
+        },
+        "sourceKind": {
+          "$ref": "#/definitions/sourceKind"
+        },
+        "path": {
+          "$ref": "#/definitions/id"
+        }
+      }
+    },
+    "importRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sources",
+        "smartDocumentation"
+      ],
+      "properties": {
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/importSource"
+          }
+        },
+        "smartDocumentation": {
+          "type": "boolean"
+        },
+        "textModel": {
+          "$ref": "#/definitions/id"
+        },
+        "cursor": {
+          "$ref": "#/definitions/cursor"
+        }
+      }
+    },
+    "continuation": {
+      "description": "Next page call (toolId + arguments with cursor) or null when complete.",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "toolId",
+            "arguments"
+          ],
+          "properties": {
+            "toolId": {
+              "$ref": "#/definitions/id"
+            },
+            "arguments": {
+              "type": "object"
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "sourcesListInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "endpoint": {
+          "$ref": "#/definitions/endpointIdentity"
+        },
+        "sourceKind": {
+          "$ref": "#/definitions/sourceKind"
+        },
+        "cursor": {
+          "$ref": "#/definitions/id"
+        }
+      }
+    },
+    "sourcesListOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sources",
+        "continuation"
+      ],
+      "properties": {
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/sourceIdentity"
+          }
+        },
+        "continuation": {
+          "$ref": "#/definitions/continuation"
+        }
+      }
+    },
+    "workflowGetInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entryId"
+      ],
+      "properties": {
+        "entryId": {
+          "$ref": "#/definitions/id"
+        },
+        "revision": {
+          "$ref": "#/definitions/revision"
+        }
+      }
+    },
+    "workflowGetOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entryId",
+        "revision",
+        "mapping",
+        "documentation",
+        "hasDocumentationArtifact",
+        "sourceRevision",
+        "importItem"
+      ],
+      "properties": {
+        "entryId": {
+          "$ref": "#/definitions/id"
+        },
+        "revision": {
+          "$ref": "#/definitions/revision"
+        },
+        "mapping": {
+          "description": "Published mapping contract (comfy-workflow-mapping owner JSON).",
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "documentation": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "revision",
+                "claimCount"
+              ],
+              "properties": {
+                "revision": {
+                  "$ref": "#/definitions/revision"
+                },
+                "claimCount": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "hasDocumentationArtifact": {
+          "type": "boolean"
+        },
+        "capabilities": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Published capabilities (caps.json owner JSON: workflowType, media inputs/outputs, size/duration contracts)."
+        },
+        "referenceSlots": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/referenceSlot"
+          }
+        },
+        "defaults": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/workflowDefaults"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "displayAlias": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sourceRevision": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/revision"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Latest saved original revision, including before first publish; null only when no original is saved."
+        },
+        "importItem": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/importItem"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Library import readiness projection for this entry (session + published dims). runtimeReady stays unknown until nodeCheck runs."
+        },
+        "nodeCheck": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/workflowNodeCheck"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Always null on comfy.workflow.get. Node coverage is a separate explicit check, not part of this read."
+        }
+      }
+    },
+    "importGetInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "importSessionId"
+      ],
+      "properties": {
+        "importSessionId": {
+          "$ref": "#/definitions/id"
+        },
+        "cursor": {
+          "$ref": "#/definitions/id"
+        }
+      }
+    },
+    "importGetOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "importSessionId",
+        "session",
+        "publishedRevision",
+        "continuation"
+      ],
+      "properties": {
+        "importSessionId": {
+          "$ref": "#/definitions/id"
+        },
+        "session": {
+          "description": "ImportSessionV1 (comfy-workflow-import-v1.schema.json root).",
+          "type": "object"
+        },
+        "publishedRevision": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "continuation": {
+          "$ref": "#/definitions/continuation"
+        }
+      }
+    },
+    "actionImport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "actionId",
+        "request"
+      ],
+      "properties": {
+        "type": {
+          "const": "workflow.import"
+        },
+        "actionId": {
+          "$ref": "#/definitions/id"
+        },
+        "request": {
+          "$ref": "#/definitions/importRequest"
+        }
+      }
+    },
+    "promptProjection": {
+      "$ref": "prompt-projection-capability.schema.json"
+    },
+    "actionMappingConfirm": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "actionId",
+        "entryId",
+        "expectedRevision",
+        "selections"
+      ],
+      "properties": {
+        "type": {
+          "const": "workflow.mapping.confirm"
+        },
+        "actionId": {
+          "$ref": "#/definitions/id"
+        },
+        "entryId": {
+          "$ref": "#/definitions/id"
+        },
+        "expectedRevision": {
+          "$ref": "#/definitions/revision"
+        },
+        "selections": {
+          "type": "array",
+          "minItems": 0,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "diagnosticId",
+              "candidateId"
+            ],
+            "properties": {
+              "diagnosticId": {
+                "$ref": "#/definitions/id"
+              },
+              "candidateId": {
+                "$ref": "#/definitions/id"
+              }
+            }
+          }
+        },
+        "promptProjection": {
+          "$ref": "#/definitions/promptProjection"
+        }
+      }
+    },
+    "actionDocumentationPatch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "actionId",
+        "entryId",
+        "sourceRevision",
+        "expectedDocRevision",
+        "documentation"
+      ],
+      "properties": {
+        "type": {
+          "const": "workflow.documentation.patch"
+        },
+        "actionId": {
+          "$ref": "#/definitions/id"
+        },
+        "entryId": {
+          "$ref": "#/definitions/id"
+        },
+        "sourceRevision": {
+          "$ref": "#/definitions/revision"
+        },
+        "expectedDocRevision": {
+          "$ref": "#/definitions/revision"
+        },
+        "documentation": {
+          "description": "WorkflowDocumentationV1 (comfy-workflow-documentation-v1.schema.json); validated by the owner.",
+          "type": "object"
+        }
+      }
+    },
+    "actionVariantCreate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "actionId",
+        "entryId",
+        "expectedRevision",
+        "variantId"
+      ],
+      "properties": {
+        "type": {
+          "const": "workflow.variant.create"
+        },
+        "actionId": {
+          "$ref": "#/definitions/id"
+        },
+        "entryId": {
+          "$ref": "#/definitions/id"
+        },
+        "expectedRevision": {
+          "$ref": "#/definitions/revision"
+        },
+        "variantId": {
+          "$ref": "#/definitions/id"
+        }
+      }
+    },
+    "actionDefinitionsRefresh": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "actionId"
+      ],
+      "properties": {
+        "type": {
+          "const": "workflow.definitions.refresh"
+        },
+        "actionId": {
+          "$ref": "#/definitions/id"
+        },
+        "classTypes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/id"
+          }
+        }
+      }
+    },
+    "workflowOnlineInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {}
+    },
+    "actionWorkflowOnlineStart": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "actionId",
+        "candidateId",
+        "kind",
+        "confirmInstall"
+      ],
+      "properties": {
+        "type": {
+          "const": "workflow.online.start"
+        },
+        "actionId": {
+          "$ref": "#/definitions/id"
+        },
+        "candidateId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "install",
+            "update",
+            "adopt"
+          ]
+        },
+        "confirmInstall": {
+          "type": "boolean"
+        }
+      }
+    },
+    "actionWorkflowOnlineCancel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "actionId",
+        "operationId"
+      ],
+      "properties": {
+        "type": {
+          "const": "workflow.online.cancel"
+        },
+        "actionId": {
+          "$ref": "#/definitions/id"
+        },
+        "operationId": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^[a-fA-F0-9]{8}(?:-[a-fA-F0-9]{4}){3}-[a-fA-F0-9]{12}$"
+        }
+      }
+    },
+    "actionWorkflowOnlineRetryCleanup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "actionId",
+        "operationId"
+      ],
+      "properties": {
+        "type": {
+          "const": "workflow.online.retryCleanup"
+        },
+        "actionId": {
+          "$ref": "#/definitions/id"
+        },
+        "operationId": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^[a-fA-F0-9]{8}(?:-[a-fA-F0-9]{4}){3}-[a-fA-F0-9]{12}$"
+        }
+      }
+    },
+    "actionWorkflowOnlineAutoRun": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "actionId"
+      ],
+      "properties": {
+        "type": {
+          "const": "workflow.online.autoRun"
+        },
+        "actionId": {
+          "$ref": "#/definitions/id"
+        }
+      }
+    },
+    "workflowOnlineCandidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidateId",
+        "packageId",
+        "displayName",
+        "version",
+        "bytes",
+        "vendorId",
+        "functionIds",
+        "kind",
+        "entryId",
+        "userRemoved"
+      ],
+      "properties": {
+        "candidateId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "packageId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "vendorId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "functionIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "kind": {
+          "enum": [
+            "install",
+            "update",
+            "adopt"
+          ]
+        },
+        "entryId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "userRemoved": {
+          "type": "boolean"
+        }
+      }
+    },
+    "workflowOnlineOperation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operationId",
+        "candidateId",
+        "packageId",
+        "displayName",
+        "version",
+        "entryId",
+        "phase",
+        "errorCode",
+        "kind"
+      ],
+      "properties": {
+        "operationId": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^[a-fA-F0-9]{8}(?:-[a-fA-F0-9]{4}){3}-[a-fA-F0-9]{12}$"
+        },
+        "candidateId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "packageId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "entryId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "phase": {
+          "enum": [
+            "queued",
+            "downloading",
+            "verifying",
+            "installing",
+            "switching",
+            "pendingActivation",
+            "cleaning",
+            "cleanupFailed",
+            "done",
+            "failed",
+            "cancelled"
+          ]
+        },
+        "errorCode": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "kind": {
+          "enum": [
+            "install",
+            "update",
+            "adopt"
+          ]
+        }
+      }
+    },
+    "workflowOnlineCheckOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sequence",
+        "publishedAt",
+        "filters",
+        "guidance",
+        "retired",
+        "updates",
+        "newPackages",
+        "blocked",
+        "installed"
+      ],
+      "properties": {
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "publishedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "filters": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "vendors",
+            "functions"
+          ],
+          "properties": {
+            "vendors": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "labels",
+                  "order"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "labels": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "zh-CN",
+                      "en"
+                    ],
+                    "properties": {
+                      "zh-CN": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "en": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    }
+                  },
+                  "order": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "aliases": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                }
+              }
+            },
+            "functions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "labels",
+                  "order"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "labels": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "zh-CN",
+                      "en"
+                    ],
+                    "properties": {
+                      "zh-CN": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "en": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    }
+                  },
+                  "order": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "aliases": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "guidance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "messages"
+          ],
+          "properties": {
+            "messages": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "endpointUnconfigured",
+                "endpointUnavailable",
+                "missingModels"
+              ],
+              "properties": {
+                "endpointUnconfigured": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "zh-CN",
+                    "en"
+                  ],
+                  "properties": {
+                    "zh-CN": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "title",
+                        "body",
+                        "actionLabel"
+                      ],
+                      "properties": {
+                        "title": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "body": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "actionLabel": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    },
+                    "en": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "title",
+                        "body",
+                        "actionLabel"
+                      ],
+                      "properties": {
+                        "title": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "body": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "actionLabel": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  }
+                },
+                "endpointUnavailable": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "zh-CN",
+                    "en"
+                  ],
+                  "properties": {
+                    "zh-CN": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "title",
+                        "body",
+                        "actionLabel"
+                      ],
+                      "properties": {
+                        "title": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "body": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "actionLabel": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    },
+                    "en": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "title",
+                        "body",
+                        "actionLabel"
+                      ],
+                      "properties": {
+                        "title": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "body": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "actionLabel": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  }
+                },
+                "missingModels": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "zh-CN",
+                    "en"
+                  ],
+                  "properties": {
+                    "zh-CN": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "title",
+                        "body",
+                        "actionLabel"
+                      ],
+                      "properties": {
+                        "title": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "body": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "actionLabel": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    },
+                    "en": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "title",
+                        "body",
+                        "actionLabel"
+                      ],
+                      "properties": {
+                        "title": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "body": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "actionLabel": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "retired": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "packageId",
+              "retiredAt"
+            ],
+            "properties": {
+              "packageId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "retiredAt": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        },
+        "updates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/workflowOnlineCandidate"
+          }
+        },
+        "newPackages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/workflowOnlineCandidate"
+          }
+        },
+        "blocked": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "packageId",
+              "reason"
+            ],
+            "properties": {
+              "packageId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "installed": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "entryId",
+              "packageId",
+              "version",
+              "displayName",
+              "vendorId",
+              "functionIds",
+              "retired"
+            ],
+            "properties": {
+              "entryId": {
+                "type": "string"
+              },
+              "packageId": {
+                "type": "string"
+              },
+              "version": {
+                "type": "string"
+              },
+              "displayName": {
+                "type": "string"
+              },
+              "vendorId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "functionIds": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "retired": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+    },
+    "workflowOnlineStatusOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operations",
+        "catalog"
+      ],
+      "properties": {
+        "operations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/workflowOnlineOperation"
+          }
+        },
+        "catalog": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/workflowOnlineCheckOutput"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "changePrepareInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "actions"
+      ],
+      "properties": {
+        "actions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/actionImport"
+              },
+              {
+                "$ref": "#/definitions/actionMappingConfirm"
+              },
+              {
+                "$ref": "#/definitions/actionDocumentationPatch"
+              },
+              {
+                "$ref": "#/definitions/actionVariantCreate"
+              },
+              {
+                "$ref": "#/definitions/actionDefinitionsRefresh"
+              },
+              {
+                "$ref": "#/definitions/actionWorkflowDelete"
+              },
+              {
+                "$ref": "#/definitions/actionLibraryClear"
+              },
+              {
+                "$ref": "#/definitions/actionAliasSet"
+              },
+              {
+                "$ref": "#/definitions/actionOrderSet"
+              },
+              {
+                "$ref": "#/definitions/actionDefaultsSet"
+              },
+              {
+                "$ref": "#/definitions/actionBindingSet"
+              },
+              {
+                "$ref": "#/definitions/actionAdapterSet"
+              },
+              {
+                "$ref": "#/definitions/actionAdapterPackageInstall"
+              },
+              {
+                "$ref": "#/definitions/actionAdapterPackageBindCredentials"
+              },
+              {
+                "$ref": "#/definitions/actionAdapterPackageRegisterModels"
+              },
+              {
+                "$ref": "#/definitions/actionAdapterPackageUninstall"
+              },
+              {
+                "$ref": "#/definitions/actionWorkflowOnlineStart"
+              },
+              {
+                "$ref": "#/definitions/actionWorkflowOnlineCancel"
+              },
+              {
+                "$ref": "#/definitions/actionWorkflowOnlineRetryCleanup"
+              },
+              {
+                "$ref": "#/definitions/actionWorkflowOnlineAutoRun"
+              },
+              {
+                "$ref": "#/definitions/actionAdapterOnlineStart"
+              },
+              {
+                "$ref": "#/definitions/actionAdapterOnlineConfigure"
+              },
+              {
+                "$ref": "#/definitions/actionAdapterOnlineCancel"
+              },
+              {
+                "$ref": "#/definitions/actionAdapterOnlineRetryCleanup"
+              },
+              {
+                "$ref": "#/definitions/actionAdapterOnlineStopOldTasks"
+              },
+              {
+                "$ref": "#/definitions/actionAdapterOnlineAutoRun"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "documentationExtractInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entryId",
+        "sourceRevision"
+      ],
+      "properties": {
+        "entryId": {
+          "$ref": "#/definitions/id"
+        },
+        "sourceRevision": {
+          "$ref": "#/definitions/revision"
+        },
+        "textModel": {
+          "$ref": "#/definitions/id"
+        }
+      }
+    },
+    "documentationExtractOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entryId",
+        "sourceRevision",
+        "taskRef",
+        "followUp"
+      ],
+      "properties": {
+        "entryId": {
+          "$ref": "#/definitions/id"
+        },
+        "sourceRevision": {
+          "$ref": "#/definitions/revision"
+        },
+        "taskRef": {
+          "$ref": "#/definitions/id"
+        },
+        "followUp": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "progress",
+            "result"
+          ],
+          "properties": {
+            "progress": {
+              "const": "task.wait"
+            },
+            "result": {
+              "const": "comfy.workflow.get"
+            }
+          }
+        }
+      }
+    },
+    "bridgeStatusInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {}
+    },
+    "bridgeStatusOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "instanceId",
+        "userScope",
+        "status",
+        "nextAction",
+        "installTools"
+      ],
+      "properties": {
+        "instanceId": {
+          "$ref": "#/definitions/id"
+        },
+        "userScope": {
+          "$ref": "#/definitions/id"
+        },
+        "status": {
+          "description": "Owner BridgeStatusV1 (kind-tagged).",
+          "type": "object"
+        },
+        "nextAction": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "installTools": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/id"
+          }
+        }
+      }
+    },
+    "referenceSlot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "slotId",
+        "media",
+        "nodeId",
+        "inputName",
+        "required"
+      ],
+      "properties": {
+        "slotId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "media": {
+          "enum": [
+            "image",
+            "video",
+            "audio"
+          ]
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "inputName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "label": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "workflowDefaults": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "revision",
+        "params"
+      ],
+      "properties": {
+        "revision": {
+          "$ref": "#/definitions/revision"
+        },
+        "params": {
+          "type": "object",
+          "description": "Saved default generation params (video library): keys are mapping parameter ids."
+        }
+      }
+    },
+    "workflowCapabilitySummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "workflowType",
+        "outputType",
+        "requiresReferenceImage",
+        "requiresReferenceAudio",
+        "supportsReferenceAudio",
+        "referenceAudioSlots",
+        "supportsReferenceVideo",
+        "postprocessChannel"
+      ],
+      "properties": {
+        "workflowType": {
+          "type": "string"
+        },
+        "outputType": {
+          "type": "string"
+        },
+        "requiresReferenceImage": {
+          "type": "boolean"
+        },
+        "requiresReferenceAudio": {
+          "type": "boolean"
+        },
+        "supportsReferenceAudio": {
+          "type": "boolean"
+        },
+        "referenceAudioSlots": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "supportsReferenceVideo": {
+          "type": "boolean"
+        },
+        "postprocessChannel": {
+          "enum": [
+            "seedvr2",
+            "flashvsr",
+            "comfy_workflow",
+            null
+          ]
+        }
+      }
+    },
+    "workflowListItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entryId",
+        "revision",
+        "displayName",
+        "displayAlias",
+        "workflowType",
+        "readiness",
+        "capabilitySummary",
+        "bindings",
+        "librarySummary"
+      ],
+      "properties": {
+        "entryId": {
+          "$ref": "#/definitions/id"
+        },
+        "revision": {
+          "$ref": "#/definitions/revision"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "displayAlias": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "workflowType": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "readiness": {
+          "enum": [
+            "ready",
+            "needsMapping",
+            "needsDefinitions",
+            "failed"
+          ]
+        },
+        "capabilitySummary": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/workflowCapabilitySummary"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Saved capability summary (picker lane placement); null when the entry has no saved capabilities."
+        },
+        "legacyName": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "custom:<legacyName> generation id of a migrated legacy entry."
+        },
+        "bindings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/workflowBindingPreference"
+          }
+        },
+        "librarySummary": {
+          "description": "Management-card summary. Null for view=picker (omitted view). Library view must return this object; a null summary is a contract error for that view and is not a reason to get each entry.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/workflowLibrarySummary"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "workflowLibraryDefaultSize": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "width",
+        "height"
+      ],
+      "properties": {
+        "width": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "workflowLibraryCapabilityDisplay": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Card labels and capability filters only. Not an executable capabilities document. Null when the entry has no stored published capabilities.",
+      "required": [
+        "workflowType",
+        "requiresReferenceImage",
+        "requiresReferenceAudio",
+        "hasControlNet",
+        "hasIpAdapter",
+        "defaultSize",
+        "complexity"
+      ],
+      "properties": {
+        "workflowType": {
+          "type": "string"
+        },
+        "requiresReferenceImage": {
+          "type": "boolean"
+        },
+        "requiresReferenceAudio": {
+          "type": "boolean"
+        },
+        "hasControlNet": {
+          "type": "boolean"
+        },
+        "hasIpAdapter": {
+          "type": "boolean"
+        },
+        "defaultSize": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/workflowLibraryDefaultSize"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "complexity": {
+          "type": "string"
+        }
+      }
+    },
+    "workflowLibraryImportState": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Card import projection. Same status, readiness and documentation structures as importItem, without diagnostics body, nextAction or sourceDigest. blockingDiagnosticCount is the count of severity=blocking diagnostics.",
+      "required": [
+        "entryId",
+        "sourceRevision",
+        "status",
+        "readiness",
+        "documentation",
+        "blockingDiagnosticCount"
+      ],
+      "properties": {
+        "entryId": {
+          "$ref": "#/definitions/id"
+        },
+        "sourceRevision": {
+          "$ref": "#/definitions/revision"
+        },
+        "status": {
+          "type": "string"
+        },
+        "readiness": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "documentation": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "blockingDiagnosticCount": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "workflowLibrarySummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capabilityDisplay",
+        "importState"
+      ],
+      "properties": {
+        "capabilityDisplay": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/workflowLibraryCapabilityDisplay"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "importState": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/workflowLibraryImportState"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "workflowListInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "view": {
+          "description": "picker (default when omitted) returns librarySummary null and does not read import sessions. library returns the management summary.",
+          "enum": [
+            "picker",
+            "library"
+          ]
+        },
+        "workflowType": {
+          "type": "string"
+        },
+        "cursor": {
+          "$ref": "#/definitions/cursor"
+        }
+      }
+    },
+    "workflowListOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "items",
+        "continuation"
+      ],
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/workflowListItem"
+          }
+        },
+        "continuation": {
+          "$ref": "#/definitions/continuation"
+        }
+      }
+    },
+    "actionLibraryClear": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "actionId"
+      ],
+      "properties": {
+        "type": {
+          "const": "workflow.library.clear"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "description": "Clear all local workflow library data, including hidden entries, versions, import history and bindings. Runs alone; refuses while library writers are active. External source files, models and nodes are retained."
+    },
+    "actionWorkflowDelete": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "actionId",
+        "entryId",
+        "expectedRevision"
+      ],
+      "properties": {
+        "type": {
+          "const": "workflow.delete"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "entryId": {
+          "$ref": "#/definitions/id"
+        },
+        "expectedRevision": {
+          "$ref": "#/definitions/revision"
+        }
+      }
+    },
+    "actionAliasSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "actionId",
+        "entryId"
+      ],
+      "properties": {
+        "type": {
+          "const": "workflow.alias.set"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "entryId": {
+          "$ref": "#/definitions/id"
+        },
+        "alias": {
+          "type": "string",
+          "description": "Display alias; omit to clear.",
+          "maxLength": 128
+        }
+      }
+    },
+    "actionAdapterSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Associate the entry's latest saved source with an installed SDK v2 adapter operation (omit adapter to clear). The package must declare the operation and list the source sha256 in its workflow-templates.json; without an association the entry offers no adapter capability.",
+      "required": [
+        "type",
+        "actionId",
+        "entryId",
+        "expectedSourceRevision"
+      ],
+      "properties": {
+        "type": {
+          "const": "workflow.adapter.set"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "entryId": {
+          "$ref": "#/definitions/id"
+        },
+        "expectedSourceRevision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "adapter": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "pluginId",
+            "version",
+            "capabilityKey",
+            "operationId",
+            "operationVersion"
+          ],
+          "properties": {
+            "pluginId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "version": {
+              "type": "string",
+              "minLength": 1
+            },
+            "capabilityKey": {
+              "type": "string",
+              "minLength": 1
+            },
+            "operationId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "operationVersion": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        }
+      }
+    },
+    "actionAdapterPackageInstall": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Install a built SDK v2 adapter package directory with its explicit non-secret host configuration (the SDK CLI Config without media, plus budgetMs per operation). A version is installed once; publish a new version to update.",
+      "required": [
+        "type",
+        "actionId",
+        "packageDir",
+        "hostConfig"
+      ],
+      "properties": {
+        "type": {
+          "const": "workflow.adapterPackage.install"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "packageDir": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Absolute path of the package directory (manifest.json at its root)."
+        },
+        "hostConfig": {
+          "type": "object"
+        }
+      }
+    },
+    "actionAdapterPackageBindCredentials": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Bind saved account IDs to the credential fields of an installed SDK adapter version. Read the binding revision from adapterPackage.list. Never include API keys in a workflow plan.",
+      "required": ["type", "actionId", "pluginId", "version", "expectedRevision", "appCredentials"],
+      "properties": {
+        "type": { "const": "workflow.adapterPackage.bindCredentials" },
+        "actionId": { "type": "string", "minLength": 1 },
+        "pluginId": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 },
+        "expectedRevision": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "appCredentials": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["reference", "credentialId"],
+            "properties": {
+              "reference": { "type": "string", "minLength": 1 },
+              "credentialId": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    },
+    "actionAdapterPackageRegisterModels": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Register already installed SDK text, image, speech, or video models through the same membership owner used at installation; preserves existing choices and supports explicit retry.",
+      "required": [
+        "type",
+        "actionId",
+        "pluginId",
+        "version",
+        "capability"
+      ],
+      "properties": {
+        "type": {
+          "const": "workflow.adapterPackage.registerModels"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pluginId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "capability": {
+          "enum": [
+            "text",
+            "image",
+            "speech",
+            "video"
+          ]
+        }
+      }
+    },
+    "actionAdapterPackageUninstall": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Uninstall one SDK v2 adapter package version. Set force to remove workflow associations and stop unfinished local tasks pinned to this version. Workflow sources, saved editor documents and remote checkpoints are retained. Without force, active references and unfinished tasks block uninstall.",
+      "required": [
+        "type",
+        "actionId",
+        "pluginId",
+        "version"
+      ],
+      "properties": {
+        "type": {
+          "const": "workflow.adapterPackage.uninstall"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pluginId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "force": {
+          "type": "boolean"
+        }
+      }
+    },
+    "actionOrderSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "actionId",
+        "entryIds"
+      ],
+      "properties": {
+        "type": {
+          "const": "workflow.order.set"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "entryIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/id"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "actionDefaultsSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "actionId",
+        "entryId",
+        "expectedRevision",
+        "expectedDefaultsRevision",
+        "params"
+      ],
+      "properties": {
+        "type": {
+          "const": "workflow.defaults.set"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "entryId": {
+          "$ref": "#/definitions/id"
+        },
+        "expectedRevision": {
+          "$ref": "#/definitions/revision"
+        },
+        "expectedDefaultsRevision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "params": {
+          "type": "object"
+        }
+      }
+    },
+    "actionBindingSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "actionId",
+        "schemaVersion",
+        "credentialId",
+        "capability",
+        "entryId",
+        "expectedBindingRevision",
+        "registered",
+        "hiddenInPicker",
+        "displayAlias",
+        "defaultSelection"
+      ],
+      "properties": {
+        "type": {
+          "const": "workflow.binding.set"
+        },
+        "actionId": {
+          "$ref": "#/definitions/id"
+        },
+        "schemaVersion": {
+          "const": 2
+        },
+        "credentialId": {
+          "$ref": "#/definitions/id"
+        },
+        "capability": {
+          "$ref": "#/definitions/workflowCapability"
+        },
+        "entryId": {
+          "$ref": "#/definitions/id"
+        },
+        "expectedBindingRevision": {
+          "$ref": "#/definitions/revision"
+        },
+        "registered": {
+          "type": "boolean"
+        },
+        "hiddenInPicker": {
+          "type": "boolean"
+        },
+        "displayAlias": {
+          "type": "string",
+          "description": "Connection-specific label. Empty string clears the label."
+        },
+        "defaultSelection": {
+          "enum": [
+            "keep",
+            "select",
+            "clear"
+          ]
+        }
+      },
+      "description": "Replace one workflow preference within a connection/capability; CAS covers the scope. Other registered entries are retained. Generation category defaults update in the same transaction."
+    },
+    "importItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entryId",
+        "sourceRevision",
+        "status",
+        "readiness",
+        "documentation"
+      ],
+      "properties": {
+        "entryId": {
+          "$ref": "#/definitions/id"
+        },
+        "sourceRevision": {
+          "$ref": "#/definitions/revision"
+        },
+        "sourceDigest": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "readiness": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "documentation": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "diagnostics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "nextAction": {
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      }
+    },
+    "workflowNodeCheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "verified",
+            "missingNodes",
+            "unverified"
+          ]
+        },
+        "missingClassTypes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "unverifiedReason": {
+          "type": "string",
+          "enum": [
+            "comfyuiUnreachable",
+            "comfyuiNotConfigured",
+            "comfyuiNotReady",
+            "checkFailed"
+          ]
+        },
+        "unverifiedHint": {
+          "type": "string"
+        }
+      }
+    },
+    "workflowCapability": {
+      "enum": [
+        "image",
+        "imageToImage",
+        "video",
+        "imageUpscale",
+        "videoUpscale",
+        "videoFaceRefine"
+      ]
+    },
+    "workflowBindingPreference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "bindingId",
+        "credentialId",
+        "capability",
+        "revision",
+        "registered",
+        "hiddenInPicker",
+        "displayAlias",
+        "isDefault"
+      ],
+      "properties": {
+        "bindingId": {
+          "$ref": "#/definitions/id"
+        },
+        "credentialId": {
+          "$ref": "#/definitions/id"
+        },
+        "capability": {
+          "$ref": "#/definitions/workflowCapability"
+        },
+        "revision": {
+          "$ref": "#/definitions/revision"
+        },
+        "registered": {
+          "type": "boolean"
+        },
+        "hiddenInPicker": {
+          "type": "boolean"
+        },
+        "displayAlias": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "isDefault": {
+          "type": "boolean"
+        }
+      }
+    },
+    "documentationGetInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entryId"
+      ],
+      "properties": {
+        "entryId": {
+          "$ref": "#/definitions/id"
+        },
+        "revision": {
+          "$ref": "#/definitions/revision"
+        }
+      }
+    },
+    "documentationGetOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entryId",
+        "documentation"
+      ],
+      "properties": {
+        "entryId": {
+          "$ref": "#/definitions/id"
+        },
+        "documentation": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": [
+                {
+                  "$ref": "#/definitions/revision"
+                },
+                {
+                  "type": "object"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "nodesCheckInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [],
+      "properties": {
+        "entryIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/id"
+          }
+        }
+      }
+    },
+    "nodesCheckOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "items"
+      ],
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "entryId",
+              "check",
+              "context"
+            ],
+            "properties": {
+              "entryId": {
+                "$ref": "#/definitions/id"
+              },
+              "check": {
+                "$ref": "#/definitions/workflowNodeCheck"
+              },
+              "importItem": {
+                "$ref": "#/definitions/importItem"
+              },
+              "context": {
+                "$ref": "#/definitions/workflowNodeCheckContext"
+              },
+              "modelCheck": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "visibility",
+                  "visible",
+                  "notVisible",
+                  "detail"
+                ],
+                "properties": {
+                  "visibility": {
+                    "enum": [
+                      "visible",
+                      "empty",
+                      "unknown"
+                    ]
+                  },
+                  "visible": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "notVisible": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "detail": {
+                    "type": "string"
+                  },
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "name",
+                        "status",
+                        "categoryVerified",
+                        "pathScope",
+                        "directorySource"
+                      ],
+                      "properties": {
+                        "name": { "type": "string" },
+                        "status": {
+                          "enum": [
+                            "listed",
+                            "listedNotOnDisk",
+                            "onDiskNotListed",
+                            "wrongLocation",
+                            "subpathMismatch",
+                            "caseMismatch",
+                            "missing",
+                            "unknown"
+                          ]
+                        },
+                        "classType": { "type": "string" },
+                        "input": { "type": "string" },
+                        "categoryVerified": { "type": "boolean" },
+                        "relativePath": { "type": "string" },
+                        "absolutePath": { "type": "string" },
+                        "pathScope": { "enum": ["local", "remote", "unknown"] },
+                        "directorySource": {
+                          "enum": ["instanceInventory", "loaderTable", "workflowDeclared", "none"]
+                        },
+                        "actualValue": { "type": ["string", "null"] },
+                        "candidates": {
+                          "type": "array",
+                          "items": { "type": "string" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "importCancelInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "importSessionId"
+      ],
+      "properties": {
+        "importSessionId": {
+          "$ref": "#/definitions/id"
+        }
+      }
+    },
+    "importCancelOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "importSessionId",
+        "cancelRequested",
+        "status"
+      ],
+      "properties": {
+        "importSessionId": {
+          "$ref": "#/definitions/id"
+        },
+        "cancelRequested": {
+          "type": "boolean"
+        },
+        "status": {
+          "const": "cancelRequested"
+        }
+      }
+    },
+    "workflowNodeCheckContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "checkedAtMs",
+        "publishedRevision"
+      ],
+      "properties": {
+        "checkedAtMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "publishedRevision": {
+          "$ref": "#/definitions/revision"
+        },
+        "sourceRevision": {
+          "$ref": "#/definitions/revision"
+        },
+        "endpointRevision": {
+          "$ref": "#/definitions/revision"
+        },
+        "endpoint": {
+          "$ref": "#/definitions/endpointIdentity"
+        }
+      }
+    },
+    "adapterPackageListInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {}
+    },
+    "adapterPackageListOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entries"
+      ],
+      "properties": {
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "pluginId",
+              "version",
+              "capabilityKey",
+              "operationId"
+            ],
+            "properties": {
+              "pluginId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "version": {
+                "type": "string",
+                "minLength": 1
+              },
+              "capabilityKey": {
+                "type": "string",
+                "minLength": 1
+              },
+              "operationId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "credentialConfiguration": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["revision", "fields"],
+                "properties": {
+                  "revision": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+                  "fields": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": ["reference", "label", "mode", "origins", "credentialId"],
+                      "properties": {
+                        "reference": { "type": "string", "minLength": 1 },
+                        "label": { "type": "string", "minLength": 1 },
+                        "mode": { "enum": ["bearer", "custom-header", "jwt-hs256", "hmac-sha256-credential"] },
+                        "origins": { "type": "array", "items": { "type": "string" } },
+                        "customHeader": { "type": ["string", "null"] },
+                        "accountOriginHostSuffix": { "type": "string" },
+                        "credentialId": { "type": ["string", "null"] }
+                      }
+                    }
+                  }
+                }
+              },
+              "bundledUpdate": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "version",
+                  "packageDir",
+                  "artifactSha256",
+                  "hostConfig"
+                ],
+                "properties": {
+                  "version": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "packageDir": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "artifactSha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "hostConfig": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "speechManaged"
+                    ],
+                    "properties": {
+                      "speechManaged": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "additionalProperties": true
+          }
+        }
+      }
+    },
+    "adapterPackageInspectInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "packageDir"
+      ],
+      "properties": {
+        "packageDir": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "adapterPackageInspectOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pluginId",
+        "version",
+        "displayName",
+        "installation"
+      ],
+      "properties": {
+        "pluginId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "installation": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "digest",
+                "authentication"
+              ],
+              "properties": {
+                "digest": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "authentication": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "source",
+                        "fields"
+                      ],
+                      "properties": {
+                        "source": {
+                          "const": "userInput"
+                        },
+                        "fields": {
+                          "type": "array",
+                          "minItems": 1,
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "reference",
+                              "label",
+                              "mode",
+                              "origins"
+                            ],
+                            "properties": {
+                              "reference": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "label": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "mode": {
+                                "enum": [
+                                  "bearer",
+                                  "custom-header",
+                                  "jwt-hs256",
+                                  "hmac-sha256-credential"
+                                ]
+                              },
+                              "origins": {
+                                "type": "array",
+                                "minItems": 1,
+                                "uniqueItems": true,
+                                "items": {
+                                  "type": "string",
+                                  "minLength": 1
+                                }
+                              },
+                              "customHeader": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "source"
+                      ],
+                      "properties": {
+                        "source": {
+                          "enum": [
+                            "embedded",
+                            "none"
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "adapterOnlineCheckInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [],
+      "properties": {}
+    },
+    "adapterOnlineStatusInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [],
+      "properties": {}
+    },
+    "adapterOnlineCandidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidateId",
+        "kind",
+        "pluginId",
+        "displayName",
+        "version",
+        "bytes",
+        "sourceVersion"
+      ],
+      "properties": {
+        "candidateId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "update",
+            "install"
+          ]
+        },
+        "pluginId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sourceVersion": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "adapterOnlineBlocked": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pluginId",
+        "version",
+        "reason"
+      ],
+      "properties": {
+        "pluginId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "enum": [
+            "hostVersion",
+            "dependency"
+          ]
+        }
+      }
+    },
+    "adapterOnlineCheckOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sequence",
+        "updates",
+        "newPackages",
+        "blocked"
+      ],
+      "properties": {
+        "sequence": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "updates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/adapterOnlineCandidate"
+          }
+        },
+        "newPackages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/adapterOnlineCandidate"
+          }
+        },
+        "blocked": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/adapterOnlineBlocked"
+          }
+        }
+      }
+    },
+    "adapterOnlineOperation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operationId",
+        "candidateId",
+        "pluginId",
+        "displayName",
+        "targetVersion",
+        "updatedAt",
+        "kind",
+        "sourceVersion",
+        "bytes",
+        "phase",
+        "errorCode",
+        "trigger",
+        "downloadedBytes",
+        "totalBytes",
+        "oldTaskIds",
+        "installation"
+      ],
+      "properties": {
+        "operationId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "candidateId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pluginId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "targetVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "updatedAt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "update",
+            "install"
+          ]
+        },
+        "sourceVersion": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "phase": {
+          "enum": [
+            "downloading",
+            "verifying",
+            "awaitingCredentials",
+            "installing",
+            "migrating",
+            "oldPendingTasks",
+            "oldInUse",
+            "cleaning",
+            "cleanupFailed",
+            "done",
+            "failed"
+          ]
+        },
+        "errorCode": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "trigger": {
+          "enum": [
+            "manual",
+            "auto"
+          ]
+        },
+        "downloadedBytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "totalBytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "oldTaskIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "installation": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "digest",
+                "authentication"
+              ],
+              "properties": {
+                "digest": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "authentication": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "source",
+                        "fields"
+                      ],
+                      "properties": {
+                        "source": {
+                          "const": "userInput"
+                        },
+                        "fields": {
+                          "type": "array",
+                          "minItems": 1,
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "reference",
+                              "label",
+                              "mode",
+                              "origins"
+                            ],
+                            "properties": {
+                              "reference": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "label": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "mode": {
+                                "enum": [
+                                  "bearer",
+                                  "custom-header",
+                                  "jwt-hs256",
+                                  "hmac-sha256-credential"
+                                ]
+                              },
+                              "origins": {
+                                "type": "array",
+                                "minItems": 1,
+                                "uniqueItems": true,
+                                "items": {
+                                  "type": "string",
+                                  "minLength": 1
+                                }
+                              },
+                              "customHeader": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "source"
+                      ],
+                      "properties": {
+                        "source": {
+                          "enum": [
+                            "embedded",
+                            "none"
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "adapterOnlineStatusOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operations"
+      ],
+      "properties": {
+        "operations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/adapterOnlineOperation"
+          }
+        }
+      }
+    },
+    "actionAdapterOnlineStart": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "actionId",
+        "candidateId"
+      ],
+      "properties": {
+        "type": {
+          "const": "workflow.adapterPackage.onlineStart"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "candidateId": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "actionAdapterOnlineConfigure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "actionId",
+        "operationId",
+        "hostConfig"
+      ],
+      "properties": {
+        "type": {
+          "const": "workflow.adapterPackage.onlineConfigure"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "hostConfig": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "installationDigest",
+            "appCredentials"
+          ],
+          "properties": {
+            "installationDigest": {
+              "type": "string",
+              "minLength": 1
+            },
+            "appCredentials": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "reference",
+                  "credentialId"
+                ],
+                "properties": {
+                  "reference": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "credentialId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "actionAdapterOnlineCancel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "actionId",
+        "operationId"
+      ],
+      "properties": {
+        "type": {
+          "const": "workflow.adapterPackage.onlineCancel"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "actionAdapterOnlineRetryCleanup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "actionId",
+        "operationId"
+      ],
+      "properties": {
+        "type": {
+          "const": "workflow.adapterPackage.onlineRetryCleanup"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "actionAdapterOnlineStopOldTasks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "actionId",
+        "operationId",
+        "confirmedTaskIds"
+      ],
+      "properties": {
+        "type": {
+          "const": "workflow.adapterPackage.onlineStopOldTasks"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "confirmedTaskIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "actionAdapterOnlineAutoRun": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "actionId"
+      ],
+      "properties": {
+        "type": {
+          "const": "workflow.adapterPackage.onlineAutoRun"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

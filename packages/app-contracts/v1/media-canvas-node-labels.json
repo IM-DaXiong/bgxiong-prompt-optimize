@@ -1,0 +1,8 @@
+{
+  "image": "图片",
+  "video": "视频",
+  "audio": "音频",
+  "text": "文本",
+  "group": "组",
+  "fallback": "内容"
+}

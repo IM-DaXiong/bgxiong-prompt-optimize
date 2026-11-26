@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 1,
+  "rules": [
+    {
+      "ruleId": "source_fidelity",
+      "zh": "原文事实与来源范围",
+      "en": "Source facts and ownership",
+      "canBlock": true,
+      "scopes": [
+        "chapter",
+        "scene"
+      ],
+      "evidenceKinds": [
+        "source_range",
+        "item",
+        "fact",
+        "requirement",
+        "reference"
+      ]
+    },
+    {
+      "ruleId": "user_requirements",
+      "zh": "明确用户要求与修改权限",
+      "en": "Explicit user requirements and permission",
+      "canBlock": true,
+      "scopes": [
+        "chapter",
+        "scene"
+      ],
+      "evidenceKinds": [
+        "source_range",
+        "item",
+        "fact",
+        "requirement",
+        "reference"
+      ]
+    },
+    {
+      "ruleId": "entity_identity",
+      "zh": "实体身份与引用",
+      "en": "Entity identity and references",
+      "canBlock": true,
+      "scopes": [
+        "chapter",
+        "scene"
+      ],
+      "evidenceKinds": [
+        "source_range",
+        "item",
+        "fact",
+        "requirement",
+        "reference"
+      ]
+    },
+    {
+      "ruleId": "structure_boundaries",
+      "zh": "章节场次边界与叙述顺序",
+      "en": "Structure boundaries and narrative order",
+      "canBlock": true,
+      "scopes": [
+        "chapter",
+        "scene"
+      ],
+      "evidenceKinds": [
+        "source_range",
+        "item",
+        "fact",
+        "requirement",
+        "reference"
+      ]
+    },
+    {
+      "ruleId": "accepted_continuity",
+      "zh": "已接受正文连续性",
+      "en": "Accepted narrative continuity",
+      "canBlock": true,
+      "scopes": [
+        "chapter",
+        "scene"
+      ],
+      "evidenceKinds": [
+        "source_range",
+        "item",
+        "fact",
+        "requirement",
+        "reference"
+      ]
+    },
+    {
+      "ruleId": "reference_binding",
+      "zh": "参考资料归属",
+      "en": "Reference attribution",
+      "canBlock": true,
+      "scopes": [
+        "chapter",
+        "scene"
+      ],
+      "evidenceKinds": [
+        "source_range",
+        "item",
+        "fact",
+        "requirement",
+        "reference"
+      ]
+    },
+    {
+      "ruleId": "content_safety",
+      "zh": "现有内容安全规则",
+      "en": "Existing content safety policy",
+      "canBlock": true,
+      "scopes": [
+        "chapter",
+        "scene"
+      ],
+      "evidenceKinds": [
+        "source_range",
+        "item",
+        "fact",
+        "requirement",
+        "reference"
+      ]
+    },
+    {
+      "ruleId": "genre_craft",
+      "zh": "题材适配与叙事建议",
+      "en": "Genre-appropriate craft advice",
+      "canBlock": false,
+      "scopes": [
+        "chapter",
+        "scene"
+      ],
+      "evidenceKinds": [
+        "source_range",
+        "item",
+        "fact",
+        "requirement",
+        "reference"
+      ]
+    }
+  ]
+}

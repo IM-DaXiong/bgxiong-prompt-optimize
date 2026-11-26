@@ -1,0 +1,278 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "runtime-intake-target.schema.json",
+  "title": "RuntimeIntakeTargetTicketV1",
+  "description": "RI003. Where the external agent may write and when the host accepts it.",
+  "schemaVersion": 1,
+  "definitions": {
+    "slotKind": {
+      "enum": [
+        "launchDir",
+        "modelDir",
+        "store",
+        "venv",
+        "hfCache",
+        "comfyDataRoot",
+        "comfyCustomNodes",
+        "workflowLibrary"
+      ],
+      "description": "Never the Desktop install (exe) directory."
+    },
+    "slot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "slotRef",
+        "rootRef",
+        "absolutePath",
+        "relativeLayout",
+        "pathKind",
+        "writePolicy",
+        "writeBoundary",
+        "isolationMode",
+        "expectedExistingState",
+        "writableEvidence",
+        "capacityEvidence",
+        "requiredCompletionMarker"
+      ],
+      "properties": {
+        "slotRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rootRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "absolutePath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "relativeLayout": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pathKind": {
+          "$ref": "#/definitions/slotKind"
+        },
+        "writePolicy": {
+          "enum": [
+            "newInactiveVersion",
+            "createMissing",
+            "maintenanceReplace"
+          ]
+        },
+        "writeBoundary": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "allowedRelativeRoots",
+            "overwriteUserContent"
+          ],
+          "properties": {
+            "allowedRelativeRoots": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1
+            },
+            "overwriteUserContent": {
+              "const": false
+            }
+          }
+        },
+        "isolationMode": {
+          "enum": [
+            "versionedRoot",
+            "sharedStoreMaintenance"
+          ]
+        },
+        "expectedExistingState": {
+          "enum": [
+            "absent",
+            "partial",
+            "present"
+          ]
+        },
+        "writableEvidence": {
+          "type": "string",
+          "minLength": 1
+        },
+        "capacityEvidence": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requiredCompletionMarker": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "maintenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required",
+        "condition",
+        "maintenanceRef"
+      ],
+      "properties": {
+        "required": {
+          "type": "boolean"
+        },
+        "condition": {
+          "enum": [
+            "none",
+            "serviceStopped",
+            "maintenanceWindow"
+          ]
+        },
+        "maintenanceRef": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        }
+      }
+    },
+    "hostBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "hostId",
+        "instanceRef",
+        "sameHostFilesystemRequired",
+        "agentLocalPathAccepted"
+      ],
+      "properties": {
+        "hostId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "instanceRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sameHostFilesystemRequired": {
+          "const": true
+        },
+        "agentLocalPathAccepted": {
+          "const": false
+        }
+      }
+    },
+    "targetTicket": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "ticketRef",
+        "revision",
+        "requestRef",
+        "hostBinding",
+        "moduleRefs",
+        "requirementBundleRef",
+        "requirementBundleRevision",
+        "baselineFingerprint",
+        "targetSlots",
+        "maintenance",
+        "validity",
+        "submissionContractRef",
+        "licenseAcceptances",
+        "requestedCapabilities"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "ticketRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "requestRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "hostBinding": {
+          "$ref": "#/definitions/hostBinding"
+        },
+        "moduleRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "runtime-requirements.schema.json#/definitions/id"
+          },
+          "minItems": 1
+        },
+        "requirementBundleRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requirementBundleRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "baselineFingerprint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "targetSlots": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/slot"
+          },
+          "minItems": 1
+        },
+        "maintenance": {
+          "$ref": "#/definitions/maintenance"
+        },
+        "validity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "issuedAt",
+            "expiresAt"
+          ],
+          "properties": {
+            "issuedAt": {
+              "type": "string",
+              "minLength": 1
+            },
+            "expiresAt": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "submissionContractRef": {
+          "const": "runtime-intake-receipt.schema.json#/definitions/deliveryManifest"
+        },
+        "licenseAcceptances": {
+          "type": "object",
+          "description": "RI013/RI026: moduleId -> true for upstream licenses the user explicitly confirmed in the app (copied from the host's license acceptance store at issue time; never from agent input).",
+          "additionalProperties": {
+            "enum": [
+              true
+            ]
+          }
+        },
+        "requestedCapabilities": {
+          "type": "array",
+          "description": "Capabilities the agent asked the host to open (selection.requestedCapabilities); a request only, adapters decide (RI029 rejects arbitrary shell).",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        }
+      }
+    }
+  },
+  "$ref": "#/definitions/targetTicket"
+}

@@ -1,0 +1,440 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bgxiong.com/app-contracts/v1/creator-motion-actions.schema.json",
+  "title": "CreatorMotionActions",
+  "description": "Args for motion Creator tools (motion PLAN AM073-AM076). Read + write tools; delivery deferred.",
+  "definitions": {
+    "motionRuntimeGetArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {}
+    },
+    "motionLibraryListArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "cursor": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 256
+        },
+        "limit": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "maximum": 100
+        },
+        "query": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 128
+        },
+        "projectId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 128
+        }
+      }
+    },
+    "motionBundleListArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "cursor": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 256
+        },
+        "limit": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "maximum": 100
+        },
+        "query": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 128
+        },
+        "projectId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 128
+        }
+      }
+    },
+    "motionSceneGetArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      }
+    },
+    "motionRenderGetArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      }
+    },
+    "motionLibraryImportArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "archivePath"
+      ],
+      "properties": {
+        "archivePath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        }
+      }
+    },
+    "motionLibrarySetEnabledArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "digest",
+        "enabled"
+      ],
+      "properties": {
+        "digest": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "motionLibraryRemoveImpactArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "digest"
+      ],
+      "properties": {
+        "digest": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      }
+    },
+    "motionLibraryRemoveArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "digest",
+        "confirmToken"
+      ],
+      "properties": {
+        "digest": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "confirmToken": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      }
+    },
+    "motionLibraryExportArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "digest",
+        "destPath"
+      ],
+      "properties": {
+        "digest": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "destPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        }
+      }
+    },
+    "motionAuthorRunArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "verb",
+        "projectDir",
+        "pickedByDialog"
+      ],
+      "properties": {
+        "verb": {
+          "type": "string",
+          "enum": [
+            "init",
+            "check",
+            "build",
+            "dev",
+            "test",
+            "pack"
+          ]
+        },
+        "projectDir": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "pickedByDialog": {
+          "type": "boolean"
+        },
+        "templateId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 64
+        }
+      }
+    },
+    "motionSceneSaveArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request"
+      ],
+      "properties": {
+        "request": {
+          "type": "object"
+        },
+        "projectId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 128
+        }
+      }
+    },
+    "motionAssetFreezeArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "path"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "image",
+            "font",
+            "audio",
+            "video",
+            "data"
+          ]
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        }
+      }
+    },
+    "motionPreviewCallArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "params"
+      ],
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": [
+            "session.open",
+            "session.update",
+            "session.seek",
+            "session.close"
+          ]
+        },
+        "params": {
+          "type": "object"
+        }
+      }
+    },
+    "motionDesignValidateArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "design"
+      ],
+      "properties": {
+        "design": {}
+      }
+    },
+    "motionDesignStartArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "packet"
+      ],
+      "properties": {
+        "packet": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "requirement"
+          ],
+          "properties": {
+            "requirement": {
+              "type": "string",
+              "minLength": 1
+            },
+            "cues": {
+              "type": "array",
+              "maxItems": 2000,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "cueId",
+                  "startMs",
+                  "endMs",
+                  "text"
+                ],
+                "properties": {
+                  "cueId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "startMs": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "endMs": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "projectId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 128
+        }
+      }
+    },
+    "motionRenderStartArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "idempotencyKey",
+        "scenes",
+        "outputProfile",
+        "outputDir"
+      ],
+      "properties": {
+        "idempotencyKey": {
+          "type": "string",
+          "minLength": 1
+        },
+        "projectId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "scenes": {
+          "type": "array"
+        },
+        "outputProfile": {
+          "type": "string"
+        },
+        "outputDir": {
+          "type": "string"
+        }
+      }
+    },
+    "motionRenderCancelArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "jobId"
+      ],
+      "properties": {
+        "jobId": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "motionBundleExportArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "bundleId",
+        "destDir"
+      ],
+      "properties": {
+        "bundleId": {
+          "type": "string"
+        },
+        "destDir": {
+          "type": "string"
+        }
+      }
+    },
+    "motionDeliveryPrepareArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "bundleId": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,251 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-capability-registry.schema.json",
+  "title": "CreatorCapabilityRegistry",
+  "description": "S15: closed capability registry for the F1/MCP three-canvas creative flow. A published entry only adds ownerPort/targetKinds to an existing creator-tool-catalog.json tool (catalog stays the single source of effect/billing/undo/revision; duplicating them here is rejected). A planned entry declares everything inline and is never projected into published tool lists (F1 schema / MCP tools/list / capabilities.get published section). nestedRemoteModel=true forces billing remoteMetered: a tool that calls a remote model internally can never be advertised as none/localFree.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "note",
+    "ownerPorts",
+    "capabilities"
+  ],
+  "definitions": {
+    "nonBlank": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "\\S"
+    },
+    "capabilityId": {
+      "type": "string",
+      "pattern": "^[a-z][a-zA-Z0-9]*(\\.[a-z][a-zA-Z0-9_]*)+$",
+      "maxLength": 96
+    },
+    "ownerPort": {
+      "enum": [
+        "contextPort",
+        "queryPort",
+        "surfacePort",
+        "changePlanPort",
+        "generationPort",
+        "taskPort",
+        "mediaDescribePort",
+        "creativeRevisionPort",
+        "shotRestructurePort",
+        "workbenchPort",
+        "recipePort",
+        "textOrganizePort",
+        "storyCreationPort"
+      ]
+    },
+    "targetKind": {
+      "enum": [
+        "actor",
+        "canvasEdge",
+        "canvasNode",
+        "canvasProject",
+        "chapter",
+        "chatAttachment",
+        "clipNode",
+        "delivery",
+        "mediaVersion",
+        "memory",
+        "motionBundle",
+        "motionScene",
+        "motionTemplate",
+        "projectFile",
+        "projectRoot",
+        "role",
+        "singingPlan",
+        "skill",
+        "skillDraft",
+        "story",
+        "storyProp",
+        "storySource",
+        "task",
+        "visualAsset"
+      ]
+    },
+    "targetKinds": {
+      "type": "array",
+      "maxItems": 24,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/targetKind"
+      },
+      "description": "Empty = kind-agnostic (operates on plan/task/change ids)."
+    },
+    "effectClass": {
+      "enum": [
+        "read",
+        "prepare",
+        "apply",
+        "undo",
+        "task",
+        "ui"
+      ]
+    },
+    "billing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "class",
+        "nestedRemoteModel"
+      ],
+      "properties": {
+        "class": {
+          "enum": [
+            "none",
+            "localFree",
+            "remoteMetered"
+          ]
+        },
+        "nestedRemoteModel": {
+          "type": "boolean"
+        }
+      }
+    },
+    "published": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capabilityId",
+        "availability",
+        "catalogToolId",
+        "ownerPort",
+        "targetKinds",
+        "nestedRemoteModel"
+      ],
+      "properties": {
+        "capabilityId": {
+          "$ref": "#/definitions/capabilityId"
+        },
+        "availability": {
+          "const": "published"
+        },
+        "catalogToolId": {
+          "$ref": "#/definitions/nonBlank"
+        },
+        "ownerPort": {
+          "$ref": "#/definitions/ownerPort"
+        },
+        "targetKinds": {
+          "$ref": "#/definitions/targetKinds"
+        },
+        "nestedRemoteModel": {
+          "type": "boolean",
+          "description": "Cross-checked against the catalog billingClass (true requires remoteMetered)."
+        }
+      }
+    },
+    "planned": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capabilityId",
+        "availability",
+        "plannedIn",
+        "ownerPort",
+        "targetKinds",
+        "effects",
+        "billing",
+        "revisionPolicy",
+        "undo"
+      ],
+      "properties": {
+        "capabilityId": {
+          "$ref": "#/definitions/capabilityId"
+        },
+        "availability": {
+          "const": "planned"
+        },
+        "plannedIn": {
+          "type": "string",
+          "pattern": "^S[0-9]{2}$"
+        },
+        "ownerPort": {
+          "$ref": "#/definitions/ownerPort"
+        },
+        "targetKinds": {
+          "$ref": "#/definitions/targetKinds"
+        },
+        "effects": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/definitions/effectClass"
+          }
+        },
+        "billing": {
+          "$ref": "#/definitions/billing"
+        },
+        "revisionPolicy": {
+          "enum": [
+            "none",
+            "resourceCas",
+            "draftCas",
+            "changeSetCas"
+          ]
+        },
+        "undo": {
+          "enum": [
+            "none",
+            "token",
+            "tombstone",
+            "externalIrreversible"
+          ]
+        },
+        "contractRef": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+\\.schema\\.json$"
+        }
+      }
+    }
+  },
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "note": {
+      "type": "string"
+    },
+    "ownerPorts": {
+      "const": [
+        "contextPort",
+        "queryPort",
+        "surfacePort",
+        "changePlanPort",
+        "generationPort",
+        "taskPort",
+        "mediaDescribePort",
+        "creativeRevisionPort",
+        "shotRestructurePort",
+        "workbenchPort",
+        "recipePort",
+        "textOrganizePort",
+        "storyCreationPort"
+      ]
+    },
+    "capabilities": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 256,
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/definitions/published"
+          },
+          {
+            "$ref": "#/definitions/planned"
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,5 @@
+[
+  {"targetId":"image/qwen-image-2.1","label":"Qwen Image 2.1","methodId":"qwen-image-2-1-prompt-writing"},
+  {"targetId":"image/seedream-5.5","label":"Seedream 5.5","methodId":"seedream-5-5-prompt-writing"},
+  {"targetId":"image/h3","label":"H3-Image","methodId":"h3-image-prompt-writing"}
+]

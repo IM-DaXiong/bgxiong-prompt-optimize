@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "formatVersion": 1,
+  "maxFileBytes": 8388608,
+  "maxDepth": 64,
+  "maxTotalInputBytes": 33554432,
+  "initTimeoutMs": 3000
+}

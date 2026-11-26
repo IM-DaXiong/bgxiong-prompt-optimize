@@ -1,0 +1,1623 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "agent-skill-management-tools.schema.json",
+  "title": "Agent Skills management tools (unified Creator tools)",
+  "description": "Business inputs/outputs of the unified skills.* management tools. Every client (UI, F1, MCP) calls these through the Creator kernel; the kernel injects and validates callContext. Writes run the E02 effect coordinator; publish goes through change.apply.",
+  "schemaVersion": 1,
+  "tools": {
+    "skills.online.check": {
+      "input": {
+        "$ref": "#/definitions/onlineEmpty"
+      },
+      "output": {
+        "$ref": "#/definitions/onlineCheckOutput"
+      },
+      "purpose": "Check the signed official Skill catalog."
+    },
+    "skills.online.status": {
+      "input": {
+        "$ref": "#/definitions/onlineEmpty"
+      },
+      "output": {
+        "$ref": "#/definitions/onlineStatusOutput"
+      },
+      "purpose": "Read official Skill update operation state."
+    },
+    "skills.online.change.prepare": {
+      "input": {
+        "$ref": "#/definitions/onlinePrepare"
+      },
+      "purpose": "Prepare skills.online.start, skills.online.cancel, skills.online.retryCleanup, or skills.online.autoRun. Apply with change.apply."
+    },
+    "skills.library.list": {
+      "input": {
+        "$ref": "agent-skill-library.schema.json#/definitions/libraryListInput"
+      },
+      "output": {
+        "$ref": "#/definitions/libraryPage"
+      },
+      "purpose": "分页列出技能库（含本地覆盖与内置修改投影）。"
+    },
+    "skills.library.get": {
+      "input": {
+        "$ref": "#/definitions/stableIdInput"
+      },
+      "output": {
+        "$ref": "#/definitions/detailOutput"
+      },
+      "purpose": "读取一个技能的详情与版本列表；可选 resourceRef=SKILL.md 附带当前已发布正文（不打开草稿）。"
+    },
+    "skills.layout.project": {
+      "input": {
+        "$ref": "#/definitions/layoutProjectInput"
+      },
+      "output": {
+        "$ref": "#/definitions/layoutProjectOutput"
+      },
+      "purpose": "只读投影一个已冻结技能在指定宿主、模式和生成方式下的画幅、槽位和单图版式。不改技能，也不出图。"
+    },
+    "skills.library.patch": {
+      "input": {
+        "$ref": "agent-skill-library.schema.json#/definitions/patchInput"
+      },
+      "output": {
+        "$ref": "#/definitions/mutationOutput"
+      },
+      "purpose": "批量修改技能库元数据（启用、名称、宿主、分类、标签、顺序）。"
+    },
+    "skills.versions.list": {
+      "input": {
+        "$ref": "#/definitions/versionsListInput"
+      },
+      "output": {
+        "$ref": "#/definitions/versionsOutput"
+      },
+      "purpose": "列出一个技能当前与保留的版本。"
+    },
+    "skills.versions.activate": {
+      "input": {
+        "$ref": "#/definitions/versionsActivateInput"
+      },
+      "output": {
+        "$ref": "#/definitions/mutationOutput"
+      },
+      "purpose": "切换一个技能的当前版本。"
+    },
+    "skills.uninstall": {
+      "input": {
+        "$ref": "#/definitions/uninstallInput"
+      },
+      "output": {
+        "$ref": "#/definitions/mutationOutput"
+      },
+      "purpose": "卸载一个技能（版本文件留给 GC）。"
+    },
+    "skills.edit.open": {
+      "input": {
+        "$ref": "#/definitions/editOpenInput"
+      },
+      "output": {
+        "$ref": "#/definitions/draft"
+      },
+      "purpose": "打开编辑草稿：编辑已安装技能、新建或恢复草稿。"
+    },
+    "skills.edit.read": {
+      "input": {
+        "$ref": "#/definitions/editReadInput"
+      },
+      "output": {
+        "$ref": "#/definitions/readOutput"
+      },
+      "purpose": "分页读取草稿中的一个文本文件。"
+    },
+    "skills.edit.get": {
+      "input": {
+        "$ref": "#/definitions/editGetInput"
+      },
+      "output": {
+        "$ref": "#/definitions/draft"
+      },
+      "purpose": "读取草稿当前状态（只读，不产生写入回执）。"
+    },
+    "skills.edit.save": {
+      "input": {
+        "$ref": "#/definitions/editSaveInput"
+      },
+      "output": {
+        "$ref": "#/definitions/draft"
+      },
+      "purpose": "保存草稿文件操作（删除/重命名携带文件哈希）。"
+    },
+    "skills.edit.rebase": {
+      "input": {
+        "$ref": "#/definitions/editRebaseInput"
+      },
+      "output": {
+        "$ref": "#/definitions/rebaseOutput"
+      },
+      "purpose": "把草稿变基到当前已安装版本；冲突需显式决定。"
+    },
+    "skills.edit.publish.prepare": {
+      "input": {
+        "$ref": "#/definitions/publishPrepareInput"
+      },
+      "output": {
+        "$ref": "#/definitions/publishOutput"
+      },
+      "purpose": "为草稿准备发布变更集，之后由 change.apply 生效。"
+    },
+    "skills.edit.discard": {
+      "input": {
+        "$ref": "#/definitions/draftRevisionInput"
+      },
+      "output": {
+        "$ref": "#/definitions/discardOutput"
+      },
+      "purpose": "丢弃草稿指针（不可变对象留给 GC）。"
+    }
+  },
+  "definitions": {
+    "onlineEmpty": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {}
+    },
+    "onlinePrepare": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "actions"
+      ],
+      "properties": {
+        "actions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type",
+                  "actionId",
+                  "candidateId",
+                  "confirmInstall"
+                ],
+                "properties": {
+                  "type": {
+                    "const": "skills.online.start"
+                  },
+                  "actionId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "candidateId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "expectedDigest": {
+                    "type": "string",
+                    "pattern": "^sha256:[0-9a-f]{64}$"
+                  },
+                  "confirmInstall": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type",
+                  "actionId",
+                  "operationId"
+                ],
+                "properties": {
+                  "type": {
+                    "const": "skills.online.cancel"
+                  },
+                  "actionId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "operationId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^[a-fA-F0-9]{8}(?:-[a-fA-F0-9]{4}){3}-[a-fA-F0-9]{12}$"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type",
+                  "actionId",
+                  "operationId"
+                ],
+                "properties": {
+                  "type": {
+                    "const": "skills.online.retryCleanup"
+                  },
+                  "actionId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "operationId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^[a-fA-F0-9]{8}(?:-[a-fA-F0-9]{4}){3}-[a-fA-F0-9]{12}$"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type",
+                  "actionId"
+                ],
+                "properties": {
+                  "type": {
+                    "const": "skills.online.autoRun"
+                  },
+                  "actionId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "onlineCheckOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sequence",
+        "publishedAt",
+        "candidates"
+      ],
+      "properties": {
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "publishedAt": {
+          "type": "string"
+        },
+        "candidates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "candidateId",
+              "packageId",
+              "version",
+              "displayName",
+              "bytes",
+              "expectedDigest",
+              "reason"
+            ],
+            "properties": {
+              "candidateId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "packageId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "version": {
+                "type": "string",
+                "minLength": 1
+              },
+              "displayName": {
+                "type": "string",
+                "minLength": 1
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "expectedDigest": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "reason": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "onlineStatusOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operations"
+      ],
+      "properties": {
+        "operations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "operationId",
+              "candidateId",
+              "packageId",
+              "version",
+              "phase",
+              "errorCode",
+              "addedTools"
+            ],
+            "properties": {
+              "operationId": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^[a-fA-F0-9]{8}(?:-[a-fA-F0-9]{4}){3}-[a-fA-F0-9]{12}$"
+              },
+              "candidateId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "packageId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "version": {
+                "type": "string",
+                "minLength": 1
+              },
+              "phase": {
+                "enum": [
+                  "queued",
+                  "downloading",
+                  "verifying",
+                  "switching",
+                  "oldInUse",
+                  "cleaning",
+                  "done",
+                  "cancelled",
+                  "failed",
+                  "cleanupFailed"
+                ]
+              },
+              "errorCode": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "addedTools": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "stableIdInput": {
+      "type": "object",
+      "required": [
+        "stableId"
+      ],
+      "properties": {
+        "stableId": {
+          "$ref": "agent-skills.json#/definitions/stableId"
+        },
+        "resourceRef": {
+          "description": "Optional. Only SKILL.md is accepted: attach the current published package body. Omit to keep the detail-only response.",
+          "const": "SKILL.md"
+        }
+      },
+      "additionalProperties": false
+    },
+    "versionsListInput": {
+      "type": "object",
+      "required": [
+        "stableId"
+      ],
+      "properties": {
+        "stableId": {
+          "$ref": "agent-skills.json#/definitions/stableId"
+        }
+      },
+      "additionalProperties": false
+    },
+    "versionsActivateInput": {
+      "type": "object",
+      "required": [
+        "stableId",
+        "packageDigest",
+        "expectedEntryToken"
+      ],
+      "properties": {
+        "stableId": {
+          "$ref": "agent-skills.json#/definitions/stableId"
+        },
+        "packageDigest": {
+          "$ref": "agent-skills.json#/definitions/packageDigest"
+        },
+        "expectedEntryToken": {
+          "$ref": "agent-skill-library.schema.json#/definitions/entryToken"
+        }
+      },
+      "additionalProperties": false
+    },
+    "uninstallInput": {
+      "type": "object",
+      "required": [
+        "stableId",
+        "expectedEntryToken"
+      ],
+      "properties": {
+        "stableId": {
+          "$ref": "agent-skills.json#/definitions/stableId"
+        },
+        "expectedEntryToken": {
+          "$ref": "agent-skill-library.schema.json#/definitions/entryToken"
+        }
+      },
+      "additionalProperties": false
+    },
+    "editSelection": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "skillRef"
+          ],
+          "properties": {
+            "kind": {
+              "const": "edit"
+            },
+            "skillRef": {
+              "$ref": "agent-skills.json#/definitions/skillRef"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "name"
+          ],
+          "properties": {
+            "kind": {
+              "const": "create"
+            },
+            "name": {
+              "$ref": "agent-skills.json#/definitions/skillName"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "draftId"
+          ],
+          "properties": {
+            "kind": {
+              "const": "resume"
+            },
+            "draftId": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "editOpenInput": {
+      "type": "object",
+      "required": [
+        "selection"
+      ],
+      "properties": {
+        "selection": {
+          "$ref": "#/definitions/editSelection"
+        }
+      },
+      "additionalProperties": false
+    },
+    "draftRevisionInput": {
+      "type": "object",
+      "required": [
+        "draftId",
+        "expectedDraftRevision"
+      ],
+      "properties": {
+        "draftId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "expectedDraftRevision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "additionalProperties": false
+    },
+    "editReadInput": {
+      "type": "object",
+      "required": [
+        "draftId",
+        "expectedDraftRevision",
+        "resourceRef",
+        "offset"
+      ],
+      "properties": {
+        "draftId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "expectedDraftRevision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "resourceRef": {
+          "$ref": "agent-skills.json#/definitions/resourceRef"
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "draftFileOperation": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "path",
+            "text"
+          ],
+          "properties": {
+            "kind": {
+              "const": "putText"
+            },
+            "path": {
+              "$ref": "agent-skills.json#/definitions/resourceRef"
+            },
+            "text": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "path",
+            "fileRef"
+          ],
+          "properties": {
+            "kind": {
+              "const": "putBinary"
+            },
+            "path": {
+              "$ref": "agent-skills.json#/definitions/resourceRef"
+            },
+            "fileRef": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200,
+              "description": "Opaque E04 FileRef issued by the Host file adapter; never a path or bytes."
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "path",
+            "expectedFileSha256"
+          ],
+          "properties": {
+            "kind": {
+              "const": "delete"
+            },
+            "path": {
+              "$ref": "agent-skills.json#/definitions/resourceRef"
+            },
+            "expectedFileSha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "from",
+            "to",
+            "expectedFileSha256"
+          ],
+          "properties": {
+            "kind": {
+              "const": "rename"
+            },
+            "from": {
+              "$ref": "agent-skills.json#/definitions/resourceRef"
+            },
+            "to": {
+              "$ref": "agent-skills.json#/definitions/resourceRef"
+            },
+            "expectedFileSha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "editSaveInput": {
+      "type": "object",
+      "required": [
+        "draftId",
+        "expectedDraftRevision",
+        "fileOps"
+      ],
+      "properties": {
+        "draftId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "expectedDraftRevision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "fileOps": {
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 1000,
+          "items": {
+            "$ref": "#/definitions/draftFileOperation"
+          }
+        },
+        "versionPolicy": {
+          "$ref": "#/definitions/versionPolicy"
+        }
+      },
+      "additionalProperties": false,
+      "description": "fileOps may be empty only together with versionPolicy (Host rejects otherwise)."
+    },
+    "fileHashes": {
+      "type": "object",
+      "properties": {
+        "base": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "current": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "draft": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "rebaseResolution": {
+      "type": "object",
+      "required": [
+        "path",
+        "hashes",
+        "result"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "agent-skills.json#/definitions/resourceRef"
+        },
+        "hashes": {
+          "$ref": "#/definitions/fileHashes"
+        },
+        "result": {
+          "oneOf": [
+            {
+              "type": "object",
+              "required": [
+                "kind",
+                "text"
+              ],
+              "properties": {
+                "kind": {
+                  "const": "text"
+                },
+                "text": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "kind",
+                "fileRef"
+              ],
+              "properties": {
+                "kind": {
+                  "const": "binary"
+                },
+                "fileRef": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200,
+                  "description": "Opaque E04 FileRef issued by the Host file adapter; never a path or bytes."
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "kind"
+              ],
+              "properties": {
+                "kind": {
+                  "const": "delete"
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "editRebaseInput": {
+      "type": "object",
+      "required": [
+        "draftId",
+        "expectedDraftRevision",
+        "resolutions"
+      ],
+      "properties": {
+        "draftId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "expectedDraftRevision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "resolutions": {
+          "type": "array",
+          "maxItems": 1000,
+          "items": {
+            "$ref": "#/definitions/rebaseResolution"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "draftFile": {
+      "type": "object",
+      "required": [
+        "path",
+        "sha256",
+        "kind",
+        "bytes"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "agent-skills.json#/definitions/resourceRef"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "kind": {
+          "enum": [
+            "text",
+            "binary"
+          ]
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "draft": {
+      "type": "object",
+      "required": [
+        "draftId",
+        "draftRevision",
+        "name",
+        "orphaned",
+        "files",
+        "diagnostics"
+      ],
+      "properties": {
+        "draftId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "draftRevision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "name": {
+          "type": "string"
+        },
+        "orphaned": {
+          "type": "boolean"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/draftFile"
+          }
+        },
+        "diagnostics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "effect": {
+          "$ref": "#/definitions/canonicalEffect"
+        }
+      },
+      "additionalProperties": false
+    },
+    "card": {
+      "type": "object",
+      "required": [
+        "skillRef",
+        "entryToken",
+        "displayName",
+        "description",
+        "enabled",
+        "source",
+        "formatStatus",
+        "categoryIds",
+        "tags",
+        "hosts",
+        "available",
+        "overrides",
+        "builtinModified",
+        "projectionBindings",
+        "projectionBindingIssues",
+        "version",
+        "executionReadiness",
+        "limitations"
+      ],
+      "properties": {
+        "skillRef": {
+          "$ref": "agent-skills.json#/definitions/skillRef"
+        },
+        "entryToken": {
+          "$ref": "agent-skill-library.schema.json#/definitions/entryToken"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "source": {
+          "$ref": "agent-skills.json#/definitions/source"
+        },
+        "formatStatus": {
+          "$ref": "agent-skills.json#/definitions/formatStatus"
+        },
+        "categoryIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "hosts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "available": {
+          "type": "boolean"
+        },
+        "executionReadiness": {
+          "description": "Unavailable when the package workflow is incompatible or unreadable. Null means no workflow block was found; full readiness still requires the requested operation and actual host capabilities.",
+          "anyOf": [
+            { "$ref": "agent-skills.json#/definitions/executionReadiness" },
+            { "type": "null" }
+          ]
+        },
+        "limitations": {
+          "type": "array",
+          "items": { "$ref": "agent-skills.json#/definitions/limitation" }
+        },
+        "overrides": {
+          "type": "object",
+          "required": [
+            "displayName",
+            "hosts",
+            "categories",
+            "tags",
+            "projectionBindings"
+          ],
+          "properties": {
+            "displayName": {
+              "type": "boolean"
+            },
+            "hosts": {
+              "type": "boolean"
+            },
+            "categories": {
+              "type": "boolean"
+            },
+            "tags": {
+              "type": "boolean"
+            },
+            "projectionBindings": {
+              "type": "boolean",
+              "description": "The row carries library video prompt projection bindings (user config, CF-22)."
+            }
+          },
+          "additionalProperties": false
+        },
+        "builtinModified": {
+          "type": "boolean",
+          "description": "Builtin row whose digest differs from its verified official baseline; false when no baseline is known."
+        },
+        "projectionBindings": {
+          "type": "array",
+          "description": "Library video prompt projection bindings of the row in wire form; [] when the row has none (CF-37).",
+          "items": {
+            "$ref": "agent-skill-library.schema.json#/definitions/projectionBinding"
+          }
+        },
+        "projectionBindingIssues": {
+          "description": "Kept bindings that are not bound against the row's current version; [] = none; null = the current version's manifest cannot be read, so compatibility is unknown (CF-37).",
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/projectionRebind"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "version": {
+          "$ref": "#/definitions/versionInfo"
+        }
+      },
+      "additionalProperties": false
+    },
+    "projectionRebind": {
+      "type": "object",
+      "description": "One kept projection binding that is not bound against a package version: reported by card issues, version activation and the publish plan, never dropped (VS15/VS26/CF-31/CF-32).",
+      "required": [
+        "profileId",
+        "profileVersion",
+        "state",
+        "missingResourceRefs"
+      ],
+      "properties": {
+        "profileId": {
+          "$ref": "agent-skill-library.schema.json#/definitions/projectionProfileId"
+        },
+        "profileVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "state": {
+          "$ref": "agent-skill-library.schema.json#/definitions/projectionBindingState"
+        },
+        "missingResourceRefs": {
+          "type": "array",
+          "description": "Bound resourceRefs absent from the version; non-empty only for resourceMissing.",
+          "items": {
+            "$ref": "agent-skills.json#/definitions/resourceRef"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "libraryPage": {
+      "type": "object",
+      "required": [
+        "revision",
+        "rows",
+        "categories",
+        "nextCursor",
+        "total",
+        "diagnostics",
+        "suppressedBuiltins"
+      ],
+      "properties": {
+        "revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/card"
+          }
+        },
+        "categories": {
+          "type": "array",
+          "items": {
+            "$ref": "agent-skill-library.schema.json#/definitions/category"
+          }
+        },
+        "nextCursor": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "diagnostics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "suppressedBuiltins": {
+          "description": "Builtins the user uninstalled (explicit suppression). restorable: this build ships the trusted official package, so restoreBuiltin can bring the entry back.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/suppressedBuiltin"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "suppressedBuiltin": {
+      "type": "object",
+      "required": [
+        "stableId",
+        "displayName",
+        "restorable"
+      ],
+      "properties": {
+        "stableId": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "restorable": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "mutationOutput": {
+      "type": "object",
+      "required": [
+        "revision",
+        "changed"
+      ],
+      "properties": {
+        "revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "changed": {
+          "type": "boolean"
+        },
+        "createdCategoryIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "effect": {
+          "$ref": "#/definitions/canonicalEffect"
+        },
+        "projectionRebinds": {
+          "type": "array",
+          "description": "skills.versions.activate: kept bindings that are not bound against the activated version (CF-37).",
+          "items": {
+            "$ref": "#/definitions/projectionRebind"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "versionsOutput": {
+      "type": "object",
+      "required": [
+        "items",
+        "nextCursor"
+      ],
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "skillRef",
+              "label",
+              "versionStatus",
+              "current",
+              "available"
+            ],
+            "properties": {
+              "skillRef": {
+                "$ref": "agent-skills.json#/definitions/skillRef"
+              },
+              "label": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "current": {
+                "type": "boolean"
+              },
+              "available": {
+                "type": "boolean"
+              },
+              "versionStatus": {
+                "enum": [
+                  "declared",
+                  "missing",
+                  "nonStandard",
+                  "unavailable"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "nextCursor": {
+          "type": "null"
+        }
+      },
+      "additionalProperties": false
+    },
+    "readOutput": {
+      "type": "object",
+      "required": [
+        "text",
+        "nextOffset",
+        "sha256"
+      ],
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "nextOffset": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "rebaseOutput": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "draft"
+          ],
+          "properties": {
+            "kind": {
+              "const": "prepared"
+            },
+            "draft": {
+              "$ref": "#/definitions/draft"
+            },
+            "effect": {
+              "$ref": "#/definitions/canonicalEffect"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "conflicts"
+          ],
+          "properties": {
+            "kind": {
+              "const": "needsResolution"
+            },
+            "conflicts": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "path",
+                  "hashes",
+                  "kind"
+                ],
+                "properties": {
+                  "path": {
+                    "$ref": "agent-skills.json#/definitions/resourceRef"
+                  },
+                  "hashes": {
+                    "$ref": "#/definitions/fileHashes"
+                  },
+                  "kind": {
+                    "enum": [
+                      "bothChanged",
+                      "renameAmbiguous"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "effect": {
+              "$ref": "#/definitions/canonicalEffect"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "publishOutput": {
+      "type": "object",
+      "required": [
+        "changeSetId"
+      ],
+      "properties": {
+        "changeSetId": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "discardOutput": {
+      "type": "object",
+      "required": [
+        "discarded"
+      ],
+      "properties": {
+        "discarded": {
+          "const": true
+        },
+        "effect": {
+          "$ref": "#/definitions/canonicalEffect"
+        }
+      },
+      "additionalProperties": false
+    },
+    "layoutProjectInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stableId",
+        "packageDigest",
+        "host",
+        "mode",
+        "delivery",
+        "selectableAspects"
+      ],
+      "properties": {
+        "stableId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "packageDigest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "host": {
+          "type": "string",
+          "enum": [
+            "actor",
+            "role_portrait",
+            "beat_scene",
+            "prop_asset",
+            "scene_asset"
+          ]
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "view3",
+            "view4",
+            "view9"
+          ]
+        },
+        "delivery": {
+          "type": "string",
+          "enum": [
+            "sheet_single_shot",
+            "per_angle_batch"
+          ]
+        },
+        "selectableAspects": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "16:9",
+              "9:16",
+              "1:1",
+              "4:3",
+              "3:4",
+              "21:9",
+              "4:5"
+            ]
+          }
+        }
+      }
+    },
+    "layoutProjectOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "errorCode",
+        "requiredAspectRatio",
+        "sheetAvailable",
+        "slotIds",
+        "packageDigest",
+        "host",
+        "mode",
+        "delivery"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "compatible",
+            "model_unsupported",
+            "layout_invalid",
+            "mode_unsupported",
+            "binding_changed"
+          ]
+        },
+        "errorCode": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "requiredAspectRatio": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sheetAvailable": {
+          "type": "boolean"
+        },
+        "slotIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "packageDigest": {
+          "type": "string"
+        },
+        "host": {
+          "type": "string"
+        },
+        "mode": {
+          "type": "string"
+        },
+        "delivery": {
+          "type": "string"
+        }
+      }
+    },
+    "detailOutput": {
+      "type": "object",
+      "required": [
+        "row",
+        "versions",
+        "pendingEffect",
+        "suppressedBuiltin"
+      ],
+      "properties": {
+        "row": {
+          "$ref": "#/definitions/card"
+        },
+        "versions": {
+          "type": "array",
+          "items": {
+            "$ref": "agent-skills.json#/definitions/packageDigest"
+          }
+        },
+        "pendingEffect": {
+          "type": "boolean"
+        },
+        "suppressedBuiltin": {
+          "type": "boolean"
+        },
+        "resource": {
+          "description": "Present only when input.resourceRef was SKILL.md.",
+          "type": "object",
+          "required": [
+            "resourceRef",
+            "text",
+            "sha256"
+          ],
+          "properties": {
+            "resourceRef": {
+              "const": "SKILL.md"
+            },
+            "text": {
+              "type": "string"
+            },
+            "sha256": {
+              "$ref": "agent-skills.json#/definitions/sha256Hex"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "canonicalEffect": {
+      "description": "Committed skills mutations return data.effect from the shared canonical EffectStore. The effect ID, operation reference and sequence are real store values; native receipts commit the canonical effect and request evidence in the same SQLite transaction. Replay returns the stored complete result. Read-only calls and handler-only tests without the kernel do not fabricate effects.",
+      "$ref": "creator-effect-receipt.schema.json"
+    },
+    "versionPolicy": {
+      "description": "S03: Host writes SKILL.md metadata.version in the same save. auto = patch bump of the published version (new package 1.0.0); manual = validated MAJOR.MINOR.PATCH greater than the published one and unused.",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "mode"
+          ],
+          "properties": {
+            "mode": {
+              "const": "auto"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "mode",
+            "version"
+          ],
+          "properties": {
+            "mode": {
+              "const": "manual"
+            },
+            "version": {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "versionInfo": {
+      "type": "object",
+      "required": [
+        "label",
+        "status"
+      ],
+      "properties": {
+        "label": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "metadata.version text; null when the package declares none. Never a digest."
+        },
+        "status": {
+          "enum": [
+            "declared",
+            "missing",
+            "nonStandard",
+            "unavailable"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "editGetInput": {
+      "type": "object",
+      "required": [
+        "draftId"
+      ],
+      "properties": {
+        "draftId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "publishPrepareInput": {
+      "type": "object",
+      "required": [
+        "draftId",
+        "expectedDraftRevision"
+      ],
+      "properties": {
+        "draftId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "expectedDraftRevision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "libraryPatch": {
+          "description": "S06: local property changes saved together with this publish. Applied by the publish applier under the same library lock, CAS on expectedLibraryRevision; every action must name the publish target.",
+          "$ref": "agent-skill-library.schema.json#/definitions/patchInput"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

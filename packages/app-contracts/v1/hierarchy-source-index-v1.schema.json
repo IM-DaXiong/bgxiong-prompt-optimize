@@ -1,0 +1,131 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "hierarchy-source-index-v1.schema.json",
+  "$ref": "#/definitions/SourceIndex",
+  "definitions": {
+    "SourceBoundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "boundaryId",
+        "byteOffset"
+      ],
+      "properties": {
+        "boundaryId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "byteOffset": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "SourceRange": {
+      "type": "object",
+      "description": "A nonempty half-open source interval [startBoundaryId, endBoundaryId). Copy both IDs from the explicitly provided source units or source-index mapping. Their original source order must satisfy start < end; the host validates their frozen byte offsets. A point citation (start=end), reversed interval or invented boundary is invalid.",
+      "additionalProperties": false,
+      "required": [
+        "sourceDigest",
+        "startBoundaryId",
+        "endBoundaryId"
+      ],
+      "properties": {
+        "sourceDigest": {
+          "type": "string",
+          "minLength": 1,
+          "x-closedSet": "sourceDigests"
+        },
+        "startBoundaryId": {
+          "type": "string",
+          "minLength": 1,
+          "x-closedSet": "boundaryIds"
+        },
+        "endBoundaryId": {
+          "type": "string",
+          "minLength": 1,
+          "x-closedSet": "boundaryIds"
+        }
+      }
+    },
+    "SourceIndex": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "sourceDigest",
+        "byteLength",
+        "boundaries"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "sourceDigest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "byteLength": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "boundaries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SourceBoundary"
+          },
+          "minItems": 2
+        }
+      }
+    },
+    "NonNarrativeRange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "range",
+        "reason"
+      ],
+      "properties": {
+        "range": {
+          "$ref": "#/definitions/SourceRange"
+        },
+        "reason": {
+          "type": "string",
+          "enum": [
+            "front_matter",
+            "credits",
+            "annotation",
+            "explicit_exclusion"
+          ]
+        }
+      }
+    },
+    "SourceEntity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceEntityId",
+        "displayName",
+        "entityType"
+      ],
+      "properties": {
+        "sourceEntityId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "entityType": {
+          "type": "string",
+          "enum": [
+            "cast",
+            "prop",
+            "location"
+          ]
+        }
+      }
+    }
+  }
+}

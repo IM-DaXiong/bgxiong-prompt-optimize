@@ -1,0 +1,2199 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-story-actions.schema.json",
+  "title": "CreatorStoryActions",
+  "type": "object",
+  "required": [
+    "actions"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "actionId",
+              "name"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "story.create"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "field",
+              "value",
+              "expectedRevision"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "story.field.patch"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "field": {
+                "enum": [
+                  "name",
+                  "description"
+                ]
+              },
+              "value": {
+                "type": "string"
+              },
+              "expectedRevision": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "tags",
+              "expectedRevision"
+            ],
+            "additionalProperties": false,
+            "description": "Replace the whole story tag list (user order). CAS on the tags revision from resource.get/previous write. Blank/duplicate/over-limit tags are rejected (no silent dedupe).",
+            "properties": {
+              "type": {
+                "const": "tag.set"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "tags": {
+                "type": "array",
+                "maxItems": 32,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 24
+                }
+              },
+              "expectedRevision": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "title"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "chapter.create"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "title": {
+                "type": "string"
+              },
+              "script": {
+                "type": "string",
+                "description": "Optional. Absent creates an empty script. Present, including an empty string, is stored as the script."
+              },
+              "aiPrompt": {
+                "type": "string",
+                "description": "Optional. Absent omits the AI prompt section. An empty string is an explicit empty prompt, not an omitted field."
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "chapterId",
+              "title"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "scene.create"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "chapterId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "title": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "chapterId",
+              "sceneId",
+              "content"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "segment.create"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "chapterId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "sceneId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "content": {
+                "type": "string",
+                "description": "Shot text. Plain text is stored as the story_text_v1 shot title. A story_text_v1 shot envelope is stored as that shot. This action does not write the retired storyboard graph."
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "nodeId",
+              "title",
+              "expectedRevision"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "chapter.title.patch"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "nodeId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "title": {
+                "type": "string"
+              },
+              "expectedRevision": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "nodeId",
+              "script",
+              "expectedRevision"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "chapter.script.patch"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "nodeId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "script": {
+                "type": "string"
+              },
+              "expectedRevision": {
+                "type": "string",
+                "minLength": 1,
+                "description": "chapterContentFingerprint, the same value as fieldRevisions.content"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "nodeId",
+              "aiPrompt",
+              "expectedRevision"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "chapter.aiPrompt.patch"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "nodeId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "aiPrompt": {
+                "type": "string",
+                "description": "Empty string clears the AI prompt section. Omitting the field is rejected."
+              },
+              "expectedRevision": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "actionId",
+              "storyId"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "story.delete"
+              },
+              "actionId": {
+                "type": "string"
+              },
+              "storyId": {
+                "type": "string"
+              },
+              "expectedRevision": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "W5 A501: multi-field story meta patch; each key in fields needs expectedRevisions[key] (field_revision). Stale -> REVISION_STALE, in-action rollback.",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "fields",
+              "expectedRevisions"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "story.patch"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "fields": {
+                "type": "object",
+                "additionalProperties": false,
+                "minProperties": 1,
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  }
+                }
+              },
+              "expectedRevisions": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "W5 A502: role detail patch via RoleDisplayNameService.save_role_detail_panel(node_only). CAS on field_revision(role content).",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "nodeId",
+              "patch",
+              "expectedRevision"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "role.patch"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "nodeId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "patch": {
+                "type": "object",
+                "additionalProperties": false,
+                "minProperties": 1,
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "roleBrief": {
+                    "type": "string"
+                  },
+                  "portraitPromptManual": {
+                    "type": "string"
+                  },
+                  "appearanceExcerptManual": {
+                    "type": "string"
+                  },
+                  "roleVisualContract": {
+                    "type": "object",
+                    "description": "Existing roleVisualContract V1 draft; saved by the role detail service. Partial fields remain missing, never forged ready."
+                  },
+                  "portraitPromptAi": {
+                    "type": "string"
+                  }
+                }
+              },
+              "expectedRevision": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "W5 A503: replace story bible JSON (same path as save_story_bible_content: normalize + style_domain mirror). INV-BIBLE-SAVE-01: empty characters over non-empty -> BIBLE_CHARACTERS_OVERWRITE_REJECTED unless forceClearCharacters. expectedRevision = field_revision(current bible content, \"\" if none).",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "content",
+              "expectedRevision"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "bible.patch"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "content": {
+                "type": "object"
+              },
+              "forceClearCharacters": {
+                "type": "boolean"
+              },
+              "expectedRevision": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "W5 A503: merge-patch prop content (unknown keys e.g. visualSeed preserved). CAS on field_revision(prop content).",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "propId",
+              "fields",
+              "expectedRevision"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "prop.patch"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "propId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "fields": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "narrativeRole": {
+                    "type": "string"
+                  },
+                  "notes": {
+                    "type": "string"
+                  },
+                  "aliases": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "firstAppearanceHint": {
+                    "type": "string"
+                  }
+                },
+                "minProperties": 1
+              },
+              "expectedRevision": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "Create one role in the specified story from supplied content. 创建故事角色；无需演员图片，不自动绑定演员或接入画布。",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "name"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "role.create"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "name": {
+                "type": "string"
+              },
+              "roleBrief": {
+                "type": "string"
+              },
+              "portraitPromptManual": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "W5 A502: move role to story recycle bin (StoryEntityRecycleService).",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "nodeId"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "role.trash"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "nodeId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "expectedRecycleRevision": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "W5 A502: restore role from recycle bin; not recycled -> RESTORE_NOOP.",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "nodeId"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "role.restore"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "nodeId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "expectedRecycleRevision": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "W5 A503: create story prop (StoryPropContentV1). Produces propId. Compensation: hard delete.",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "fields"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "prop.create"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "fields": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "narrativeRole": {
+                    "type": "string"
+                  },
+                  "notes": {
+                    "type": "string"
+                  },
+                  "aliases": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "firstAppearanceHint": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "title"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "W5 A503: move prop to recycle bin.",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "propId"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "prop.trash"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "propId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "expectedRecycleRevision": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "W5 A503: restore prop from recycle bin.",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "propId"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "prop.restore"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "propId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "expectedRecycleRevision": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "Soft-link a story prop card to an existing global prop asset (same as UI link_story_prop_asset). Writes story_props.prop_asset_id only; does not set prop_assets.story_id. expectedPropAssetId is the current link (empty string when unlinked).",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "propId",
+              "propAssetId",
+              "expectedPropAssetId"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "prop.asset.link"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "propId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "propAssetId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "expectedPropAssetId": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "Clear the soft link from a story prop card to its global prop asset (same as UI unlink_story_prop_asset). expectedPropAssetId must equal the current linked asset id.",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "propId",
+              "expectedPropAssetId"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "prop.asset.unlink"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "propId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "expectedPropAssetId": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "Attach the exact fromNodeId/toNodeId using edgeType, for example role_uses_actor. 绑定故事角色与演员身份；不选定装照、不创建画布连线、不生成内容。",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "fromNodeId",
+              "toNodeId",
+              "edgeType"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "binding.attach"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "fromNodeId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "toNodeId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "edgeType": {
+                "enum": [
+                  "role_in_chapter",
+                  "role_uses_actor",
+                  "uses_asset"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "Detach the exact relationship edgeId in this story. 解除角色或资产关系；不删除两端资产或它们的媒体。",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "edgeId"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "binding.detach"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "edgeId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "W5B A501: list move (LayoutService *_apply_move). CAS: expectedOrder must equal current ids. S74: listKind=segmentPlayOrder (parentId=sceneId) moves segment play order via SegmentPlayOrderService (IPC segment_play_order_move + scene chapter-plan write guard); independent of shot numbers; no pin.",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "listKind",
+              "fromIndex",
+              "toIndex",
+              "expectedOrder"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "order.reorder"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "listKind": {
+                "enum": [
+                  "chapter",
+                  "actor",
+                  "visualAsset"
+                ]
+              },
+              "parentId": {
+                "type": "string"
+              },
+              "fromIndex": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "toIndex": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "expectedOrder": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "W5B A501: pin/unpin to top (LayoutService *_pin_to_top/_unpin).",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "listKind",
+              "targetId",
+              "pinned"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "order.pin"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "listKind": {
+                "enum": [
+                  "chapter",
+                  "actor",
+                  "visualAsset"
+                ]
+              },
+              "parentId": {
+                "type": "string"
+              },
+              "targetId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "pinned": {
+                "type": "boolean"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "W5B A501: insert chapter before/after anchor (commands::chapter_insert::insert_chapter_at_core).",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "anchorChapterId",
+              "position"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "chapter.insertAt"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "anchorChapterId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "position": {
+                "enum": [
+                  "before",
+                  "after"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "W5B A501: physical delete (commands::delete::delete_node_core). Irreversible: must be alone + confirm=true.",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "nodeId",
+              "confirm"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "chapter.delete"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "nodeId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "confirm": {
+                "const": true
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "W5B A501: ContentHistoryService.restore_node_content_version. CAS on field_revision(content).",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "nodeId",
+              "versionIndex",
+              "expectedRevision"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "node.contentVersion.restore"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "nodeId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "versionIndex": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "expectedRevision": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "W5B A501: rename a history entry (must belong to nodeId).",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "nodeId",
+              "historyId",
+              "userTitle"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "node.contentHistory.title"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "nodeId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "historyId": {
+                "type": "integer"
+              },
+              "userTitle": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "W5B A501: delete history range. Irreversible: alone + confirm=true.",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "nodeId",
+              "fromVersionIndex",
+              "toVersionIndex",
+              "confirm"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "node.contentHistory.delete"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "nodeId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "fromVersionIndex": {
+                "type": "integer"
+              },
+              "toVersionIndex": {
+                "type": "integer"
+              },
+              "confirm": {
+                "const": true
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "Create an actor card from supplied content; no photo is required. 创建演员；不自动创建故事角色、连线或生成定装照。",
+            "required": [
+              "type",
+              "actionId",
+              "content"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "actor.create"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ],
+                "description": "CC22 / V3: optional. Omit storyId for a standalone Cast actor with no story link (same as the Cast tab without a target story); never write null or the string \"null\". A string or action reference must resolve to an existing story id. Never pick or create a story implicitly."
+              },
+              "content": {
+                "type": "object",
+                "description": "The actor card as an object (not a JSON string): name is required; keyInfo, imagePrompt and portraitExtractedHints are optional text (omit when empty).",
+                "required": [
+                  "name"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "keyInfo": {
+                    "type": "string"
+                  },
+                  "imagePrompt": {
+                    "type": "string"
+                  },
+                  "portraitExtractedHints": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "W5B A502: actor content write. CAS on field_revision(content).",
+            "required": [
+              "type",
+              "actionId",
+              "nodeId",
+              "content",
+              "expectedRevision"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "actor.patch"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ],
+                "description": "CC22 / V3: optional. Omit storyId for a standalone Cast actor with no story link (same as the Cast tab without a target story); never write null or the string \"null\". A string or action reference must resolve to an existing story id. Never pick or create a story implicitly."
+              },
+              "nodeId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "content": {
+                "type": "string"
+              },
+              "expectedRevision": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "W5B A502: physical delete (delete_node_core). Irreversible: alone + confirm=true.",
+            "required": [
+              "type",
+              "actionId",
+              "nodeId",
+              "confirm"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "actor.delete"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ],
+                "description": "CC22 / V3: optional. Omit storyId for a standalone Cast actor with no story link (same as the Cast tab without a target story); never write null or the string \"null\". A string or action reference must resolve to an existing story id. Never pick or create a story implicitly."
+              },
+              "nodeId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "confirm": {
+                "const": true
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "W5B A502: NodeService.set_actor_story_id. CAS: expectedStoryId.",
+            "required": [
+              "type",
+              "actionId",
+              "nodeId",
+              "storyId",
+              "expectedStoryId"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "actor.scope.set"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "nodeId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "storyId": {
+                "type": "string"
+              },
+              "expectedStoryId": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "Create the supplied visual asset identity/content. 创建场景或道具等视觉资产；不转成角色、不生成图片、不自动引用。 content 是字段对象，由宿主写成存储 JSON。",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "assetKind",
+              "content"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "visualAsset.create"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "assetKind": {
+                "const": "prop"
+              },
+              "content": {
+                "$ref": "#/$defs/visualAssetPropContent"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "Create the supplied visual asset identity/content. 创建场景或道具等视觉资产；不转成角色、不生成图片、不自动引用。 content 是字段对象，由宿主写成存储 JSON。",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "assetKind",
+              "content"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "visualAsset.create"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "assetKind": {
+                "const": "scene"
+              },
+              "content": {
+                "$ref": "#/$defs/visualAssetSceneContent"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "W5B A503: VisualAssetService.update_asset. CAS on field_revision(content). content 是字段对象，由宿主写成存储 JSON。",
+            "required": [
+              "type",
+              "actionId",
+              "assetKind",
+              "assetId",
+              "content",
+              "expectedRevision"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "visualAsset.patch"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "assetKind": {
+                "const": "prop"
+              },
+              "assetId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "content": {
+                "$ref": "#/$defs/visualAssetPropContent"
+              },
+              "expectedRevision": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "W5B A503: VisualAssetService.update_asset. CAS on field_revision(content). content 是字段对象，由宿主写成存储 JSON。",
+            "required": [
+              "type",
+              "actionId",
+              "assetKind",
+              "assetId",
+              "content",
+              "expectedRevision"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "visualAsset.patch"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "assetKind": {
+                "const": "scene"
+              },
+              "assetId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "content": {
+                "$ref": "#/$defs/visualAssetSceneContent"
+              },
+              "expectedRevision": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "W5B A503: delete_visual_asset_core. Irreversible: alone + confirm=true.",
+            "required": [
+              "type",
+              "actionId",
+              "assetKind",
+              "assetId",
+              "confirm"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "visualAsset.delete"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "assetKind": {
+                "enum": [
+                  "scene",
+                  "prop"
+                ]
+              },
+              "assetId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "confirm": {
+                "const": true
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "W5B A503: set_visual_asset_story_id_core (prop cannot be story-bound). CAS: expectedStoryId.",
+            "required": [
+              "type",
+              "actionId",
+              "assetKind",
+              "assetId",
+              "storyId",
+              "expectedStoryId"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "visualAsset.scope.set"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "assetKind": {
+                "enum": [
+                  "scene",
+                  "prop"
+                ]
+              },
+              "assetId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "storyId": {
+                "type": "string"
+              },
+              "expectedStoryId": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "W5B A503: VisualAssetService.append_content_history (changeSource=manual); compensation deletes the appended row. content 是字段对象，由宿主写成存储 JSON。",
+            "required": [
+              "type",
+              "actionId",
+              "assetKind",
+              "assetId",
+              "content"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "visualAsset.history.append"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "assetKind": {
+                "const": "prop"
+              },
+              "assetId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "content": {
+                "$ref": "#/$defs/visualAssetPropContent"
+              },
+              "forceDuplicate": {
+                "type": "boolean"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "W5B A503: VisualAssetService.append_content_history (changeSource=manual); compensation deletes the appended row. content 是字段对象，由宿主写成存储 JSON。",
+            "required": [
+              "type",
+              "actionId",
+              "assetKind",
+              "assetId",
+              "content"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "visualAsset.history.append"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "assetKind": {
+                "const": "scene"
+              },
+              "assetId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "content": {
+                "$ref": "#/$defs/visualAssetSceneContent"
+              },
+              "forceDuplicate": {
+                "type": "boolean"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "W5B A503: VisualAssetService.delete_content_history_range. Irreversible: alone + confirm=true.",
+            "required": [
+              "type",
+              "actionId",
+              "assetKind",
+              "assetId",
+              "fromVersionIndex",
+              "toVersionIndex",
+              "confirm"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "visualAsset.history.delete"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "assetKind": {
+                "enum": [
+                  "scene",
+                  "prop"
+                ]
+              },
+              "assetId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "fromVersionIndex": {
+                "type": "integer"
+              },
+              "toVersionIndex": {
+                "type": "integer"
+              },
+              "confirm": {
+                "const": true
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "description": "W4: every action needs a unique actionId; slot fields accept an id string or {fromActionId,resultField}; per-field CAS via fieldRevisions from resource.get.",
+  "$defs": {
+    "actionRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fromActionId",
+        "resultField"
+      ],
+      "properties": {
+        "fromActionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "resultField": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "visualAssetPropContent": {
+      "type": "object",
+      "description": "字段对象，不是提示词原文，也不是再包一层 JSON 字符串。宿主写入道具 content v3。",
+      "additionalProperties": false,
+      "required": [
+        "subjectKind",
+        "title",
+        "prompt"
+      ],
+      "properties": {
+        "subjectKind": {
+          "enum": [
+            "clothing",
+            "jewelry",
+            "handheld",
+            "generic"
+          ]
+        },
+        "title": {
+          "type": "string"
+        },
+        "prompt": {
+          "type": "string"
+        },
+        "material": {
+          "type": "string"
+        },
+        "dimensions": {
+          "type": "string"
+        },
+        "keyDetails": {
+          "type": "string"
+        },
+        "refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "visualAssetSceneContent": {
+      "type": "object",
+      "description": "字段对象，不是提示词原文，也不是再包一层 JSON 字符串。宿主写入场景 content v2。",
+      "additionalProperties": false,
+      "required": [
+        "title"
+      ],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "prompt": {
+          "type": "string"
+        },
+        "refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

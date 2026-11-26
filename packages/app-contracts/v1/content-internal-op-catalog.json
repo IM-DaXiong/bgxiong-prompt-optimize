@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "catalogId": "InternalOpCatalog",
+  "operations": [
+    {
+      "name": "materialize_bible",
+      "artifact": "bible",
+      "executor": "content_production"
+    },
+    {
+      "name": "materialize_chapters",
+      "artifact": "chapters",
+      "executor": "content_production"
+    },
+    {
+      "name": "materialize_scenes",
+      "artifact": "scenes",
+      "executor": "content_production"
+    },
+    {
+      "name": "materialize_shots",
+      "artifact": "shots",
+      "executor": "content_production"
+    },
+    {
+      "name": "materialize_roles",
+      "artifact": "roles",
+      "executor": "content_production"
+    },
+    {
+      "name": "materialize_appearance",
+      "artifact": "appearance",
+      "executor": "content_production"
+    },
+    {
+      "name": "assemble_package",
+      "artifact": "package",
+      "executor": "content_production"
+    },
+    {
+      "name": "materialize_bgx_package",
+      "artifact": "package",
+      "executor": "content_production"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+[package]
+name = "prompt-optimize-runtime"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+bgx-prompt-optimize = { path = "../../src-tauri/crates/bgx-prompt-optimize" }
+bgx-agent-skills-core = { path = "../../src-tauri/crates/bgx-agent-skills-core" }
+bgx-internal-prompts = { path = "../../src-tauri/crates/bgx-internal-prompts" }
+bgx-skill-distribution = { path = "../../src-tauri/crates/bgx-skill-distribution" }
+bgx-text-http = { path = "../../src-tauri/crates/bgx-text-http" }
+dirs = "6"
+reqwest = { version = "0.13.2", default-features = false, features = ["json", "native-tls", "blocking", "stream", "multipart"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+semver = "1"
+sha2 = "0.10"
+tempfile = "3"
+tracing = "0.1"
+tokio = { version = "1", features = ["rt-multi-thread", "time", "sync"] }
+uuid = { version = "1", features = ["v4"] }

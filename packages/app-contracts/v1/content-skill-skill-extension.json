@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "type": "SkillExtensionBag",
+  "shape": {
+    "schemaFingerprint": "string",
+    "values": "object"
+  },
+  "maxKeys": 16,
+  "maxBytes": 8192,
+  "itemMaxBytes": 1024,
+  "forbiddenKeys": [
+    "id",
+    "nodeId",
+    "parentId",
+    "storyId",
+    "sceneNodeId",
+    "shotIndex",
+    "content",
+    "dialogueMode",
+    "dialogueLines",
+    "charactersInShot",
+    "angleId",
+    "shotSize",
+    "cameraMove",
+    "beat",
+    "lens",
+    "intendedDurationSeconds"
+  ]
+}

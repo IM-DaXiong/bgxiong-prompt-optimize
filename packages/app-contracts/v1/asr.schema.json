@@ -1,0 +1,1513 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "asr.schema.json",
+  "title": "Model-neutral ASR v1",
+  "definitions": {
+    "selectionV1": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "default"
+            }
+          },
+          "required": [
+            "kind"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "explicit"
+            },
+            "modelConfigId": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "kind",
+            "modelConfigId"
+          ]
+        }
+      ]
+    },
+    "outputTimingV1": {
+      "type": "string",
+      "enum": [
+        "textOnly",
+        "segmentTimed",
+        "unitTimed"
+      ]
+    },
+    "timingPolicyV1": {
+      "type": "string",
+      "enum": ["strict", "subtitleDisplay"]
+    },
+    "outputRequirementsV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "timingPolicy": {
+          "$ref": "#/definitions/timingPolicyV1"
+        },
+        "timing": {
+          "$ref": "#/definitions/outputTimingV1"
+        },
+        "language": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "timing"
+      ]
+    },
+    "capabilitiesV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "type": "boolean"
+        },
+        "segmentTiming": {
+          "type": "boolean"
+        },
+        "unitTiming": {
+          "type": "boolean"
+        },
+        "autoLanguage": {
+          "type": "boolean"
+        },
+        "supportedLanguages": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "scriptControl": {
+          "type": "boolean"
+        },
+        "maxInputMs": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "deviceProfiles": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "nativeStreaming": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "text",
+        "segmentTiming",
+        "unitTiming",
+        "autoLanguage",
+        "supportedLanguages",
+        "scriptControl",
+        "maxInputMs",
+        "deviceProfiles",
+        "nativeStreaming"
+      ]
+    },
+    "errorCodeV1": {
+      "type": "string",
+      "enum": [
+        "invalidRequest",
+        "defaultNotSet",
+        "modelNotFound",
+        "duplicateModel",
+        "unsupportedLanguage",
+        "unsupportedOutput",
+        "unsupportedPlatform",
+        "missingModule",
+        "missingArtifacts",
+        "missingEnvironment",
+        "modelChanged",
+        "busy",
+        "cancelled",
+        "deadlineExceeded",
+        "terminateFailed",
+        "invalidOutput",
+        "protocolMismatch",
+        "revisionConflict",
+        "unauthorized",
+        "internalError"
+      ]
+    },
+    "errorV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "$ref": "#/definitions/errorCodeV1"
+        },
+        "requestRef": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "messageKey": {
+          "type": "string",
+          "minLength": 1
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "retryable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "code",
+        "requestRef",
+        "messageKey",
+        "details",
+        "retryable"
+      ]
+    },
+    "resolvedByV1": {
+      "type": "string",
+      "enum": [
+        "default",
+        "explicit"
+      ]
+    },
+    "resolvedV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "operationRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "modelConfigId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "engineId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "resolvedBy": {
+          "$ref": "#/definitions/resolvedByV1"
+        },
+        "modelRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "runtimeRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "optionsRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "capabilityRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifactFingerprint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requiredArtifactRoles": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "ownerRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expiresAtMs": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "operationRef",
+        "modelConfigId",
+        "engineId",
+        "resolvedBy",
+        "modelRevision",
+        "runtimeRevision",
+        "optionsRevision",
+        "capabilityRevision",
+        "artifactFingerprint",
+        "requiredArtifactRoles",
+        "ownerRef",
+        "expiresAtMs"
+      ]
+    },
+    "timingLevelV1": {
+      "type": "string",
+      "enum": [
+        "none",
+        "segment",
+        "unit"
+      ]
+    },
+    "timingOriginV1": {
+      "type": "string",
+      "enum": [
+        "native",
+        "forcedAlignment",
+        "none"
+      ]
+    },
+    "outcomeV1": {
+      "type": "string",
+      "enum": [
+        "speech",
+        "noSpeech"
+      ]
+    },
+    "unitV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "text": {
+          "type": "string"
+        },
+        "startMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "endMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "text",
+        "startMs",
+        "endMs",
+        "confidence"
+      ]
+    },
+    "segmentV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "text": {
+          "type": "string"
+        },
+        "startMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "endMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unitIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "id",
+        "text",
+        "startMs",
+        "endMs",
+        "unitIds"
+      ]
+    },
+    "resultV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "requestRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "outcome": {
+          "$ref": "#/definitions/outcomeV1"
+        },
+        "fullText": {
+          "type": "string"
+        },
+        "detectedLanguage": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "segments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/segmentV1"
+          }
+        },
+        "units": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/unitV1"
+          }
+        },
+        "timingLevel": {
+          "$ref": "#/definitions/timingLevelV1"
+        },
+        "timingOrigin": {
+          "$ref": "#/definitions/timingOriginV1"
+        },
+        "elapsedMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "resolvedEngine": {
+          "$ref": "#/definitions/resolvedV1"
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "requestRef",
+        "outcome",
+        "fullText",
+        "detectedLanguage",
+        "segments",
+        "units",
+        "timingLevel",
+        "timingOrigin",
+        "elapsedMs",
+        "resolvedEngine",
+        "warnings"
+      ]
+    },
+    "readinessV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "installed": {
+          "type": "boolean"
+        },
+        "runtimeReady": {
+          "type": "boolean"
+        },
+        "inferenceReady": {
+          "type": "boolean"
+        },
+        "verified": {
+          "type": "boolean"
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/errorV1"
+          }
+        }
+      },
+      "required": [
+        "installed",
+        "runtimeReady",
+        "inferenceReady",
+        "verified",
+        "issues"
+      ]
+    },
+    "modelV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "modelConfigId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "engineId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "displayOrder": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "isDefault": {
+          "type": "boolean"
+        },
+        "runtimeScope": {
+          "type": "string",
+          "enum": [
+            "local",
+            "cloud"
+          ]
+        },
+        "capabilities": {
+          "$ref": "#/definitions/capabilitiesV1"
+        },
+        "readiness": {
+          "$ref": "#/definitions/readinessV1"
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/errorV1"
+          }
+        }
+      },
+      "required": [
+        "modelConfigId",
+        "engineId",
+        "displayName",
+        "displayOrder",
+        "isDefault",
+        "runtimeScope",
+        "capabilities",
+        "readiness",
+        "issues"
+      ]
+    },
+    "catalogV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "models": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/modelV1"
+          }
+        },
+        "defaultModelConfigId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "defaultRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nextCursor": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "displayOrderRevision": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "models",
+        "defaultModelConfigId",
+        "defaultRevision",
+        "displayOrderRevision",
+        "nextCursor"
+      ]
+    },
+    "artifactRoleV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requiredFor": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/outputTimingV1"
+          }
+        }
+      },
+      "required": [
+        "role",
+        "requiredFor"
+      ]
+    },
+    "moduleDescriptorV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "engineId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "moduleRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "protocolVersion": {
+          "$ref": "#/definitions/protocolVersionV1"
+        },
+        "transportKey": {
+          "type": "string",
+          "minLength": 1
+        },
+        "certifiedPlatforms": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "artifactRoles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/artifactRoleV1"
+          }
+        },
+        "optionSchemaRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "capabilities": {
+          "$ref": "#/definitions/capabilitiesV1"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "engineId",
+        "moduleRevision",
+        "protocolVersion",
+        "transportKey",
+        "certifiedPlatforms",
+        "artifactRoles",
+        "optionSchemaRef",
+        "capabilities"
+      ]
+    },
+    "knownEngineV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "engineId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "installState": {
+          "type": "string",
+          "enum": [
+            "installed",
+            "notInstalled",
+            "invalid"
+          ]
+        },
+        "module": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/moduleDescriptorV1"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "engineId",
+        "displayName",
+        "installState",
+        "module"
+      ]
+    },
+    "inputV1": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "resource"
+            },
+            "resourceRef": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "kind",
+            "resourceRef"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "authorizedFile"
+            },
+            "fileRef": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "kind",
+            "fileRef"
+          ]
+        }
+      ]
+    },
+    "transcribeRequestV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "requestRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "selection": {
+          "$ref": "#/definitions/selectionV1"
+        },
+        "input": {
+          "$ref": "#/definitions/inputV1"
+        },
+        "outputRequirements": {
+          "$ref": "#/definitions/outputRequirementsV1"
+        }
+      },
+      "required": [
+        "requestRef",
+        "selection",
+        "input",
+        "outputRequirements"
+      ]
+    },
+    "prepareRequestV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "selection": {
+          "$ref": "#/definitions/selectionV1"
+        },
+        "outputRequirements": {
+          "$ref": "#/definitions/outputRequirementsV1"
+        },
+        "correlationRef": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "selection",
+        "outputRequirements",
+        "correlationRef"
+      ]
+    },
+    "preparedV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "preparedRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "resolved": {
+          "$ref": "#/definitions/resolvedV1"
+        }
+      },
+      "required": [
+        "preparedRef",
+        "resolved"
+      ]
+    },
+    "executePreparedRequestV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "requestRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "preparedRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "input": {
+          "$ref": "#/definitions/inputV1"
+        }
+      },
+      "required": [
+        "requestRef",
+        "preparedRef",
+        "input"
+      ]
+    },
+    "releaseRequestV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "preparedRef": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "preparedRef"
+      ]
+    },
+    "setDefaultRequestV1": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "setDefault"
+            },
+            "modelConfigId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "expectedRevision": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "kind",
+            "modelConfigId",
+            "expectedRevision"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "clearDefault"
+            },
+            "expectedRevision": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "kind",
+            "expectedRevision"
+          ]
+        }
+      ]
+    },
+    "setDisplayOrderRequestV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "orderedModelConfigIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "expectedRevision": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "orderedModelConfigIds",
+        "expectedRevision"
+      ]
+    },
+    "changeReceiptV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "effectRef": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "revision",
+        "effectRef"
+      ]
+    },
+    "runtimeControlRequestV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "instanceRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "stop",
+            "restart"
+          ]
+        },
+        "expectedFingerprint": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "instanceRef",
+        "action",
+        "expectedFingerprint"
+      ]
+    },
+    "healthV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "instanceRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ownedProcessNonce": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pid": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "engineId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "moduleRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ready": {
+          "type": "boolean"
+        },
+        "activeModelFingerprint": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "capabilities": {
+          "$ref": "#/definitions/capabilitiesV1"
+        },
+        "deviceFacts": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "workerState": {
+          "$ref": "#/definitions/workerStateV1"
+        },
+        "residentRef": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "activeExecutionRef": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "instanceRef",
+        "ownedProcessNonce",
+        "pid",
+        "engineId",
+        "moduleRevision",
+        "ready",
+        "activeModelFingerprint",
+        "capabilities",
+        "deviceFacts",
+        "workerState",
+        "residentRef",
+        "activeExecutionRef"
+      ]
+    },
+    "sidecarPrepareV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "residentRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "loadIdentity": {
+          "$ref": "#/definitions/sidecarLoadIdentityV1"
+        },
+        "artifactBindings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "role": {
+                "type": "string",
+                "minLength": 1
+              },
+              "path": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "role",
+              "path"
+            ]
+          }
+        },
+        "options": {
+          "type": "object",
+          "additionalProperties": {}
+        },
+        "deviceProfile": {
+          "type": "string",
+          "minLength": 1
+        },
+        "outputRequirements": {
+          "$ref": "#/definitions/outputRequirementsV1"
+        },
+        "requiredArtifactRoles": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "residentRef",
+        "loadIdentity",
+        "artifactBindings",
+        "options",
+        "deviceProfile",
+        "outputRequirements",
+        "requiredArtifactRoles"
+      ]
+    },
+    "sidecarTranscribeV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "residentRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "executionRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "executionSeq": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "requestRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "resolvedEngine": {
+          "$ref": "#/definitions/resolvedV1"
+        },
+        "outputRequirements": {
+          "$ref": "#/definitions/outputRequirementsV1"
+        },
+        "operationDir": {
+          "type": "string",
+          "minLength": 1
+        },
+        "inputPath": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "residentRef",
+        "executionRef",
+        "executionSeq",
+        "requestRef",
+        "resolvedEngine",
+        "outputRequirements",
+        "operationDir",
+        "inputPath"
+      ]
+    },
+    "sidecarCancelV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "residentRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "executionRef": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "residentRef",
+        "executionRef"
+      ]
+    },
+    "sidecarReleaseV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "residentRef": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "residentRef"
+      ]
+    },
+    "fileTranscribeRequestV1": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "selection"
+            },
+            "selection": {
+              "$ref": "#/definitions/selectionV1"
+            },
+            "audioPath": {
+              "type": "string",
+              "minLength": 1
+            },
+            "outputRequirements": {
+              "$ref": "#/definitions/outputRequirementsV1"
+            }
+          },
+          "required": [
+            "kind",
+            "selection",
+            "audioPath",
+            "outputRequirements"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "prepared"
+            },
+            "preparedRef": {
+              "type": "string",
+              "minLength": 1
+            },
+            "audioPath": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "kind",
+            "preparedRef",
+            "audioPath"
+          ]
+        }
+      ]
+    },
+    "runtimeInstanceV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "instanceRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "engineId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "moduleRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "health": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/healthV1"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "terminateFailed": {
+          "type": "boolean"
+        },
+        "busy": {
+          "type": "boolean"
+        },
+        "fingerprint": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "instanceRef",
+        "engineId",
+        "moduleRevision",
+        "health",
+        "terminateFailed",
+        "busy",
+        "fingerprint"
+      ]
+    },
+    "uninstallPreviewV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "modelConfigId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "retainedTargets": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "engineId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "moduleRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "targets": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "fingerprint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "busy": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "retainedTargets",
+        "engineId",
+        "moduleRevision",
+        "targets",
+        "fingerprint",
+        "busy"
+      ]
+    },
+    "uninstallReceiptV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "modelConfigId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "retainedTargets": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "engineId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "moduleRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "recoveryPath": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "retainedTargets",
+        "engineId",
+        "moduleRevision",
+        "recoveryPath"
+      ]
+    },
+    "protocolVersionV1": {
+      "const": 2
+    },
+    "prepareCancelRequestV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "correlationRef": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "correlationRef"
+      ]
+    },
+    "workerStateV1": {
+      "type": "string",
+      "enum": [
+        "idle",
+        "loading",
+        "ready",
+        "running",
+        "stopping",
+        "terminateFailed"
+      ]
+    },
+    "residentStateV1": {
+      "type": "string",
+      "enum": [
+        "empty",
+        "loading",
+        "ready",
+        "running",
+        "stopping",
+        "terminateFailed"
+      ]
+    },
+    "residentSnapshotV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "residentRef": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "generation": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "engineId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "deviceProfile": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "state": {
+          "$ref": "#/definitions/residentStateV1"
+        },
+        "processUp": {
+          "type": "boolean"
+        },
+        "busy": {
+          "type": "boolean"
+        },
+        "terminateFailed": {
+          "type": "boolean"
+        },
+        "pinCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "activeExecutionRef": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "processIds": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "required": [
+        "residentRef",
+        "generation",
+        "engineId",
+        "deviceProfile",
+        "state",
+        "processUp",
+        "busy",
+        "terminateFailed",
+        "pinCount",
+        "activeExecutionRef",
+        "processIds"
+      ]
+    },
+    "sidecarLoadIdentityV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "engineId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "moduleRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "runtimeFingerprint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifactFingerprint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "optionsRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "profileFingerprint": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "engineId",
+        "moduleRevision",
+        "runtimeFingerprint",
+        "artifactFingerprint",
+        "optionsRevision",
+        "profileFingerprint"
+      ]
+    }
+  }
+}

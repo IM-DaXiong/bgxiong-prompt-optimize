@@ -1,0 +1,63 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "canvas-image-projection.schema.json",
+  "title": "CanvasImageProjection",
+  "description": "Application media-version imageProjection (plan01 A02 draft enum). Field name is fixed; do not invent is360/isPanorama.",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["imageProjection"],
+      "properties": {
+        "imageProjection": {
+          "type": "string",
+          "enum": ["flat", "equirectangular180", "equirectangular360"]
+        },
+        "derivedFrom": { "$ref": "#/definitions/mediaDerivedFrom" }
+      }
+    }
+  ],
+  "definitions": {
+    "imageProjection": {
+      "type": "string",
+      "enum": ["flat", "equirectangular180", "equirectangular360"]
+    },
+    "panoramaNormRect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "w", "h"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "w": { "type": "number" },
+        "h": { "type": "number" }
+      }
+    },
+    "panoramaViewport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["yawDeg", "pitchDeg", "hFovDeg", "viewportAspect", "crop", "outputWidth", "outputHeight"],
+      "properties": {
+        "yawDeg": { "type": "number" },
+        "pitchDeg": { "type": "number" },
+        "hFovDeg": { "type": "number" },
+        "viewportAspect": { "type": "number" },
+        "crop": { "$ref": "#/definitions/panoramaNormRect" },
+        "outputWidth": { "type": "integer", "minimum": 1 },
+        "outputHeight": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "mediaDerivedFrom": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceWorkspaceId", "sourceNodeId", "sourceVersionId"],
+      "properties": {
+        "sourceWorkspaceId": { "type": "string", "minLength": 1 },
+        "sourceNodeId": { "type": "string", "minLength": 1 },
+        "sourceVersionId": { "type": "string", "minLength": 1 },
+        "sourceContentSha256": { "type": "string" },
+        "panoramaViewport": { "$ref": "#/definitions/panoramaViewport" }
+      }
+    }
+  }
+}

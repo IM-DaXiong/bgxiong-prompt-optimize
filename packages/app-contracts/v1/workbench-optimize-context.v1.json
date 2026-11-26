@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "type": "WorkbenchOptimizeContext",
+  "storyboardShot": [
+    { "field": "storyId", "presence": "always", "faultTolerance": "required" },
+    { "field": "sceneNodeId", "presence": "always", "faultTolerance": "required" },
+    { "field": "shotId", "presence": "always", "faultTolerance": "required" },
+    { "field": "currentPrompt", "presence": "mayEmpty", "faultTolerance": "emptyPolicy.ifCurrentPromptEmpty" },
+    { "field": "shotContent", "presence": "mayEmpty", "faultTolerance": "emptyPolicy.ifContextFieldEmpty" },
+    { "field": "angleId", "presence": "optional", "faultTolerance": "emptyPolicy.ifContextFieldEmpty" },
+    { "field": "shotSize", "presence": "optional", "faultTolerance": "emptyPolicy.ifContextFieldEmpty" },
+    { "field": "cameraMove", "presence": "optional", "faultTolerance": "emptyPolicy.ifContextFieldEmpty" },
+    { "field": "sceneSummary", "presence": "mayEmpty", "faultTolerance": "emptyPolicy.ifContextFieldEmpty" },
+    { "field": "characterNames", "presence": "mayEmpty", "faultTolerance": "emptyPolicy.ifContextFieldEmpty" },
+    { "field": "userExtraInstruction", "presence": "mayEmpty", "faultTolerance": "emptyPolicy.ifContextFieldEmpty" },
+    { "field": "locale", "presence": "always", "faultTolerance": "required" }
+  ],
+  "segment": [
+    { "field": "storyId", "presence": "always", "faultTolerance": "required" },
+    { "field": "segmentNodeId", "presence": "always", "faultTolerance": "required" },
+    { "field": "currentPrompt", "presence": "mayEmpty", "faultTolerance": "emptyPolicy.ifCurrentPromptEmpty" },
+    { "field": "dialogue", "presence": "mayEmpty", "faultTolerance": "emptyPolicy.ifContextFieldEmpty" },
+    { "field": "actionLine", "presence": "mayEmpty", "faultTolerance": "emptyPolicy.ifContextFieldEmpty" },
+    { "field": "visualDesc", "presence": "mayEmpty", "faultTolerance": "emptyPolicy.ifContextFieldEmpty" },
+    { "field": "durationHint", "presence": "optional", "faultTolerance": "emptyPolicy.ifContextFieldEmpty" },
+    { "field": "linkedShotIds", "presence": "mayEmpty", "faultTolerance": "emptyPolicy.ifContextFieldEmpty" },
+    { "field": "userExtraInstruction", "presence": "mayEmpty", "faultTolerance": "emptyPolicy.ifContextFieldEmpty" },
+    { "field": "locale", "presence": "always", "faultTolerance": "required" }
+  ],
+  "forbidHostFabrication": true
+}

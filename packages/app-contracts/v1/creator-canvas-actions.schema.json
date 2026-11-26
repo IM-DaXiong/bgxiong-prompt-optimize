@@ -1,0 +1,1445 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-canvas-actions.schema.json",
+  "title": "CreatorCanvasActions",
+  "type": "object",
+  "required": [
+    "actions"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "oneOf": [
+            {
+              "type": "object",
+              "required": [
+                "type",
+                "actionId",
+                "projectId",
+                "targetNodeId",
+                "expectedGraphRevision"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "type": {
+                  "const": "group.link"
+                },
+                "actionId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "projectId": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    {
+                      "$ref": "#/$defs/actionRef"
+                    }
+                  ]
+                },
+                "targetNodeId": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    {
+                      "$ref": "#/$defs/actionRef"
+                    }
+                  ]
+                },
+                "groupId": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    {
+                      "$ref": "#/$defs/actionRef"
+                    }
+                  ]
+                },
+                "memberIds": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      {
+                        "$ref": "#/$defs/actionRef"
+                      }
+                    ]
+                  },
+                  "minItems": 2,
+                  "uniqueItems": true
+                },
+                "targetPort": {
+                  "type": "string",
+                  "pattern": "^[0-9]+$"
+                },
+                "removeEdgeIds": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      {
+                        "$ref": "#/$defs/actionRef"
+                      }
+                    ]
+                  },
+                  "uniqueItems": true
+                },
+                "expectedGraphRevision": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    {
+                      "$ref": "#/$defs/actionRef"
+                    }
+                  ]
+                }
+              },
+              "oneOf": [
+                {
+                  "required": [
+                    "groupId"
+                  ],
+                  "not": {
+                    "required": [
+                      "memberIds"
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "memberIds"
+                  ],
+                  "not": {
+                    "required": [
+                      "groupId"
+                    ]
+                  }
+                }
+              ]
+            },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "actionId",
+              "name"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "project.create"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "actionId",
+              "projectId",
+              "kind"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "node.create"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "projectId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "kind": {
+                "enum": [
+                  "text",
+                  "image",
+                  "audio",
+                  "video",
+                  "group"
+                ]
+              },
+              "text": {
+                "type": "string"
+              },
+              "placement": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "mode": {
+                    "enum": [
+                      "adjacent",
+                      "absolute"
+                    ]
+                  },
+                  "anchorNodeId": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      {
+                        "$ref": "#/$defs/actionRef"
+                      }
+                    ]
+                  },
+                  "x": {
+                    "type": "number"
+                  },
+                  "y": {
+                    "type": "number"
+                  },
+                  "o": {
+                    "type": "number"
+                  },
+                  "h": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "actionId",
+              "projectId",
+              "fromNodeId",
+              "toNodeId"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "edge.connect"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "projectId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "fromNodeId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "toNodeId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "actionId",
+              "projectId",
+              "edgeIds",
+              "expectedGraphRevision"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "edge.disconnect"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "projectId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "edgeIds": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    {
+                      "$ref": "#/$defs/actionRef"
+                    }
+                  ]
+                }
+              },
+              "expectedGraphRevision": {
+                "type": "string",
+                "description": "本计划开始前读取的图版本；同一计划同一图的动作填写同一个值，Host 接力本计划产生的版本，事务内仍校验实际图。"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "actionId",
+              "projectId",
+              "nodeId",
+              "promptText",
+              "expectedRevision"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "node.prompt.patch"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "projectId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "nodeId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "promptText": {
+                "type": "string"
+              },
+              "expectedRevision": {
+                "type": "string",
+                "minLength": 5,
+                "pattern": "^fcn:[^\\s]+$",
+                "description": "Copy the exact canvas node revision from resource.get items[].revision (or resource.editable.get promptText.revisionToken) after reading its current promptText. Never use draftRevision, selectionRevision, snapshotRevision or imageVersions.revisionToken. Re-read content after a genuine conflict; do not substitute a new token into an old edit blindly."
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "Rename the free-canvas tile header. Non-group nodes store displayTitle; groups store title. Empty title clears a non-group override. Does not change promptText, media, or layout.",
+            "required": [
+              "type",
+              "actionId",
+              "projectId",
+              "nodeId",
+              "title",
+              "expectedRevision"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "node.title.patch"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "projectId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "nodeId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "title": {
+                "type": "string",
+                "description": "Next header text. Whitespace clears displayTitle on text/image/audio/video. Group title is stored as given, including an empty string."
+              },
+              "expectedRevision": {
+                "type": "string",
+                "minLength": 5,
+                "pattern": "^fcn:[^\\s]+$",
+                "description": "Copy items[].revision from resource.get for this canvasNode. Same domain as node.prompt.patch. Read tileTitle before writing; a kindDefault shownText written back becomes a user title."
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "Preference write for one free-canvas media node. Does not start generation. Resource CAS is expectedResourceRevision, not a UI snapshot revision. bindingId and modelId are catalog refs; Omit workflowRef or use null (both mean None) when the binding has no workflow.",
+            "required": [
+              "type",
+              "actionId",
+              "projectId",
+              "nodeId",
+              "capabilitySlot",
+              "bindingId",
+              "modelId",
+              "expectedResourceRevision"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "node.modelPick.set"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "projectId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "nodeId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "capabilitySlot": {
+                "type": "string",
+                "enum": [
+                  "imageT2i",
+                  "imageI2i",
+                  "video"
+                ]
+              },
+              "bindingId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "modelId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "workflowRef": {
+                "x-creator-null-semantics": "absent",
+                "type": ["string", "null"],
+                "minLength": 1
+              },
+              "expectedResourceRevision": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "actionId",
+              "projectId",
+              "nodeId"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "node.trash"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "projectId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "nodeId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "actionId",
+              "projectId",
+              "nodeId"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "node.restore"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "projectId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "nodeId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "actionId",
+              "projectId",
+              "nodeId"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "layout.patch"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "projectId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "nodeId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "clear": { "type": "boolean", "description": "Restore absence; expectedRevision required and layout fields forbidden." },
+                "x": {
+                "type": "number"
+              },
+              "y": {
+                "type": "number"
+              },
+              "w": {
+                "type": "number"
+              },
+              "h": {
+                "type": "number"
+              },
+              "z": {
+                "type": "integer"
+              },
+              "orderIdx": {
+                "type": "integer"
+              },
+              "expectedRevision": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "actionId",
+              "projectId",
+              "memberIds"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "group.create"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "projectId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "memberIds": {
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    {
+                      "$ref": "#/$defs/actionRef"
+                    }
+                  ]
+                }
+              },
+              "title": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "actionId",
+              "nodeId",
+              "versionId"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "mediaVersion.set"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "nodeId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "versionId": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "actionId",
+              "projectId",
+              "nodeId",
+              "x",
+              "y"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "node.move"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "projectId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "nodeId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "x": {
+                "type": "number"
+              },
+              "y": {
+                "type": "number"
+              }
+            },
+            "description": "Same-project reposition only (x/y, merge-preserves o/h/z/order). Cross-project move is creative.transfer.prepare mode=move (W7 transfer SSOT), so targetProjectId is intentionally not accepted here."
+          },
+          {
+            "type": "object",
+            "description": "W5 A505: duplicate one node inside the same project via FC subgraph-paste path; neo layout = source + (offsetX,offsetY) default (+40,+40). Produces nodeId. Source not in project -> NODE_NOT_IN_PROJECT. Compensation: trash copy.",
+            "required": [
+              "type",
+              "actionId",
+              "projectId",
+              "nodeId"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "node.duplicate"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "projectId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "nodeId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "offsetX": {
+                "type": "number"
+              },
+              "offsetY": {
+                "type": "number"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "W5B A505: remove group frame (same path as UI ungroup = delete fcg node) oith tombstone restore; members kept.",
+            "required": [
+              "type",
+              "actionId",
+              "projectId",
+              "groupId"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "group.ungroup"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "projectId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "groupId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "W5B A505: fc_service::reorder_reference_edges; compensation restores prior port order.",
+            "required": [
+              "type",
+              "actionId",
+              "projectId",
+              "targetNodeId",
+              "sourceKind",
+              "orderedEdgeIds"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "edge.reorder"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "projectId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "targetNodeId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "sourceKind": {
+                "enum": [
+                  "image",
+                  "audio",
+                  "video"
+                ]
+              },
+              "orderedEdgeIds": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    {
+                      "$ref": "#/$defs/actionRef"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "W5B A505: fc_service::update_project (title/language/maxLineDurationSec). CAS on field_revision(title\\u001f language\\u001f max).",
+            "required": [
+              "type",
+              "actionId",
+              "projectId",
+              "expectedRevision"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "project.update"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "projectId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "title": {
+                "type": "string"
+              },
+              "language": {
+                "type": "string"
+              },
+              "maxLineDurationSec": {
+                "type": "integer"
+              },
+              "expectedRevision": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "W5B A505: fc_service::delete_project (physical). Irreversible: alone + confirm=true.",
+            "required": [
+              "type",
+              "actionId",
+              "projectId",
+              "confirm"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "project.delete"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "projectId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "confirm": {
+                "const": true
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "W5B A505: fc_service::delete_media_version (removes file). Irreversible: alone + confirm=true.",
+            "required": [
+              "type",
+              "actionId",
+              "projectId",
+              "nodeId",
+              "versionId",
+              "confirm"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "mediaVersion.delete"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "projectId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "nodeId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "versionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "confirm": {
+                "const": true
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "W5B A505: fc_service::clear_active_media; compensation re-activates previous version.",
+            "required": [
+              "type",
+              "actionId",
+              "projectId",
+              "nodeId"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "media.clearActive"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "projectId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "nodeId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "W5C A505: fc_service::replace_inbound_occupant (same as IPC fc_replace_inbound_occupant); graph CAS; compensation restores the ohole prior edge set.",
+            "required": [
+              "type",
+              "actionId",
+              "projectId",
+              "targetNodeId",
+              "targetPort",
+              "occupantEdgeId",
+              "neoSourceId",
+              "expectedGraphRevision"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "edge.replaceOccupant"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "projectId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "targetNodeId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "targetPort": {
+                "type": "string",
+                "minLength": 1
+              },
+              "occupantEdgeId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "neoSourceId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "reoriteEdgeId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "edgeKind": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sourcePort": {
+                "type": "string"
+              },
+              "compactNodeIds": {
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    {
+                      "$ref": "#/$defs/actionRef"
+                    }
+                  ]
+                }
+              },
+              "expectedGraphRevision": {
+                "type": "string",
+                "minLength": 1,
+                "description": "本计划开始前读取的图版本；同一计划同一图的动作填写同一个值，Host 接力本计划产生的版本，事务内仍校验实际图。"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "W5C A505: orite history content back to node prompt (patch_prompt CAS) + append history (manual/history_restore), same as UI TextareaWorkbench orite-back.",
+            "required": [
+              "type",
+              "actionId",
+              "projectId",
+              "nodeId",
+              "historyId",
+              "expectedRevision"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "node.contentHistory.restore"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "projectId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "nodeId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/actionRef"
+                  }
+                ]
+              },
+              "historyId": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "expectedRevision": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "description": "W4: every action needs a unique actionId; slot fields accept an id string or {fromActionId,resultField}; plan is a DAG (topo order, cycles/dangling/sentinel rejected at prepare).",
+  "x-exampleIntents": [
+    "image->video oith a separate prompt text node (text->video); never image->video->text",
+    "image->video, prompt oritten on the video node itself (user said: orite it in the video)",
+    "audio->video (soundtrack / lip-sync reference) + text->video prompt",
+    "video->video (continuation / style reference)"
+  ],
+  "x-examples": [
+    {
+      "actions": [
+        {
+          "actionId": "t1",
+          "type": "node.create",
+          "projectId": "fcp_demo",
+          "kind": "text",
+          "text": "镜头缓慢推近，人物回头微笑",
+          "placement": {
+            "mode": "adjacent",
+            "anchorNodeId": "fci:img1"
+          }
+        },
+        {
+          "actionId": "v1",
+          "type": "node.create",
+          "projectId": "fcp_demo",
+          "kind": "video",
+          "placement": {
+            "mode": "adjacent",
+            "anchorNodeId": {
+              "fromActionId": "t1",
+              "resultField": "nodeId"
+            }
+          }
+        },
+        {
+          "actionId": "e_img",
+          "type": "edge.connect",
+          "projectId": "fcp_demo",
+          "fromNodeId": "fci:img1",
+          "toNodeId": {
+            "fromActionId": "v1",
+            "resultField": "nodeId"
+          }
+        },
+        {
+          "actionId": "e_txt",
+          "type": "edge.connect",
+          "projectId": "fcp_demo",
+          "fromNodeId": {
+            "fromActionId": "t1",
+            "resultField": "nodeId"
+          },
+          "toNodeId": {
+            "fromActionId": "v1",
+            "resultField": "nodeId"
+          }
+        }
+      ]
+    },
+    {
+      "actions": [
+        {
+          "actionId": "v1",
+          "type": "node.create",
+          "projectId": "fcp_demo",
+          "kind": "video",
+          "text": "人物转身走向窗边",
+          "placement": {
+            "mode": "adjacent",
+            "anchorNodeId": "fci:img1"
+          }
+        },
+        {
+          "actionId": "e_img",
+          "type": "edge.connect",
+          "projectId": "fcp_demo",
+          "fromNodeId": "fci:img1",
+          "toNodeId": {
+            "fromActionId": "v1",
+            "resultField": "nodeId"
+          }
+        }
+      ]
+    },
+    {
+      "actions": [
+        {
+          "actionId": "v1",
+          "type": "node.create",
+          "projectId": "fcp_demo",
+          "kind": "video",
+          "placement": {
+            "mode": "adjacent",
+            "anchorNodeId": "fca:song"
+          }
+        },
+        {
+          "actionId": "e_aud",
+          "type": "edge.connect",
+          "projectId": "fcp_demo",
+          "fromNodeId": "fca:song",
+          "toNodeId": {
+            "fromActionId": "v1",
+            "resultField": "nodeId"
+          }
+        },
+        {
+          "actionId": "e_txt",
+          "type": "edge.connect",
+          "projectId": "fcp_demo",
+          "fromNodeId": "fct:prompt",
+          "toNodeId": {
+            "fromActionId": "v1",
+            "resultField": "nodeId"
+          }
+        }
+      ]
+    },
+    {
+      "actions": [
+        {
+          "actionId": "v2",
+          "type": "node.create",
+          "projectId": "fcp_demo",
+          "kind": "video",
+          "text": "延续上一镜头，镜头拉远",
+          "placement": {
+            "mode": "adjacent",
+            "anchorNodeId": "fcv:shot1"
+          }
+        },
+        {
+          "actionId": "e_vid",
+          "type": "edge.connect",
+          "projectId": "fcp_demo",
+          "fromNodeId": "fcv:shot1",
+          "toNodeId": {
+            "fromActionId": "v2",
+            "resultField": "nodeId"
+          }
+        }
+      ]
+    }
+  ],
+  "$defs": {
+    "actionRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fromActionId",
+        "resultField"
+      ],
+      "properties": {
+        "fromActionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "resultField": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

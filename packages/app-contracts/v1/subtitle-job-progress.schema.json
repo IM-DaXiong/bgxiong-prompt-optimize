@@ -1,0 +1,200 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Subtitle job progress v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "revision",
+    "phase",
+    "stepState",
+    "metric",
+    "attempt",
+    "model",
+    "waitingFor",
+    "phaseStartedAtMs",
+    "lastAdvancedAtMs",
+    "elapsedMs",
+    "phaseElapsedMs",
+    "noAdvanceElapsedMs",
+    "unitStartedAtMs",
+    "unitElapsedMs"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "phase": {
+      "enum": [
+        "queued",
+        "buildingAudio",
+        "preparingModel",
+        "recognizing",
+        "validatingRecognition",
+        "formatting",
+        "writingArtifacts"
+      ]
+    },
+    "stepState": {
+      "enum": [
+        "waiting",
+        "active",
+        "validating",
+        "retrying"
+      ]
+    },
+    "metric": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "unit",
+            "completed",
+            "total",
+            "current"
+          ],
+          "properties": {
+            "unit": {
+              "enum": [
+                "track",
+                "batch",
+                "chunk",
+                "window",
+                "cue"
+              ]
+            },
+            "completed": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "total": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "current": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "attempt": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "model": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "displayName"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "displayName": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "waitingFor": {
+      "anyOf": [
+        {
+          "enum": [
+            "scheduler",
+            "modelResponse",
+            "resultValidation"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "substep": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "phaseStartedAtMs": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "lastAdvancedAtMs": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "elapsedMs": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "phaseElapsedMs": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "noAdvanceElapsedMs": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "unitStartedAtMs": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 0
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "unitElapsedMs": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 0
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  }
+}

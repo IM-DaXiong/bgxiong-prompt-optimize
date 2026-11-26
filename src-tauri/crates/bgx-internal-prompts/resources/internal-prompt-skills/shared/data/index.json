@@ -1,0 +1,8 @@
+{
+  "files": [
+    "motion-candidates.schema.json",
+    "motion-interface.json",
+    "motion-policy.json",
+    "motion-template-display-names.json"
+  ]
+}

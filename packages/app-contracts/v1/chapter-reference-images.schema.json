@@ -1,0 +1,354 @@
+{
+  "list": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "chapterId": {
+        "type": "string",
+        "minLength": 1
+      },
+      "cursor": {
+        "type": "string",
+        "minLength": 1
+      },
+      "pageSize": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 100
+      }
+    },
+    "required": [
+      "chapterId"
+    ]
+  },
+  "prepare": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "actions": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "type": {
+                  "const": "chapter.reference.append"
+                },
+                "actionId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "chapterId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "bytesB64": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "originalFilename": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "type",
+                "actionId",
+                "chapterId",
+                "bytesB64",
+                "originalFilename"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "type": {
+                  "const": "chapter.reference.copy"
+                },
+                "actionId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "chapterId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "sourceMediaRel": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "type",
+                "actionId",
+                "chapterId",
+                "sourceMediaRel"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "type": {
+                  "const": "chapter.reference.remove"
+                },
+                "actionId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "chapterId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "attachmentId": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "type",
+                "actionId",
+                "chapterId",
+                "attachmentId"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "type": {
+                  "const": "chapter.reference.reorder"
+                },
+                "actionId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "chapterId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "expectedIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "uniqueItems": true
+                },
+                "orderedIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "uniqueItems": true
+                }
+              },
+              "required": [
+                "type",
+                "actionId",
+                "chapterId",
+                "expectedIds",
+                "orderedIds"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "type": {
+                  "const": "chapter.reference.initialize"
+                },
+                "actionId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "chapterId": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "type",
+                "actionId",
+                "chapterId"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "required": [
+      "actions"
+    ]
+  },
+  "storyList": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "storyId": {
+        "type": "string",
+        "minLength": 1
+      },
+      "cursor": {
+        "type": "string",
+        "minLength": 1
+      },
+      "pageSize": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 100
+      }
+    },
+    "required": [
+      "storyId"
+    ]
+  },
+  "storyPrepare": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "actions": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "type": {
+                  "const": "story.reference.append"
+                },
+                "actionId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "storyId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "bytesB64": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "originalFilename": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "type",
+                "actionId",
+                "storyId",
+                "bytesB64",
+                "originalFilename"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "type": {
+                  "const": "story.reference.copy"
+                },
+                "actionId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "storyId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "sourceMediaRel": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "type",
+                "actionId",
+                "storyId",
+                "sourceMediaRel"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "type": {
+                  "const": "story.reference.remove"
+                },
+                "actionId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "storyId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "mediaRel": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "type",
+                "actionId",
+                "storyId",
+                "mediaRel"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "type": {
+                  "const": "story.reference.reorder"
+                },
+                "actionId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "storyId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "expectedPaths": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "uniqueItems": true
+                },
+                "orderedPaths": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "uniqueItems": true
+                }
+              },
+              "required": [
+                "type",
+                "actionId",
+                "storyId",
+                "expectedPaths",
+                "orderedPaths"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "required": [
+      "actions"
+    ]
+  }
+}

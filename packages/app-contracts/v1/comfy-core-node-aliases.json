@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "newEnoughMinVersion": "0.33.0",
+  "coreExtrasClassTypes": [
+    "ImageScaleToTotalPixels",
+    "ResizeImageMaskNode",
+    "GetImageSize"
+  ],
+  "aliases": [
+    {
+      "id": "imageScaleBy_resizeImageMask",
+      "classA": "ImageScaleBy",
+      "classB": "ResizeImageMaskNode",
+      "lossy": true
+    }
+  ]
+}

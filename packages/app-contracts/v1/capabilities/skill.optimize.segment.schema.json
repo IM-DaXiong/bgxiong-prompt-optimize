@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "draft": { "type": "string" },
+    "text": { "type": "string" },
+    "prompt": { "type": "string" },
+    "shot": { "type": "object" },
+    "segment": { "type": "object" }
+  },
+  "additionalProperties": false
+}

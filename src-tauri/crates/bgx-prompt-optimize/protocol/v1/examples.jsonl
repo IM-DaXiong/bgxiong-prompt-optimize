@@ -1,0 +1,15 @@
+{"v":1,"id":"ls","op":"targets.list"}
+{"v":1,"id":"ls","event":"done","result":{"targets":[{"targetId":"image/qwen-image-2.1","label":"Qwen Image 2.1","kind":"image","availability":"ready"}]}}
+{"v":1,"id":"j1","op":"optimize","args":{"targetId":"image/qwen-image-2.1","sourcePrompt":"夜雨中的街口","textMode":"callback"}}
+{"v":1,"id":"j1","event":"text.request","callId":"c1","call":{"messages":[{"role":"user","content":"夜雨中的街口"}],"jsonMode":true,"schema":{"type":"object"},"stepLabel":"image","imageCountPolicy":"modelCapability"}}
+{"v":1,"id":"j1","op":"text.reply","callId":"c1","reply":{"content":"{\"optimizedPrompt\":\"夜雨中的街口，湿润的路面映出灯光。\"}"}}
+{"v":1,"id":"j1","event":"done","result":{"optimizedPrompt":"夜雨中的街口，湿润的路面映出灯光。","receipt":{"requestId":"j1","targetId":"image/qwen-image-2.1","methodId":"qwen-image-2-1-prompt-writing","methodDigest":"sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","coreVersion":"0.1.0"}}}
+{"v":1,"id":"j2","op":"optimize","args":{"targetId":"image/qwen-image-2.1","sourcePrompt":"街口","textMode":"callback"}}
+{"v":1,"id":"j2","event":"text.request","callId":"c2","call":{"messages":[{"role":"user","content":"夜雨中的街口"}],"jsonMode":true,"schema":{"type":"object"},"stepLabel":"image","imageCountPolicy":"modelCapability"}}
+{"v":1,"id":"ctrl","op":"cancel","args":{"requestId":"j2"}}
+{"v":1,"id":"ctrl","event":"done","result":{"cancelRequestedFor":"j2"}}
+{"v":1,"id":"j2","event":"error","error":{"code":"OPTIMIZE_CANCELLED","message":"已取消"}}
+{"v":1,"id":"check","op":"skills.check"}
+{"v":1,"id":"check","event":"done","result":{"candidates":[{"candidateId":"content-skill:example@1.0.0#bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","packageId":"example","version":"1.0.0","sha256":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","sourceSha256":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}]}}
+{"v":1,"id":"install","op":"skills.install","args":{"candidateId":"content-skill:example@1.0.0#bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","confirmedNewInstall":true}}
+{"v":1,"id":"install","event":"done","result":{"packageId":"example","version":"1.0.0","packageDigest":"sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}}

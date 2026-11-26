@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "classVideoUpscaler": "SeedVR2VideoUpscaler",
+  "classLoadDit": "SeedVR2LoadDiTModel",
+  "classLoadVae": "SeedVR2LoadVAEModel",
+  "defaultShortEdge": 1080,
+  "defaultMaxLongEdge": 0,
+  "defaultVideoBatchSize": 5,
+  "defaultVideoTemporalOverlap": 0,
+  "defaultImageBatchSize": 1,
+  "defaultEnhancementModel": "3b_fp16",
+  "dit3bFp16": "seedvr2_ema_3b_fp16.safetensors",
+  "dit7bFp16": "seedvr2_ema_7b_fp16.safetensors",
+  "dit7bFp8Mixed": "seedvr2_ema_7b_fp8_e4m3fn_mixed_block35_fp16.safetensors",
+  "dit7bSharpFp8Mixed": "seedvr2_ema_7b_sharp_fp8_e4m3fn_mixed_block35_fp16.safetensors",
+  "seedMin": 0,
+  "seedMax": 2147483647,
+  "defaultEncodeTiled": false,
+  "defaultDecodeTiled": false,
+  "defaultTileSize": 512,
+  "defaultTileOverlap": 64,
+  "defaultWriterCrf": 18
+}

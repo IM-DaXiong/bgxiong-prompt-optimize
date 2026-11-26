@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "durationModes": ["maximum", "approximate", "automatic", "needsClarification"],
+  "executionModes": ["automatic", "canvas_only"],
+  "selectionSources": ["user", "remembered", "userDelegated"],
+  "requirementPriorities": ["hard", "preference", "delegated"],
+  "reviewSeverities": ["blocking", "minor"],
+  "preferenceScopes": ["node", "project", "global"],
+  "memoryScopes": ["run", "node", "project", "global"],
+  "preflightModes": ["check", "prepare"],
+  "toolIds": [
+    "presenter.catalog.get",
+    "presenter.preferences.get",
+    "presenter.preferences.set",
+    "presenter.plan.prepare",
+    "presenter.plan.get",
+    "presenter.plan.revise",
+    "presenter.preflight.run",
+    "presenter.execution.start",
+    "presenter.execution.get",
+    "postproduction.describe",
+    "postproduction.baseSnapshot.get"
+  ]
+}

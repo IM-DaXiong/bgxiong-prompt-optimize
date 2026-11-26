@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "serverName": "bgxiong-creator",
+  "listenHost": "127.0.0.1",
+  "listenHostLan": "0.0.0.0",
+  "listenPort": 18451,
+  "httpMcpPath": "/mcp",
+  "stdioArgv": "--mcp-creator-stdio",
+  "stdioBaseUrlEnv": "BGX_MCP_CREATOR_BASE_URL",
+  "tokenEnv": "BGX_MCP_CREATOR_TOKEN",
+  "tokenFileName": "mcp_creator_control_plane.json",
+  "mcpProtocolRevisions": {
+    "modern": [
+      "2026-07-28"
+    ],
+    "legacy": [
+      "2025-06-18",
+      "2025-03-26",
+      "2024-11-05"
+    ]
+  },
+  "uriPrefix": "bgx://",
+  "maxJsonBytes": 1048576,
+  "artifactUploadChunkBytes": 524288,
+  "artifactStageSourceKinds": [
+    "hostFile",
+    "https",
+    "upload",
+    "projectFile",
+    "localSource"
+  ],
+  "surfacePersistModes": [
+    "draft",
+    "persist",
+    "newVersion"
+  ],
+  "maxPageBytes": 262144,
+  "mediaDescribeMaxRefs": 12,
+  "mediaPreviewMaxEdgePx": 768,
+  "maxPendingEntries": 64,
+  "pendingTtlMs": 900000,
+  "pageTokenTtlMs": 600000,
+  "cursorSort": [
+    "updatedAt",
+    "id"
+  ],
+  "atomicityModes": [
+    "all",
+    "perChunk"
+  ],
+  "changeSetLifecycle": [
+    "draft",
+    "validated",
+    "prepared",
+    "applying",
+    "committed",
+    "failed",
+    "pendingEffects",
+    "stale",
+    "undone"
+  ],
+  "agentTurnExecutionModes": [
+    "execute",
+    "previewOnly"
+  ],
+  "externalMcpImpliesExecuteMode": true,
+  "textHopCostGate": {
+    "requiredBeforeRemoteMeteredHttp": true,
+    "localFreeSkipsGrant": true,
+    "unknownPriceMustPause": true
+  },
+  "recoveryOrder": [
+    "story.db receipts / ai_tasks",
+    "media journal + cost reservation",
+    "assistant/chat.db step repair",
+    "resume agent loop"
+  ],
+  "readinessLevels": [
+    "L1_install",
+    "L2_connect",
+    "L3_toolUseModel",
+    "L4_liveReadWrite"
+  ],
+  "note": "Payload/page budgets and recovery contract frozen in W0 (O9). Old mcp_text confirmModes are not carried forward. maxJsonBytes stays 1048576. artifactUploadChunkBytes is the raw upload chunk, not a second JSON budget and not the single-file cap (that cap remains media_encode_budget INLINE_MEDIA_MAX_FILE_BYTES). Remote relay is not part of this contract.",
+  "creativeContextPack": {
+    "schemaVersion": 1,
+    "maxPackBytes": 262144,
+    "maxTextCharsPerField": 0,
+    "note": "maxPackBytes must equal maxPageBytes (same page budget). maxTextCharsPerField=0 means never truncate user/body text: overflow goes to the next page via cursor (creative-context-pack-v1.schema.json)."
+  },
+  "transactionGrades": [
+    "singleDbTransaction",
+    "compensated",
+    "irreversible",
+    "none"
+  ],
+  "discoveryBudgets": {
+    "maxToolsListBytes": 262144,
+    "bootstrapTools": [
+      "capabilities.get",
+      "context.get",
+      "resource.search",
+      "resource.get",
+      "resource.children",
+      "resource.history",
+      "change.inspect",
+      "change.apply",
+      "change.status",
+      "change.undo",
+      "task.get",
+      "task.list",
+      "task.wait",
+      "task.cancel"
+    ]
+  }
+}

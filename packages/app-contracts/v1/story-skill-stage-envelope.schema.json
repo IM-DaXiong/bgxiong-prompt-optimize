@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "bgxiong://contracts/story-skill-stage-envelope-v1",
+  "title": "StorySkillStageEnvelopeV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "caseId", "stage", "units", "reportedFacts"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "caseId": { "type": "string", "minLength": 1 },
+    "stage": {
+      "enum": ["intake", "storyline", "audition", "draft", "editorial", "revision", "handoff", "export"]
+    },
+    "units": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["unitId", "kind", "body", "sourceIds"],
+        "properties": {
+          "unitId": { "type": "string", "minLength": 1 },
+          "kind": { "enum": ["brief", "storyline", "episode", "scene", "action", "dialogue", "handoff", "export"] },
+          "body": { "type": "string" },
+          "sourceIds": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 },
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+    "reportedFacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["factId", "kind", "unitIds"],
+        "properties": {
+          "factId": { "type": "string", "minLength": 1 },
+          "kind": { "enum": ["worldFact", "characterBelief", "characterClaim", "authorIntent"] },
+          "unitIds": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 },
+            "uniqueItems": true
+          }
+        }
+      }
+    }
+  }
+}

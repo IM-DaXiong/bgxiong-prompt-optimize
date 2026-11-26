@@ -1,0 +1,263 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-resource-editable.schema.json",
+  "title": "CreatorResourceEditableV1",
+  "description": "Field descriptors for resource.editable.get. Nullable and required come only from this schema. A non-editable field has null writeToolId and null actionType. Values must not include secrets.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "ref",
+    "fields"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "ref": {
+      "$ref": "creator-resource-ref.schema.json"
+    },
+    "fields": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/field"
+      }
+    }
+  },
+  "definitions": {
+    "field": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fieldId",
+        "value",
+        "valueSchemaRef",
+        "persistence",
+        "availability",
+        "reasonCode",
+        "userHint",
+        "revisionToken",
+        "writeToolId",
+        "actionType",
+        "targetField",
+        "scopeRef"
+      ],
+      "properties": {
+        "fieldId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "value": {},
+        "valueSchemaRef": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "persistence": {
+          "type": "string",
+          "enum": [
+            "durable",
+            "draftOnly"
+          ]
+        },
+        "availability": {
+          "type": "string",
+          "enum": [
+            "editable",
+            "readOnly",
+            "unavailable"
+          ]
+        },
+        "reasonCode": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "userHint": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "revisionToken": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "writeToolId": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "actionType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "targetField": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "scopeRef": {
+          "oneOf": [
+            {
+              "$ref": "creator-resource-ref.schema.json"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "availability": {
+                "enum": [
+                  "readOnly",
+                  "unavailable"
+                ]
+              }
+            },
+            "required": [
+              "availability"
+            ]
+          },
+          "then": {
+            "properties": {
+              "writeToolId": {
+                "type": "null"
+              },
+              "actionType": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "examples": [
+    {
+      "valid": true,
+      "value": {
+        "schemaVersion": 1,
+        "ref": {
+          "kind": "canvasNode",
+          "projectId": "project_example",
+          "nodeId": "node_example"
+        },
+        "fields": [
+          {
+            "fieldId": "modelPick",
+            "value": {
+              "bindingId": "binding_example",
+              "modelId": "model_example"
+            },
+            "valueSchemaRef": "creator-canvas-actions.schema.json#node.modelPick.set",
+            "persistence": "durable",
+            "availability": "editable",
+            "revisionToken": "rev_example",
+            "writeToolId": "canvas.change.prepare",
+            "actionType": "node.modelPick.set",
+            "targetField": "modelPick",
+            "scopeRef": {
+              "kind": "canvasNode",
+              "projectId": "project_example",
+              "nodeId": "node_example"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "valid": false,
+      "reason": "unavailable field must not carry an executable write",
+      "value": {
+        "schemaVersion": 1,
+        "ref": {
+          "kind": "canvasNode",
+          "projectId": "project_example",
+          "nodeId": "node_example"
+        },
+        "fields": [
+          {
+            "fieldId": "modelPick",
+            "valueSchemaRef": "creator-canvas-actions.schema.json#node.modelPick.set",
+            "persistence": "durable",
+            "availability": "unavailable",
+            "reasonCode": "FIELD_NOT_EDITABLE",
+            "userHint": "这个字段当前不能改。",
+            "writeToolId": "canvas.change.prepare",
+            "actionType": "node.modelPick.set"
+          }
+        ]
+      }
+    },
+    {
+      "valid": true,
+      "value": {
+        "schemaVersion": 1,
+        "ref": {
+          "kind": "canvasNode",
+          "projectId": "project_example",
+          "nodeId": "node_example"
+        },
+        "fields": [
+          {
+            "fieldId": "modelPick",
+            "valueSchemaRef": "creator-canvas-actions.schema.json#node.modelPick.set",
+            "persistence": "durable",
+            "availability": "unavailable",
+            "reasonCode": "FIELD_NOT_EDITABLE",
+            "userHint": "这个字段当前不能改。"
+          }
+        ]
+      }
+    }
+  ]
+}

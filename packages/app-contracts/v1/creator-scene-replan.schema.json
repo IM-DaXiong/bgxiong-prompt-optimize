@@ -1,0 +1,112 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-scene-replan.schema.json",
+  "title": "CreatorSceneReplan",
+  "description": "Scene novel source, frozen context pages, and replan/replace payloads. generation.submit does not accept story.scene.storyboard.replan until a prepared-intent record from the creator-access plan exists. Unknown fields are rejected.",
+  "definitions": {
+    "nonBlank": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "pattern": "\\S"
+    },
+    "sourceMode": {
+      "enum": ["novel", "sceneScript"]
+    },
+    "sourceStatus": {
+      "enum": ["linked", "missingLink"]
+    },
+    "sceneContextPointer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["snapshotId"],
+      "properties": {
+        "snapshotId": { "$ref": "#/definitions/nonBlank" },
+        "sourceVersionId": { "type": ["string", "null"] },
+        "sourceStatus": { "$ref": "#/definitions/sourceStatus" }
+      }
+    },
+    "storySourceImport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "storyId", "hostIdempotencyKey"],
+      "properties": {
+        "type": { "const": "story.source.import" },
+        "storyId": { "$ref": "#/definitions/nonBlank" },
+        "documentRef": { "type": "string", "minLength": 1 },
+        "text": { "type": "string", "minLength": 1 },
+        "hostIdempotencyKey": { "$ref": "#/definitions/nonBlank" },
+        "fileName": { "type": "string", "minLength": 1 }
+      },
+      "description": "documentRef and text are mutually exclusive. documentRef needs the document-identity service; until that service is wired the call fails closed."
+    },
+    "sceneSourceBind": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "storyId", "chapterNodeId", "sceneNodeId", "sourceVersionId", "unitIds", "expectedSceneRevision"],
+      "properties": {
+        "type": { "const": "story.scene.source.bind" },
+        "storyId": { "$ref": "#/definitions/nonBlank" },
+        "chapterNodeId": { "$ref": "#/definitions/nonBlank" },
+        "sceneNodeId": { "$ref": "#/definitions/nonBlank" },
+        "sourceVersionId": { "$ref": "#/definitions/nonBlank" },
+        "unitIds": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/definitions/nonBlank" }
+        },
+        "expectedSceneRevision": { "$ref": "#/definitions/nonBlank" }
+      }
+    },
+    "sceneStoryboardReplan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "storyId", "chapterNodeId", "sceneNodeId", "preparedRunId", "intentFingerprint", "sourceMode", "contextFingerprint", "sourceReadCursors"],
+      "properties": {
+        "type": { "const": "story.scene.storyboard.replan" },
+        "storyId": { "$ref": "#/definitions/nonBlank" },
+        "chapterNodeId": { "$ref": "#/definitions/nonBlank" },
+        "sceneNodeId": { "$ref": "#/definitions/nonBlank" },
+        "preparedRunId": { "$ref": "#/definitions/nonBlank" },
+        "intentFingerprint": { "$ref": "#/definitions/nonBlank" },
+        "userDirection": { "type": "string" },
+        "sourceMode": { "$ref": "#/definitions/sourceMode" },
+        "suggestedShotCount": { "type": "integer", "minimum": 1 },
+        "contextFingerprint": { "$ref": "#/definitions/nonBlank" },
+        "sourceDigest": { "type": "string", "minLength": 1 },
+        "unitIds": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/nonBlank" }
+        },
+        "sourceReadCursors": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "sceneStoryboardReplace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "storyId", "chapterNodeId", "sceneNodeId", "candidateId", "candidateFingerprint", "contextFingerprint", "expectedSceneContentFingerprint", "expectedSourceDigest", "expectedGraphFingerprint"],
+      "properties": {
+        "type": { "const": "story.scene.storyboard.replace" },
+        "storyId": { "$ref": "#/definitions/nonBlank" },
+        "chapterNodeId": { "$ref": "#/definitions/nonBlank" },
+        "sceneNodeId": { "$ref": "#/definitions/nonBlank" },
+        "candidateId": { "$ref": "#/definitions/nonBlank" },
+        "candidateFingerprint": { "$ref": "#/definitions/nonBlank" },
+        "contextFingerprint": { "$ref": "#/definitions/nonBlank" },
+        "expectedSceneContentFingerprint": { "$ref": "#/definitions/nonBlank" },
+        "expectedSourceDigest": { "$ref": "#/definitions/nonBlank" },
+        "expectedGraphFingerprint": { "$ref": "#/definitions/nonBlank" },
+        "ownTerminalTaskId": { "type": ["string", "null"] }
+      }
+    }
+  },
+  "oneOf": [
+    { "$ref": "#/definitions/storySourceImport" },
+    { "$ref": "#/definitions/sceneSourceBind" },
+    { "$ref": "#/definitions/sceneStoryboardReplan" },
+    { "$ref": "#/definitions/sceneStoryboardReplace" }
+  ]
+}

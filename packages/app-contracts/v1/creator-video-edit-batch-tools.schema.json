@@ -1,0 +1,84 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-video-edit-batch-tools.schema.json",
+  "definitions": {
+    "video.edit.batch.start": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "items"
+      ],
+      "properties": {
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "bindingId",
+              "label",
+              "submission"
+            ],
+            "properties": {
+              "bindingId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "label": {
+                "type": "string"
+              },
+              "submission": {
+                "$ref": "generative-video-edit-v1.schema.json#/definitions/submission"
+              }
+            }
+          }
+        }
+      }
+    },
+    "video.edit.batch.get": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "batchId"
+      ],
+      "properties": {
+        "batchId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    },
+    "video.edit.batch.list": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {}
+    },
+    "video.edit.batch.resume": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "batchId"
+      ],
+      "properties": {
+        "batchId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    },
+    "video.edit.batch.cancel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "batchId"
+      ],
+      "properties": {
+        "batchId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    }
+  }
+}

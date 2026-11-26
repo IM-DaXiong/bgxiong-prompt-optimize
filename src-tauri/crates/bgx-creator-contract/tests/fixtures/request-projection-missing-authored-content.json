@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 1,
+  "schemaRef": "requestProjectionV1",
+  "caseId": "missing-authored-content",
+  "expectedCode": "EXAMPLE_INVALID",
+  "expectedInstancePath": "requestProjection.explanation.acceptedReply.authoredContent",
+  "value": {
+    "schemaVersion": 2,
+    "requestRef": "req_example",
+    "revision": 3,
+    "intentRevision": 1,
+    "requestState": "completed",
+    "executionMode": "execute",
+    "clientSessionRef": "sess_example",
+    "modelBindingRef": null,
+    "instructionUtf8Bytes": 60,
+    "goalCount": 2,
+    "activeGoalCount": 2,
+    "intentDisposition": null,
+    "pendingQuestion": null,
+    "executionFacts": {
+      "schemaVersion": 1,
+      "turnId": "turn_example",
+      "originBinding": {
+        "originKind": "local",
+        "originId": "sess_example",
+        "sessionId": "sess_example",
+        "turnId": "turn_example"
+      },
+      "outcomes": [
+        {
+          "factId": "fact_apply",
+          "operationId": "op_apply",
+          "source": "changeSet",
+          "planId": "chg_example",
+          "toolCallId": "call_apply",
+          "scopeRefs": [
+            "canvas"
+          ],
+          "state": "applied",
+          "affectedResources": [
+            "fct:example",
+            "fci:example",
+            "fcv:example"
+          ],
+          "receiptRef": "undo_example",
+          "recovery": null,
+          "observedAtMs": 1
+        }
+      ],
+      "pendingPlans": [],
+      "observations": []
+    },
+    "outcome": null,
+    "deliverables": {
+      "count": 0,
+      "resultRevision": 0,
+      "section": "deliverables"
+    },
+    "actions": [
+      {
+        "actionId": "act_undo",
+        "kind": "undo",
+        "invocation": {
+          "toolId": "request.open",
+          "arguments": {
+            "callContext": {
+              "schemaVersion": 4,
+              "hostIdempotencyKey": "act_undo:req_example:3",
+              "mode": "execute",
+              "includeImageContent": false
+            },
+            "schemaVersion": 3,
+            "instruction": "撤销刚才新建的三个节点和两条连线。",
+            "originEffectRef": "eff_example"
+          }
+        }
+      }
+    ],
+    "page": {
+      "section": "evidence",
+      "items": [
+        {
+          "evidenceId": "ev_1",
+          "toolId": "change.apply",
+          "hostIdempotencyKey": "apply-example",
+          "goalRefs": [
+            "goal_nodes",
+            "goal_edges"
+          ],
+          "ok": true,
+          "state": "applied",
+          "receipt": {
+            "kind": "changeSet",
+            "planRef": "chg_example",
+            "taskRef": null,
+            "undoRef": "undo_example",
+            "resourceRefs": [
+              "fct:example"
+            ],
+            "observationRefs": []
+          },
+          "errorCode": null,
+          "recordedAtMs": 1
+        }
+      ],
+      "nextCursor": null,
+      "hasMore": false
+    },
+    "updatedAtMs": 1,
+    "completion": {
+      "workSnapshotRef": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "progressRef": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "executionClosedReason": "completed",
+      "goalSummary": {
+        "total": 2,
+        "satisfied": 2,
+        "pending": 0,
+        "needsInput": 0,
+        "waitingTask": 0,
+        "blocked": 0,
+        "cancelled": 0,
+        "undone": 0
+      },
+      "blockerSummary": null
+    },
+    "workReview": {
+      "status": "passed",
+      "requestCoverage": "complete",
+      "answerCoverage": "notRequired",
+      "snapshotRef": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "reviewRef": "rev_example"
+    },
+    "explanation": {
+      "replyRef": "reply_example",
+      "candidateStatus": "valid",
+      "reviewStatus": "passed",
+      "acceptedReply": {
+        "replyRef": "reply_example",
+        "paragraphs": [
+          "已建好三个空节点，文本和图片都连到了视频节点。"
+        ],
+        "factRefs": [
+          "fact_apply"
+        ]
+      },
+      "failureCode": null,
+      "status": "published"
+    },
+    "pendingTaskRefs": []
+  },
+  "expectedLegacyInstancePath": "requestProjection.explanation.acceptedReply",
+  "expectedInstancePathNote": "Leaf path is the planned improved diagnostic; the current production checker reports the parent oneOf path."
+}

@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "postproduction-decoration.schema.json",
+  "title": "PostproductionDecoration",
+  "description": "Future decoration contracts. Rendering is not available.",
+  "definitions": {
+    "BaseVideoSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["deliveryId", "version", "hash", "fpsNum", "fpsDen", "durationMs"],
+      "properties": {
+        "deliveryId": { "type": "string", "minLength": 1 },
+        "version": { "type": "integer", "minimum": 1 },
+        "hash": { "type": "string", "minLength": 1 },
+        "fpsNum": { "type": "integer", "minimum": 1 },
+        "fpsDen": { "type": "integer", "minimum": 1 },
+        "durationMs": { "type": "integer", "minimum": 0 },
+        "timelineStartMs": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}

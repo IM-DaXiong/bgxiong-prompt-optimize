@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "type": "ContentIntent",
+  "forbiddenHostHintKeys": [
+    "engine"
+  ],
+  "allowedHostHintKeys": [
+    "literaryMode",
+    "storyName",
+    "sourceIsStoryDesc",
+    "aiTaskId",
+    "chapterCount",
+    "durationSeconds",
+    "durationSecondsPerChapter",
+    "saveSource",
+    "syncStoryBible",
+    "syncChapterStructure",
+    "syncRoles",
+    "syncScenes",
+    "literarySupplementMode",
+    "storyBibleMirrorOnly",
+    "userExtra",
+    "repairHint",
+    "aspectRatio",
+    "replaceExisting",
+    "skipPerSceneShotsPlan",
+    "stylePresetId",
+    "renderProviderKind",
+    "mergeMode",
+    "suggestedShotCount",
+    "sceneMetadataPrefill",
+    "snapshot",
+    "episodeReference",
+    "productionBrief",
+    "chapterNodeIds",
+    "contentSkillPlanHash",
+    "contentSkillPublicPlan",
+    "contentSkillSchemaFingerprint",
+    "previewSourceSha256",
+    "previewPackageDigest",
+    "roleBriefResolution"
+  ],
+  "artifactKinds": [
+    "bible",
+    "chapters",
+    "scenes",
+    "shots",
+    "roles",
+    "appearance",
+    "package"
+  ],
+  "authoringSchema": "hierarchy-authoring-request-v1.schema.json#/definitions/AuthoringRequest"
+}

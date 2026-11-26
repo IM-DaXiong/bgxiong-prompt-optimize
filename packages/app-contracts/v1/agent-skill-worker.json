@@ -1,0 +1,106 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "agent-skill-worker.json",
+  "title": "AgentSkillWorkerProtocol",
+  "description": "比格熊 SKILL WASM worker 内部 stdio 协议 v1（GUI 宿主 <-> bgx-skill-worker 进程）。只承载已有 BGX 动态 guest 的组件验证与 produce-plan 执行；不是 SKILL 作者格式，也不是通用 WASM ABI。人读说明见 specDoc §15。",
+  "schemaVersion": 1,
+  "contractScope": "internal-worker-ipc",
+  "specDoc": "docs/dev/specs/20261002-SPEC-Agent-Skills包加载与执行合同.md",
+  "independence": "Agent Skills 与独立适配器 SDK 各自维护工作进程协议和权限策略。GUI 通过各自的独立进程调用执行器。",
+  "protocolVersion": 1,
+  "framing": {
+    "header": "u32 little-endian body length",
+    "body": "UTF-8 JSON object, one message per frame",
+    "frameMaxBytes": 16777216
+  },
+  "componentMaxBytes": 8388608,
+  "stderrTailMaxChars": 4000,
+  "helloWallMs": 15000,
+  "cancelGraceMs": 2000,
+  "shutdownGraceMs": 2000,
+  "epochTickMs": 10,
+  "maxInflightRequests": 1,
+  "hashFormat": "sha256:<lowercase hex of the raw bytes>",
+  "limitsSource": {
+    "file": "packages/app-contracts/v1/content-skill-limits.json",
+    "memoryBytes": "wasm.memoryBytes",
+    "fuel": "wasm.fuel",
+    "wallMs": "wasm.wallMs",
+    "allowedImports": "allowedHostImports",
+    "inputMaxBytes": "maxSnapshotBytes",
+    "outputMaxBytes": "maxPlanBytes",
+    "note": "worker 只从该文件取限额与 import allowlist（构建期生成常量），请求报文不能放宽限额。"
+  },
+  "abi": {
+    "world": "bgxiong:content-skill/content-skill@1.0.0",
+    "wit": "wit/content-skill-v1/world.wit",
+    "status": "helper-compat",
+    "note": "现有 BGX WIT 只作为已发布动态 guest 的兼容 helper ABI；不称通用 SKILL ABI。普通 Markdown SKILL 不经过 worker。"
+  },
+  "witMapping": {
+    "producePlan.input.bytesBase64": "produce-plan(snapshot-json: list<u8>) 参数原字节",
+    "planProduced.output.bytesBase64": "result::ok(list<u8>) 原字节（worker 不解析 Plan，Plan 验收由宿主完成）",
+    "failed[AGENT_SKILL_WORKER_GUEST_ERROR].message": "result::err(string) 原文（按 stderrTailMaxChars 截断）"
+  },
+  "parentToWorker": {
+    "hello": ["protocolVersion"],
+    "validateComponent": ["requestId", "component"],
+    "producePlan": ["requestId", "component", "input"],
+    "cancel": ["requestId"],
+    "shutdown": []
+  },
+  "workerToParent": {
+    "helloAck": ["protocolVersion", "contractSha256", "workerVersion", "limits", "abiWorld"],
+    "validated": ["requestId", "componentSha256", "imports"],
+    "planProduced": ["requestId", "componentSha256", "inputSha256", "output", "fuelConsumed"],
+    "failed": ["requestId", "code", "message"],
+    "cancelAck": ["requestId", "active"],
+    "shutdownAck": []
+  },
+  "terminalMessages": ["validated", "planProduced", "failed"],
+  "blob": {
+    "fields": ["bytesBase64", "sha256"],
+    "encoding": "RFC 4648 standard base64 with padding",
+    "rule": "接收方先按上限检查解码后长度，再校验 sha256；不符即 AGENT_SKILL_WORKER_HASH_MISMATCH，不执行。"
+  },
+  "workerErrorCodes": {
+    "AGENT_SKILL_WORKER_PROTOCOL_VERSION": "hello 协议版本不一致",
+    "AGENT_SKILL_WORKER_HELLO_REQUIRED": "握手前收到业务请求",
+    "AGENT_SKILL_WORKER_FRAME_OVERSIZE": "帧长度超过 frameMaxBytes",
+    "AGENT_SKILL_WORKER_FRAME_MALFORMED": "帧体不是合法协议 JSON",
+    "AGENT_SKILL_WORKER_BUSY": "已有请求在执行（maxInflightRequests=1）",
+    "AGENT_SKILL_WORKER_DUPLICATE_REQUEST": "requestId 为空或与在途请求重复",
+    "AGENT_SKILL_WORKER_HASH_MISMATCH": "组件或输入字节与声明的 sha256 不符，或 base64 非法",
+    "AGENT_SKILL_WORKER_INPUT_TOO_LARGE": "输入超过 maxSnapshotBytes",
+    "AGENT_SKILL_WORKER_COMPONENT_EMPTY": "组件字节为空",
+    "AGENT_SKILL_WORKER_COMPONENT_TOO_LARGE": "组件超过 componentMaxBytes",
+    "AGENT_SKILL_WORKER_COMPONENT_INVALID": "不是可解析的 component-model 二进制",
+    "AGENT_SKILL_WORKER_IMPORT_FORBIDDEN": "组件 import 不在 allowedHostImports 内",
+    "AGENT_SKILL_WORKER_ABI_MISMATCH": "组件不满足 content-skill world（缺 produce-plan 或签名不符）",
+    "AGENT_SKILL_WORKER_INSTANTIATE": "实例化失败",
+    "AGENT_SKILL_WORKER_MEMORY_LIMIT": "超过 wasm.memoryBytes",
+    "AGENT_SKILL_WORKER_FUEL_EXHAUSTED": "fuel 耗尽",
+    "AGENT_SKILL_WORKER_WALL_TIMEOUT": "超过 wasm.wallMs（epoch 中断）",
+    "AGENT_SKILL_WORKER_CANCELLED": "被 cancel 或 shutdown 终止",
+    "AGENT_SKILL_WORKER_TRAP": "guest trap",
+    "AGENT_SKILL_WORKER_GUEST_ERROR": "guest 返回 result::err",
+    "AGENT_SKILL_WORKER_OUTPUT_TOO_LARGE": "输出超过 maxPlanBytes",
+    "AGENT_SKILL_WORKER_INTERNAL": "worker 内部错误"
+  },
+  "transportErrorCodes": {
+    "AGENT_SKILL_WORKER_NOT_FOUND": "宿主注入的 worker 路径不存在",
+    "AGENT_SKILL_WORKER_SPAWN": "启动 worker 进程失败",
+    "AGENT_SKILL_WORKER_INCOMPATIBLE": "helloAck 的协议版本或 contractSha256 与宿主不一致",
+    "AGENT_SKILL_WORKER_HANDSHAKE_TIMEOUT": "helloWallMs 内未完成握手",
+    "AGENT_SKILL_WORKER_EXITED": "worker 在终态前退出（含崩溃、断管）",
+    "AGENT_SKILL_WORKER_PROTOCOL": "worker 报文违反协议（requestId 不符、stdout 非协议帧等）"
+  },
+  "lifecycle": [
+    "宿主启动隐藏 worker 进程（路径由宿主注入，禁止查 PATH），stdin/stdout 只传协议帧，stderr 只作有界诊断。",
+    "首帧必须是 hello；worker 回 helloAck（含 contractSha256 与限额），宿主校验版本与 contractSha256 后才发请求。",
+    "每个 requestId 恰好一个终态（validated/planProduced/failed）；同时最多一个在途请求，其余立即 failed BUSY。",
+    "cancel 只终止当前实例（epoch 回调在下一个 tick 内中断），回 cancelAck 后仍给该请求一个 failed CANCELLED 终态；cancelGraceMs 内无终态由宿主按句柄终止该子进程（不按进程名强杀）。",
+    "shutdown：取消在途请求并等待其终态，回 shutdownAck 后退出码 0；stdin EOF 视为父进程消失，取消在途请求后退出。",
+    "worker 不读写文件、不联网、不启动子进程、不写库；只返回字节或 typed failure。"
+  ]
+}

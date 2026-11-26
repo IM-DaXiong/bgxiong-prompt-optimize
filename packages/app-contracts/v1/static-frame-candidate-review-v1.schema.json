@@ -1,0 +1,114 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "static-frame-candidate-review-v1.schema.json",
+  "schemaVersion": 1,
+  "title": "Static-frame review metadata carried by a complete candidate (storyboard_shot_specs gen_trace_json)",
+  "description": "Self-contained: accepted audit, final checks, method/rule/input digests and FrozenPadPlan stable references, never only a link to a transient child task. Legacy candidates have no metadataKind and are read-only 'new review not done' (never ready). Q base revision and D final revision are recorded separately.",
+  "$ref": "#/definitions/candidateReviewV1",
+  "definitions": {
+    "stillReviewState": {
+      "type": "string",
+      "enum": ["unreviewed", "ready", "needs_attention"]
+    },
+    "reviewAction": {
+      "type": "string",
+      "enum": ["keep", "revise", "needs_attention"]
+    },
+    "padPlanRefV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["token", "assetRef", "contentDigest"],
+      "properties": {
+        "token": { "type": "integer", "minimum": 1 },
+        "assetRef": { "type": "string", "minLength": 1 },
+        "contentDigest": { "type": "string", "minLength": 1 }
+      }
+    },
+    "shotReviewRecordV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "shotKey", "state", "reviewAction", "acceptedAudit", "finalChecks",
+        "addressedFindings", "unresolvedFindings", "authoringInputDigest",
+        "reviewInputDigest", "methodDigest", "rulesDigest", "schemaDigest", "padPlan"
+      ],
+      "properties": {
+        "shotKey": { "type": "string", "minLength": 1 },
+        "state": { "$ref": "#/definitions/stillReviewState" },
+        "reviewAction": { "anyOf": [{ "$ref": "#/definitions/reviewAction" }, { "type": "null" }] },
+        "acceptedAudit": { "anyOf": [{ "$ref": "static-frame-authoring-v1.schema.json#/definitions/auditV1" }, { "type": "null" }] },
+        "finalChecks": { "type": "array", "items": { "$ref": "static-frame-review-edit-v1.schema.json#/definitions/finalCheckV1" } },
+        "addressedFindings": { "type": "array", "items": { "$ref": "static-frame-review-edit-v1.schema.json#/definitions/inputFindingV1" } },
+        "unresolvedFindings": { "type": "array", "items": { "$ref": "static-frame-review-edit-v1.schema.json#/definitions/inputFindingV1" } },
+        "authoringInputDigest": { "type": "string", "minLength": 1 },
+        "reviewInputDigest": { "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] },
+        "methodDigest": { "type": "string", "minLength": 1 },
+        "rulesDigest": { "type": "string", "minLength": 1 },
+        "schemaDigest": { "type": "string", "minLength": 1 },
+        "padPlan": { "type": "array", "items": { "$ref": "#/definitions/padPlanRefV1" } }
+      }
+    },
+    "reviewSummaryV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action", "reviewStatus", "persisted", "authoringChildTaskId", "reviewChildTaskId", "finalRevision",
+        "addressedRuleIds", "advisoryRuleIds", "unresolvedRuleIds", "unverifiableRuleIds", "visionVerified"
+      ],
+      "properties": {
+        "action": { "$ref": "#/definitions/reviewAction" },
+        "reviewStatus": { "$ref": "#/definitions/stillReviewState" },
+        "persisted": { "type": "boolean" },
+        "authoringChildTaskId": { "type": "string", "minLength": 1 },
+        "reviewChildTaskId": { "type": "string", "minLength": 1 },
+        "finalRevision": { "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] },
+        "addressedRuleIds": { "type": "array", "items": { "$ref": "static-frame-review-edit-v1.schema.json#/definitions/ruleId" } },
+        "advisoryRuleIds": { "type": "array", "items": { "$ref": "static-frame-review-edit-v1.schema.json#/definitions/ruleId" } },
+        "unresolvedRuleIds": { "type": "array", "items": { "$ref": "static-frame-review-edit-v1.schema.json#/definitions/ruleId" } },
+        "unverifiableRuleIds": { "type": "array", "items": { "$ref": "static-frame-review-edit-v1.schema.json#/definitions/ruleId" } },
+        "visionVerified": { "type": "boolean" }
+      }
+    },
+    "progressV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stage", "authored", "reviewed", "revised", "needsAttention", "failed", "total"],
+      "properties": {
+        "stage": { "$ref": "static-frame-authoring-policy-v1.json#/definitions/aiTaskStage" },
+        "authored": { "type": "integer", "minimum": 0 },
+        "reviewed": { "type": "integer", "minimum": 0 },
+        "revised": { "type": "integer", "minimum": 0 },
+        "needsAttention": { "type": "integer", "minimum": 0 },
+        "failed": { "type": "integer", "minimum": 0 },
+        "total": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "unknownCallV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["callId", "shotKey", "phase"],
+      "properties": {
+        "callId": { "type": "string", "minLength": 1 },
+        "shotKey": { "type": "string", "minLength": 1 },
+        "phase": { "$ref": "static-frame-authoring-policy-v1.json#/definitions/aiTaskStage" }
+      }
+    },
+    "candidateReviewV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["metadataKind", "qBaseRevision", "dFinalRevision", "shots"],
+      "properties": {
+        "metadataKind": { "const": "static_frame_review_v1" },
+        "qBaseRevision": { "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] },
+        "dFinalRevision": { "type": "string", "minLength": 1 },
+        "shots": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/shotReviewRecordV1" }, "x-uniqueBy": ["shotKey"] }
+      }
+    }
+  },
+  "x-hostRules": [
+    "state ready <=> reviewAction keep|revise and acceptedAudit non-null and no unresolved blocking and reviewInputDigest non-null.",
+    "state needs_attention <=> reviewAction needs_attention and at least one unresolved blocking.",
+    "state unreviewed <=> reviewAction null and acceptedAudit null and finalChecks empty (D failed or not run).",
+    "addressedFindings are history only and never block."
+  ]
+}

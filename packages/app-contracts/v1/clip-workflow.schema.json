@@ -1,0 +1,1368 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "schemaVersion": 1,
+  "title": "Clip workflow: source, atomic model replies and shared canvas contracts",
+  "definitions": {
+    "ClipSourceUnit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "unitId",
+        "startChar",
+        "endChar",
+        "text"
+      ],
+      "properties": {
+        "unitId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "startChar": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "endChar": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "text": {
+          "type": "string"
+        }
+      }
+    },
+    "ClipReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "referenceId",
+        "nodeId",
+        "mediaVersionId",
+        "label",
+        "description",
+        "mediaRelativePath",
+        "imageSha256",
+        "kind"
+      ],
+      "properties": {
+        "referenceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mediaVersionId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "label": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "mediaRelativePath": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "imageSha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "role",
+            "prop",
+            "reference",
+            "environment"
+          ]
+        }
+      }
+    },
+    "ClipSourceSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "storyId",
+        "chapterId",
+        "revision",
+        "digest",
+        "title",
+        "script",
+        "sourceUnits",
+        "availableReferences",
+        "imageReadStatus"
+      ],
+      "properties": {
+        "storyId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "chapterId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "digest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string"
+        },
+        "script": {
+          "type": "string"
+        },
+        "sourceUnits": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ClipSourceUnit"
+          },
+          "minItems": 1
+        },
+        "availableReferences": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ClipReference"
+          },
+          "minItems": 0
+        },
+        "imageReadStatus": {
+          "type": "string",
+          "enum": [
+            "noImages",
+            "notRead",
+            "read"
+          ]
+        },
+        "additionalInstructions": {
+          "type": "string",
+          "description": "Frozen episode additional instructions, kept separate from the literary script and attachment inventory."
+        }
+      }
+    },
+    "ClipPlanItem": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "localId"
+      ],
+      "properties": {
+        "localId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceUnitIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "narrativeIntent": {
+          "type": "string"
+        },
+        "startState": {
+          "type": "string"
+        },
+        "endState": {
+          "type": "string"
+        },
+        "estimatedSeconds": {
+          "anyOf": [
+            {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "x-preserve-raw-response": true
+    },
+    "ClipEnvironmentCandidate": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "localId",
+        "title",
+        "description"
+      ],
+      "properties": {
+        "localId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "sourceUnitIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        }
+      },
+      "x-preserve-raw-response": true
+    },
+    "ClipEnvironmentRef": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "clipLocalId",
+        "environmentLocalId"
+      ],
+      "properties": {
+        "clipLocalId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "environmentLocalId": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "x-preserve-raw-response": true
+    },
+    "ClipEpisodePlanReply": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "clips"
+      ],
+      "properties": {
+        "clips": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ClipPlanItem"
+          },
+          "minItems": 1
+        },
+        "environments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ClipEnvironmentCandidate"
+          },
+          "minItems": 0,
+          "default": []
+        },
+        "clipEnvironmentRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ClipEnvironmentRef"
+          },
+          "minItems": 0,
+          "default": []
+        }
+      },
+      "x-preserve-raw-response": true
+    },
+    "ClipShotEstimate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "count",
+        "explanation"
+      ],
+      "properties": {
+        "count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "explanation": {
+          "type": "string"
+        }
+      }
+    },
+    "ClipDraftReply": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "promptText"
+      ],
+      "properties": {
+        "promptText": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceUnitIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "referenceIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "estimatedSeconds": {
+          "anyOf": [
+            {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "shotEstimate": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ClipShotEstimate"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "x-preserve-raw-response": true
+    },
+    "ClipEnvironmentPromptReply": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "promptText"
+      ],
+      "properties": {
+        "environmentLocalId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "promptText": {
+          "type": "string",
+          "minLength": 1
+        },
+        "referenceIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        }
+      },
+      "x-preserve-raw-response": true
+    },
+    "ClipFrameOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scope",
+        "strategy",
+        "maxMiddleFrames",
+        "includeClipEndpoints"
+      ],
+      "properties": {
+        "scope": {
+          "type": "string",
+          "enum": [
+            "clip",
+            "shot"
+          ]
+        },
+        "strategy": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "keyframes",
+            "endpoints",
+            "endpointsAndMiddle"
+          ]
+        },
+        "maxMiddleFrames": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Preferred reference quantity for non-endpoint images, per clip or per shot. The submitted user value is frozen as model guidance only. Zero is valid and does not prohibit intermediate frames. Actual returned frames are retained and receive prompt tasks without exact-count matching, padding, trimming or a quantity-based pause."
+        },
+        "includeClipEndpoints": {
+          "type": "boolean",
+          "description": "Applies only to scope=shot: additionally identify whole-clip start/end using the first/last shot boundary images. False does not cancel the start/end strategy for scope=clip."
+        }
+      }
+    },
+    "ClipShotPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "localId",
+        "description"
+      ],
+      "properties": {
+        "localId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string"
+        },
+        "sourceUnitIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        }
+      }
+    },
+    "ClipFrameCandidate": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "localId",
+        "description"
+      ],
+      "properties": {
+        "localId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string"
+        },
+        "sourceUnitIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "referenceIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        }
+      },
+      "x-preserve-raw-response": true
+    },
+    "ClipBoundaryUse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "frameLocalId",
+        "scope",
+        "usage"
+      ],
+      "properties": {
+        "frameLocalId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "type": "string",
+          "enum": [
+            "clip",
+            "shot"
+          ]
+        },
+        "shotLocalId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "usage": {
+          "type": "string",
+          "enum": [
+            "start",
+            "middle",
+            "end"
+          ]
+        }
+      }
+    },
+    "ClipFramePlanReply": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "frames"
+      ],
+      "properties": {
+        "shots": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ClipShotPlan"
+          },
+          "minItems": 0
+        },
+        "frames": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ClipFrameCandidate"
+          },
+          "minItems": 1
+        },
+        "boundaryUses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ClipBoundaryUse"
+          },
+          "minItems": 0
+        },
+        "explanation": {
+          "type": "string"
+        }
+      },
+      "x-preserve-raw-response": true
+    },
+    "ClipFramePromptReply": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "promptText"
+      ],
+      "properties": {
+        "frameLocalId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "promptText": {
+          "type": "string",
+          "minLength": 1
+        },
+        "referenceIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        }
+      },
+      "x-preserve-raw-response": true
+    },
+    "ClipGenerationOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [],
+      "properties": {
+        "durationReferenceSeconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "referenceImages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ClipInputImage"
+          },
+          "description": "Ordered explicit image selection. Omitted or empty means no images; never collect defaults during submission."
+        }
+      }
+    },
+    "ClipModelInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "extraConstraints",
+        "options",
+        "planItem",
+        "environment",
+        "episodePlan"
+      ],
+      "properties": {
+        "source": {
+          "$ref": "#/definitions/ClipSourceSnapshot"
+        },
+        "extraConstraints": {
+          "type": "string"
+        },
+        "options": {
+          "$ref": "#/definitions/ClipGenerationOptions"
+        },
+        "planItem": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ClipPlanItem"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "environment": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ClipEnvironmentCandidate"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "episodePlan": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ClipEpisodePlanReply"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "ClipArtifact": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "reply",
+            "source"
+          ],
+          "properties": {
+            "kind": {
+              "const": "clipPlan"
+            },
+            "reply": {
+              "$ref": "#/definitions/ClipEpisodePlanReply"
+            },
+            "source": {
+              "$ref": "#/definitions/ClipSourceSnapshot"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "localId",
+            "reply"
+          ],
+          "properties": {
+            "kind": {
+              "const": "clipDraft"
+            },
+            "localId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "reply": {
+              "$ref": "#/definitions/ClipDraftReply"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "localId",
+            "reply"
+          ],
+          "properties": {
+            "kind": {
+              "const": "environmentPrompt"
+            },
+            "localId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "reply": {
+              "$ref": "#/definitions/ClipEnvironmentPromptReply"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "reply",
+            "source",
+            "options"
+          ],
+          "properties": {
+            "kind": {
+              "const": "framePlan"
+            },
+            "reply": {
+              "$ref": "#/definitions/ClipFramePlanReply"
+            },
+            "source": {
+              "$ref": "#/definitions/ClipFrameSource"
+            },
+            "options": {
+              "$ref": "#/definitions/ClipFrameOptions"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "localId",
+            "reply"
+          ],
+          "properties": {
+            "kind": {
+              "const": "framePrompt"
+            },
+            "localId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "reply": {
+              "$ref": "#/definitions/ClipFramePromptReply"
+            }
+          }
+        }
+      ]
+    },
+    "ClipNodeSize": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "width",
+        "height"
+      ],
+      "properties": {
+        "width": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "height": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "ClipBatchMode": {
+      "type": "string",
+      "enum": [
+        "incremental",
+        "overwrite"
+      ]
+    },
+    "ClipBatchKind": {
+      "type": "string",
+      "enum": [
+        "images",
+        "videos",
+        "mixed"
+      ]
+    },
+    "ClipBatchPhase": {
+      "type": "string",
+      "enum": [
+        "images",
+        "videos"
+      ]
+    },
+    "ClipStorageMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "storageDirectory",
+        "episodeDirectories",
+        "filenameFormat"
+      ],
+      "properties": {
+        "storageDirectory": {
+          "type": "string",
+          "minLength": 1
+        },
+        "episodeDirectories": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "chapterId",
+              "directory"
+            ],
+            "properties": {
+              "chapterId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "directory": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "minItems": 0
+        },
+        "filenameFormat": {
+          "const": "utcMillisecondsSequence23"
+        }
+      }
+    },
+    "ClipFrameSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "storyId",
+        "workspaceId",
+        "nodeId",
+        "promptText",
+        "promptDigest",
+        "sourceUnits",
+        "availableReferences",
+        "imageReadStatus",
+        "sourceProvenance"
+      ],
+      "properties": {
+        "storyId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "workspaceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "promptText": {
+          "type": "string",
+          "minLength": 1
+        },
+        "promptDigest": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "sourceUnits": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ClipSourceUnit"
+          },
+          "minItems": 1
+        },
+        "availableReferences": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ClipReference"
+          },
+          "minItems": 0
+        },
+        "imageReadStatus": {
+          "type": "string",
+          "enum": [
+            "noImages",
+            "notRead",
+            "read"
+          ]
+        },
+        "sourceProvenance": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ClipSourceSnapshot"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "ClipFrameModelInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "options",
+        "extraConstraints",
+        "framePlan",
+        "frame"
+      ],
+      "properties": {
+        "source": {
+          "$ref": "#/definitions/ClipFrameSource"
+        },
+        "options": {
+          "$ref": "#/definitions/ClipFrameOptions"
+        },
+        "extraConstraints": {
+          "type": "string"
+        },
+        "framePlan": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ClipFramePlanReply"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "frame": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ClipFrameCandidate"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "ClipFrameStartArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "workspaceId",
+        "nodeId",
+        "expectedPromptDigest",
+        "options",
+        "settings",
+        "promptSettings"
+      ],
+      "properties": {
+        "workspaceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedPromptDigest": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "options": {
+          "$ref": "#/definitions/ClipFrameOptions"
+        },
+        "settings": {
+          "$ref": "story-creation.schema.json#/definitions/StageSettings"
+        },
+        "promptSettings": {
+          "$ref": "story-creation.schema.json#/definitions/StageSettings"
+        }
+      }
+    },
+    "ClipFrameAdoptionSelection": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "artifactId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "promptText": {
+          "type": "string",
+          "minLength": 1
+        },
+        "referenceIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "boundaryUses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ClipBoundaryUse"
+          }
+        },
+        "connectToVideo": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "artifactId",
+        "promptText",
+        "referenceIds",
+        "boundaryUses",
+        "connectToVideo"
+      ]
+    },
+    "ClipFrameAdoptionRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "workspaceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedRevision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "expectedPromptDigest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "planArtifactId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "frames": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/ClipFrameAdoptionSelection"
+          }
+        },
+        "viewportWidth": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "required": [
+        "workspaceId",
+        "expectedRevision",
+        "expectedPromptDigest",
+        "planArtifactId",
+        "frames",
+        "viewportWidth"
+      ]
+    },
+    "ClipFramePromptArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "artifactId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "itemId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "aiTaskId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "localId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "promptText": {
+          "type": "string",
+          "minLength": 1
+        },
+        "referenceIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "boundaryUses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ClipBoundaryUse"
+          }
+        },
+        "reportedFrameLocalId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "unlinkedReferenceIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "artifactId",
+        "itemId",
+        "aiTaskId",
+        "localId",
+        "promptText",
+        "referenceIds",
+        "boundaryUses"
+      ]
+    },
+    "ClipFramePlanArtifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "planArtifactId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "$ref": "#/definitions/ClipFrameSource"
+        },
+        "options": {
+          "$ref": "#/definitions/ClipFrameOptions"
+        },
+        "plan": {
+          "$ref": "#/definitions/ClipFramePlanReply"
+        },
+        "frames": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ClipFramePromptArtifact"
+          }
+        },
+        "diagnostics": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ClipFrameDiagnostic"
+          }
+        },
+        "automaticPromptsPaused": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "planArtifactId",
+        "source",
+        "options",
+        "plan",
+        "frames",
+        "diagnostics",
+        "automaticPromptsPaused"
+      ]
+    },
+    "ClipFrameArtifactReadArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runId"
+      ],
+      "properties": {
+        "runId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "afterOrdinal": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200
+        }
+      }
+    },
+    "ClipFrameArtifactPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "runId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ClipFramePlanArtifacts"
+          }
+        },
+        "nextAfterOrdinal": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "runId",
+        "items",
+        "nextAfterOrdinal"
+      ]
+    },
+    "ClipFrameDiagnostic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "scope",
+        "shotLocalId",
+        "frameLocalIds",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "missingStart",
+            "missingEnd",
+            "requestedShotsMissing",
+            "unassignedFrames",
+            "unexpectedScope",
+            "ambiguousBoundary",
+            "clipEndpointsNotReused",
+            "middleBudgetExceeded",
+            "promptBudgetExceeded"
+          ]
+        },
+        "scope": {
+          "type": "string",
+          "enum": [
+            "clip",
+            "shot"
+          ]
+        },
+        "shotLocalId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "frameLocalIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "ClipInputImageSource": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "ownerNodeId",
+            "versionId",
+            "imageId"
+          ],
+          "properties": {
+            "kind": {
+              "const": "portraitFrame"
+            },
+            "ownerNodeId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "versionId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "imageId": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "path"
+          ],
+          "properties": {
+            "kind": {
+              "const": "appDataRelative"
+            },
+            "path": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "nodeId"],
+          "properties": {
+            "kind": { "const": "canvasNode" },
+            "nodeId": { "type": "string", "minLength": 1 }
+          }
+        }
+      ]
+    },
+    "ClipInputImage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "label",
+        "source"
+      ],
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/definitions/ClipInputImageSource"
+        },
+        "referenceId": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Stable editor attachment identity. Preserved in the model reference inventory; independent of image order."
+        }
+      }
+    }
+  }
+}

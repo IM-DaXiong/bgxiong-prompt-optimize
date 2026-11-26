@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "operations": [
+    "understand_source",
+    "plan_artifacts",
+    "materialize_bible",
+    "materialize_chapters",
+    "materialize_scenes",
+    "materialize_shots",
+    "materialize_roles",
+    "materialize_appearance",
+    "assemble_package",
+    "materialize_bgx_package"
+  ],
+  "artifactKinds": [
+    "bible",
+    "chapters",
+    "scenes",
+    "shots",
+    "roles",
+    "appearance",
+    "package"
+  ],
+  "artifactPrerequisites": {
+    "shots": "scenes",
+    "scenes": "chapters"
+  },
+  "impliedUpstream": {
+    "whenDbEmptyAndNoValidAnchor": true
+  },
+  "fillProductionParamsPromptId": "content.fill_production_params",
+  "layerNeeds": {
+    "rolesReady": [
+      "name",
+      "age",
+      "facialFeatures",
+      "hair",
+      "outfit"
+    ],
+    "scenes": [
+      "headline",
+      "script",
+      "coreMood",
+      "castIdsPresent",
+      "intExt",
+      "dayNight",
+      "sceneIntent",
+      "pacingTargetId",
+      "transitionIn",
+      "transitionOut",
+      "conflictId",
+      "locationDescription",
+      "settingSlug"
+    ],
+    "productionParams": [
+      "durationSecondsPerChapter",
+      "chapterCount",
+      "proposedSceneCount",
+      "proposedShotCount"
+    ]
+  },
+  "limits": {
+    "maxChaptersPerStory": 100,
+    "maxScenesPerChapter": 80,
+    "maxShotsPerScene": 120,
+    "maxShotsPerPackage": 400,
+    "minScriptChars": 200,
+    "minEpisodeDurationSeconds": 15,
+    "maxEpisodeDurationSeconds": 7200,
+    "minChapterTargetDurationSeconds": 1,
+    "minShotDurationSeconds": 0.5,
+    "maxShotDurationSeconds": 60,
+    "maxRepairRounds": 5,
+    "defaultRepairRounds": 2,
+    "maxSourceChunkChars": 8000,
+    "maxUnderstandChunks": 64,
+    "maxRunJsonBytes": 1048576
+  },
+  "coverageOpsByArtifact": {
+    "bible": [
+      "materialize_bible"
+    ],
+    "chapters": [
+      "materialize_chapters",
+      "materialize_bgx_package"
+    ],
+    "scenes": [
+      "materialize_scenes",
+      "materialize_bgx_package"
+    ],
+    "shots": [
+      "materialize_shots",
+      "materialize_bgx_package"
+    ],
+    "roles": [
+      "materialize_roles",
+      "materialize_bgx_package"
+    ],
+    "appearance": [
+      "materialize_appearance"
+    ],
+    "package": [
+      "assemble_package",
+      "materialize_bgx_package"
+    ]
+  }
+}

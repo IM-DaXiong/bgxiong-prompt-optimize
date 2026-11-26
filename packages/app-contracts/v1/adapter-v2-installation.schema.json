@@ -1,0 +1,362 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://bgxiong.ai/contracts/v1/adapter-v2-installation.schema.json",
+  "title": "App distribution envelope for SDK v2 runtime packages",
+  "description": "Outer distribution contract; does not change the public SDK execution protocol. Runtime child remains a standard SDK package. Secrets belong to the account center or author code.",
+  "definitions": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "gitCommit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "folderName": {
+      "type": "string",
+      "description": "Single ordinary ASCII directory name. Host also rejects reserved Windows device names, trailing dots and aliases.",
+      "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9_-])?$"
+    },
+    "nodeId": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:\\.[a-z0-9-]+)+$"
+    },
+    "homepage": {
+      "type": "string",
+      "description": "HTTPS source URL for display only. No credentials, query, fragment or custom port.",
+      "pattern": "^https://[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)+/[^?#]*$"
+    },
+    "archiveRelativeFile": {
+      "type": "string",
+      "description": "Ordinary relative file path inside the node archive. No absolute path, drive letter, backslash or parent traversal.",
+      "pattern": "^(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*(?:^|/)\\.(?:/|$))(?!.*[:\\\\])[A-Za-z0-9][A-Za-z0-9._-]*(?:/[A-Za-z0-9][A-Za-z0-9._-]*)*$"
+    },
+    "authentication": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "source",
+            "fields"
+          ],
+          "properties": {
+            "source": {
+              "const": "userInput"
+            },
+            "fields": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "reference",
+                  "label",
+                  "mode",
+                  "origins"
+                ],
+                "if": {"required": ["accountOriginHostSuffix"]},
+                "then": {"properties": {"origins": {"maxItems": 0}}},
+                "else": {"properties": {"origins": {"minItems": 1}}},
+                "properties": {
+                  "reference": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "label": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "mode": {
+                    "enum": [
+                      "bearer",
+                      "custom-header",
+                      "jwt-hs256",
+                      "hmac-sha256-credential"
+                    ]
+                  },
+                  "origins": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "accountOriginHostSuffix": {
+                    "type": "string",
+                    "description": "Use the selected account's HTTPS origin for endpointBaseUrl and for this credential only. The host matches this DNS suffix at a label boundary; origins must be empty.",
+                    "pattern": "^[a-z0-9]+[a-z0-9-]*(\\.[a-z0-9]+[a-z0-9-]*)+$"
+                  },
+                  "customHeader": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "source"
+          ],
+          "properties": {
+            "source": {
+              "enum": [
+                "embedded",
+                "none"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "mountedCodeFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^comfy-nodes/(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*[:\\\\]).+$"
+        },
+        "sha256": {"$ref": "#/definitions/sha256"}
+      }
+    },
+    "nodeArchive": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["url", "sha256", "bytes", "stripComponents"],
+      "properties": {
+        "url": {
+          "type": "string",
+          "description": "Production archive URL. The host also requires this exact path: https://r.bgxiong.com/client/ai-story/comfy-custom-nodes/<folderName>/<gitCommit>.zip",
+          "pattern": "^https://r\\.bgxiong\\.com/client/ai-story/comfy-custom-nodes/[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9_-])?/[0-9a-f]{40}\\.zip$"
+        },
+        "sha256": {"$ref": "#/definitions/sha256"},
+        "bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 536870912
+        },
+        "stripComponents": {
+          "type": "integer",
+          "enum": [0, 1]
+        }
+      }
+    },
+    "nodeRequirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "wheelLock"],
+      "properties": {
+        "path": {"$ref": "#/definitions/archiveRelativeFile"},
+        "sha256": {"$ref": "#/definitions/sha256"},
+        "wheelLock": {"$ref": "#/definitions/archiveRelativeFile"}
+      }
+    },
+    "customNodeWhen": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operationIds", "inputPointer", "test"],
+      "properties": {
+        "operationIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "inputPointer": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Points at an optional text field on each listed operation input schema."
+        },
+        "test": {
+          "const": "nonBlankText"
+        }
+      }
+    },
+    "requiredCustomNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "folderName",
+        "displayName",
+        "license",
+        "homepage",
+        "gitCommit",
+        "archive",
+        "acceptClassTypes"
+      ],
+      "properties": {
+        "id": {"$ref": "#/definitions/nodeId"},
+        "folderName": {"$ref": "#/definitions/folderName"},
+        "displayName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "license": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9.+-]*$"
+        },
+        "homepage": {"$ref": "#/definitions/homepage"},
+        "gitCommit": {"$ref": "#/definitions/gitCommit"},
+        "archive": {"$ref": "#/definitions/nodeArchive"},
+        "requirements": {"$ref": "#/definitions/nodeRequirements"},
+        "acceptClassTypes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "when": {"$ref": "#/definitions/customNodeWhen"}
+      }
+    },
+    "resourceWeight": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operationId", "classType", "input", "name"],
+      "properties": {
+        "operationId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "classType": {
+          "type": "string",
+          "minLength": 1
+        },
+        "input": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "declaredDirectory": {"$ref": "#/definitions/archiveRelativeFile"}
+      }
+    },
+    "resourceGuide": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["capabilityId", "resourceId", "weights"],
+      "properties": {
+        "capabilityId": {
+          "const": "comfy.resource_pack"
+        },
+        "resourceId": {
+          "const": "comfy.resource_pack"
+        },
+        "weights": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/definitions/resourceWeight"}
+        }
+      }
+    },
+    "requiredCustomNodes": {
+      "type": "array",
+      "items": {"$ref": "#/definitions/requiredCustomNode"}
+    },
+    "serviceOnlyBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["serviceOnly"],
+      "properties": {
+        "serviceOnly": { "const": true },
+        "customNodes": { "const": "" },
+        "files": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "requiredCustomNodes": {"$ref": "#/definitions/requiredCustomNodes"},
+        "resourceGuide": {"$ref": "#/definitions/resourceGuide"}
+      }
+    },
+    "inPackageMountBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["customNodes", "files"],
+      "properties": {
+        "serviceOnly": { "const": false },
+        "customNodes": { "const": "comfy-nodes" },
+        "files": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/definitions/mountedCodeFile"}
+        },
+        "requiredCustomNodes": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "resourceGuide": {"$ref": "#/definitions/resourceGuide"}
+      }
+    },
+    "editorBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "sha256"],
+      "properties": {
+        "file": { "const": "editor-bundle.json" },
+        "sha256": {"$ref": "#/definitions/sha256"}
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "packageDirectory",
+    "manifestSha256",
+    "authentication",
+    "hostConfig",
+    "managedMediaProbe"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "packageDirectory": {
+      "type": "string",
+      "pattern": "^[^/\\\\:]+$"
+    },
+    "manifestSha256": {
+      "$ref": "#/definitions/sha256"
+    },
+    "authentication": {"$ref": "#/definitions/authentication"},
+    "hostConfig": {
+      "type": "object",
+      "description": "Complete CLI host configuration with credentials=[], no media or appCredentials."
+    },
+    "managedMediaProbe": {
+      "type": "boolean"
+    },
+    "comfyui": {
+      "description": "Opt in to the app saved ComfyUI connection and existing GPU/start scheduler. This period allows either a service-only binding, optionally with hosted external custom nodes, or a legacy in-package comfy-nodes mount. External custom nodes require serviceOnly.",
+      "oneOf": [
+        {"$ref": "#/definitions/serviceOnlyBinding"},
+        {"$ref": "#/definitions/inPackageMountBinding"}
+      ]
+    },
+    "editor": {
+      "description": "Optional verified editor companion. file is the fixed envelope name editor-bundle.json; sha256 is the lowercase digest of that file.",
+      "$ref": "#/definitions/editorBinding"
+    }
+  }
+}

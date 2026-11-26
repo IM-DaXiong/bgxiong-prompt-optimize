@@ -1,0 +1,241 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-memory-actions.schema.json",
+  "title": "CreatorMemoryActions",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": [
+        "type",
+        "scope"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "memory.list"
+        },
+        "scope": {
+          "enum": [
+            "global",
+            "story"
+          ]
+        },
+        "storyId": {
+          "type": "string"
+        },
+        "category": {
+          "type": "string"
+        },
+        "cursor": {
+          "type": "string"
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "type",
+        "memoryId"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "memory.get"
+        },
+        "memoryId": {
+          "type": "string"
+        },
+        "includeHistory": {
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "type",
+        "scope",
+        "category",
+        "title",
+        "contentMarkdown",
+        "authorizationSource"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "memory.remember"
+        },
+        "scope": {
+          "enum": [
+            "global",
+            "story"
+          ]
+        },
+        "storyId": {
+          "type": "string"
+        },
+        "category": {
+          "enum": [
+            "instruction",
+            "preference",
+            "canon_note",
+            "constraint",
+            "todo"
+          ]
+        },
+        "title": {
+          "type": "string"
+        },
+        "contentMarkdown": {
+          "type": "string"
+        },
+        "authorizationSource": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "userUtteranceExcerpt"
+          ],
+          "properties": {
+            "kind": {
+              "const": "user_explicit"
+            },
+            "userUtteranceExcerpt": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "type",
+        "memoryId",
+        "expectedRevision"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "memory.patch"
+        },
+        "memoryId": {
+          "type": "string"
+        },
+        "expectedRevision": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "contentMarkdown": {
+          "type": "string"
+        },
+        "restoreFromRevision": {
+          "type": "string"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "type",
+        "memoryId",
+        "expectedRevision"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "memory.forget"
+        },
+        "memoryId": {
+          "type": "string"
+        },
+        "expectedRevision": {
+          "type": "string"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "type",
+        "scope",
+        "query"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "memory.search"
+        },
+        "scope": {
+          "enum": [
+            "global",
+            "story"
+          ]
+        },
+        "storyId": {
+          "type": "string"
+        },
+        "query": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "type",
+        "scope"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "memory.export.prepare"
+        },
+        "scope": {
+          "enum": [
+            "global",
+            "story"
+          ]
+        },
+        "storyId": {
+          "type": "string"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "type",
+        "scope",
+        "markdown"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "memory.import.prepare"
+        },
+        "scope": {
+          "enum": [
+            "global",
+            "story"
+          ]
+        },
+        "storyId": {
+          "type": "string"
+        },
+        "markdown": {
+          "type": "string"
+        }
+      }
+    }
+  ]
+}

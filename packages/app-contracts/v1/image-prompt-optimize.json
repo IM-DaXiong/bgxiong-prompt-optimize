@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "methodResourceMaxChars": 48000,
+  "inputModes": ["text", "vision"],
+  "visionSkipReasons": ["model_no_vision"],
+  "outputSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["optimizedPrompt"],
+    "properties": {
+      "optimizedPrompt": { "type": "string", "minLength": 1 }
+    }
+  }
+}

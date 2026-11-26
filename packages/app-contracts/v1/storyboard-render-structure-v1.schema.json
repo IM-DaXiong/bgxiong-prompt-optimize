@@ -1,0 +1,275 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "storyboard-render-structure-v1.schema.json",
+  "schemaVersion": 1,
+  "title": "Stage B strict wire: render descriptions, scene look and adjacent transitions",
+  "description": "The root contains exactly shots, sceneLookLock and transitions. All required fields are validated from this schema; unknown fields are rejected. Stage A supplies frozen shot identity, cast, camera and aspect bindings. The host projects these accepted structured fields and exact frozen dialogue into the internal video document; the model does not repeat facts, quote ledgers or source IDs. Static-frame prose is authored separately.",
+  "$ref": "#/definitions/output",
+  "definitions": {
+    "stringList": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "camera": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "shotSizeId",
+        "angleId",
+        "movementId"
+      ],
+      "properties": {
+        "shotSizeId": {
+          "type": "string",
+          "x-bindEnum": "cinematic_language.shot_size"
+        },
+        "angleId": {
+          "type": "string",
+          "x-bindEnum": "cinematic_language.camera_angle"
+        },
+        "movementId": {
+          "type": "string",
+          "x-bindEnum": "cinematic_language.camera_movement"
+        },
+        "focalLengthTendencyId": {
+          "type": "string",
+          "x-bindEnum": "cinematic_language.focal_length_tendency"
+        }
+      }
+    },
+    "composition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "anchorId",
+        "headroomId",
+        "noseroomId",
+        "depthLayersCount"
+      ],
+      "description": "framingMirror is host-owned (derived from Stage A) and is not accepted on the wire.",
+      "properties": {
+        "anchorId": {
+          "type": "string",
+          "x-bindEnum": "cinematic_language.composition_anchor"
+        },
+        "headroomId": {
+          "type": "string",
+          "enum": [
+            "tight",
+            "medium",
+            "generous"
+          ]
+        },
+        "noseroomId": {
+          "type": "string",
+          "enum": [
+            "tight",
+            "medium",
+            "generous"
+          ]
+        },
+        "depthLayersCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "axis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "axisLineId",
+        "cameraSideId",
+        "crossesPrevious"
+      ],
+      "properties": {
+        "axisLineId": {
+          "type": "string"
+        },
+        "cameraSideId": {
+          "type": "string",
+          "enum": [
+            "a",
+            "b"
+          ]
+        },
+        "crossesPrevious": {
+          "type": "boolean"
+        },
+        "crossingReasonId": {
+          "type": "string",
+          "x-bindEnum": "storyboard_specs.AxisCrossingReasonId",
+          "description": "Present exactly when crossesPrevious=true (host rule)."
+        }
+      }
+    },
+    "visualContinuity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "keyLightDirection",
+        "screenDirectionId",
+        "cameraMotionTrend",
+        "axis"
+      ],
+      "properties": {
+        "keyLightDirection": {
+          "type": "string",
+          "minLength": 3
+        },
+        "screenDirectionId": {
+          "type": "string",
+          "enum": [
+            "left_to_right",
+            "right_to_left",
+            "into_frame",
+            "out_of_frame",
+            "neutral"
+          ]
+        },
+        "cameraMotionTrend": {
+          "type": "string"
+        },
+        "axis": {
+          "$ref": "#/definitions/axis"
+        }
+      }
+    },
+    "shot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "shotNumber",
+        "subjects",
+        "environment",
+        "composition",
+        "camera",
+        "lightingColor",
+        "styleTokens",
+        "qualityTokens",
+        "negativeTokens",
+        "constraints",
+        "aspectRatio",
+        "wardrobeState",
+        "action",
+        "expression",
+        "atmosphere",
+        "visualContinuity"
+      ],
+      "properties": {
+        "shotNumber": {
+          "type": "integer",
+          "minimum": 1,
+          "x-bindEnum": "stageA.shotNumbers",
+          "x-uniqueAcrossShots": true
+        },
+        "subjects": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "x-bindEnum": "stageA.shot.charactersInShot.castId",
+          "description": "character shots: exactly this shot's Stage A cast closed set; scene_only shots: []"
+        },
+        "environment": {
+          "type": "string"
+        },
+        "composition": {
+          "$ref": "#/definitions/composition"
+        },
+        "camera": {
+          "$ref": "#/definitions/camera"
+        },
+        "lightingColor": {
+          "type": "string",
+          "minLength": 5
+        },
+        "styleTokens": {
+          "$ref": "#/definitions/stringList"
+        },
+        "qualityTokens": {
+          "$ref": "#/definitions/stringList"
+        },
+        "negativeTokens": {
+          "$ref": "#/definitions/stringList"
+        },
+        "constraints": {
+          "$ref": "#/definitions/stringList"
+        },
+        "aspectRatio": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "x-bindConst": "frozen.aspectRatio",
+          "description": "Equals the frozen aspect when one exists; null when none is frozen (never a fabricated 16:9)."
+        },
+        "wardrobeState": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string"
+        },
+        "expression": {
+          "type": "string"
+        },
+        "atmosphere": {
+          "type": "string"
+        },
+        "visualContinuity": {
+          "$ref": "#/definitions/visualContinuity"
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "shots",
+        "sceneLookLock",
+        "transitions"
+      ],
+      "properties": {
+        "shots": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/shot"
+          }
+        },
+        "sceneLookLock": {
+          "type": "string",
+          "description": "Scene-level fused look; empty string allowed, key required."
+        },
+        "transitions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "One prose transition per adjacent shot pair, in frozen shot order; a single-shot scene returns []. The host assigns endpoint IDs."
+        }
+      }
+    }
+  },
+  "x-hostRules": [
+    "shots[].shotNumber is a permutation of this run's Stage A shot numbers (no missing/duplicate); assembly binds by shotNumber, not by array zip.",
+    "subjects equals the Stage A charactersInShot cast set for character shots; [] for scene_only.",
+    "aspectRatio equals the frozen aspect when frozen; null otherwise.",
+    "crossingReasonId present exactly when crossesPrevious=true.",
+    "transitions has N-1 prose entries in frozen Stage A order. The host constructs video facts and verbatim quotes from accepted typed fields and source; the model does not repeat that ledger."
+  ]
+}

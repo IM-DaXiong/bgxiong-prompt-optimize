@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "description": "SkillFinding-shaped validation finding for screenplay packages (INV-SP-IMPORT H-93).",
+  "fields": [
+    "severity",
+    "code",
+    "locator",
+    "userMessage",
+    "userFix",
+    "logDetail"
+  ],
+  "severityEnum": ["error", "warning", "info"],
+  "codePrefix": "SCREENPLAY_"
+}

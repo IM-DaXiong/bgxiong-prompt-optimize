@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 1,
+  "stems": ["vocals", "instrumental"],
+  "qualityPresets": ["standard", "fine"],
+  "maxDurationSec": 1200
+}

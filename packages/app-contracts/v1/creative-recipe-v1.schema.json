@@ -1,0 +1,103 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creative-recipe-v1.schema.json",
+  "title": "CreativeRecipeV1",
+  "description": "S15: a recipe only orchestrates existing capability ports (creator-capability-registry.json). It carries no model id, prompt text, code or provider config; bindings are references to recipe inputs or earlier step outputs. Steps form a DAG (dependsOn); a recipe whose closure contains any planned capability is itself planned and not runnable. Execution reuses existing tasks / change journal (creative-run-v1).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "recipeId",
+    "version",
+    "title",
+    "inputs",
+    "steps"
+  ],
+  "definitions": {
+    "key": {
+      "type": "string",
+      "pattern": "^[a-z][a-zA-Z0-9_]{0,63}$"
+    },
+    "binding": {
+      "type": "string",
+      "pattern": "^(input\\.[a-z][a-zA-Z0-9_]{0,63}|steps\\.[a-z][a-zA-Z0-9_]{0,63}\\.output(\\.[a-zA-Z0-9_]{1,64}){0,4})$"
+    },
+    "step": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stepId",
+        "capabilityId",
+        "bind"
+      ],
+      "properties": {
+        "stepId": {
+          "$ref": "#/definitions/key"
+        },
+        "capabilityId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 96
+        },
+        "bind": {
+          "type": "object",
+          "maxProperties": 16,
+          "propertyNames": {
+            "$ref": "#/definitions/key"
+          },
+          "additionalProperties": {
+            "$ref": "#/definitions/binding"
+          }
+        },
+        "dependsOn": {
+          "type": "array",
+          "maxItems": 16,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/definitions/key"
+          }
+        },
+        "onBlocking": {
+          "enum": [
+            "stop",
+            "rewriteOnce"
+          ],
+          "description": "Only blocking review findings (creative-review-v1) may trigger rewriteOnce."
+        }
+      }
+    }
+  },
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "recipeId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_.-]{2,63}$"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "inputs": {
+      "type": "array",
+      "maxItems": 16,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/key"
+      }
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 16,
+      "items": {
+        "$ref": "#/definitions/step"
+      }
+    }
+  }
+}

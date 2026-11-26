@@ -1,0 +1,214 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Content authoring stage outputs",
+  "definitions": {
+    "LiteraryOutline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "items",
+        "backgroundParagraphIds"
+      ],
+      "properties": {
+        "backgroundParagraphIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "x-closedSet": "paragraphIds"
+          },
+          "description": "Source paragraphs containing only whole-work metadata, such as the work title, estimated total duration, credits or notes. Keep them here as retained background, without creating a chapter/scene item or spoken dialogue. Stage directions accompanying prose belong to that prose item. Empty when there is no background."
+        },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "title",
+              "summary",
+              "sourceParagraphIds"
+            ],
+            "properties": {
+              "title": {
+                "type": "string",
+                "minLength": 1
+              },
+              "summary": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sourceParagraphIds": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "x-closedSet": "paragraphIds"
+                },
+                "description": "For preserve_source, the exact paragraphs copied verbatim into this item by the host, in original order. Select the current item prose and adjoining stage directions; whole-work metadata remains in the original parent source. For other source policies these are the reading references for authoring this item."
+              }
+            }
+          }
+        },
+        "lastItemContinues": {
+          "type": "boolean",
+          "description": "On a technical source page only: whether the final item continues into the next source page."
+        }
+      }
+    },
+    "LiteraryDetail": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "script"
+      ],
+      "properties": {
+        "script": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Plain literary prose for the current chapter or scene, with actual paragraphs, dialogue and stage directions. The value is the prose itself, not a serialized JSON object or a field table. For preserve_source, retain the exact source words and punctuation."
+        }
+      }
+    },
+    "LiteraryPrompt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "prompt"
+      ],
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The complete prompt for the current content item."
+        }
+      }
+    },
+    "LiteraryScenePrompt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "prompt",
+        "castIdsPresent",
+        "settingSlug"
+      ],
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The complete prompt for the current content item."
+        },
+        "castIdsPresent": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "x-closedSet": "entityIds"
+          },
+          "description": "Registered assets actually present in this scene; offscreen mentions are not appearances. Unregistered people remain in the script."
+        },
+        "settingSlug": {
+          "type": "string",
+          "description": "The setting of the current scene, or an empty string if unspecified."
+        }
+      }
+    },
+    "LiteraryScenes": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "scenes"
+      ],
+      "properties": {
+        "scenes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": true,
+            "required": [
+              "script"
+            ],
+            "properties": {
+              "script": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "LiteraryChapters": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "chapters"
+      ],
+      "properties": {
+        "chapters": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": true,
+            "required": [
+              "script"
+            ],
+            "properties": {
+              "script": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "LiteraryShots": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "shots"
+      ],
+      "properties": {
+        "shots": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": true,
+            "required": [
+              "prompt"
+            ],
+            "properties": {
+              "prompt": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Storyboard still-image prompt: the visible starting frame, including characters, setting, composition, lighting and pose. Stored in the storyboard image prompt field."
+              },
+              "videoPrompt": {
+                "type": "string",
+                "description": "Video prompt for this shot: motion, camera movement, complete spoken dialogue and voice-over. Stored in the video prompt field. Optional; no creative-content gate."
+              }
+            }
+          }
+        }
+      }
+    },
+    "LiteraryPromptOpen": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "prompt"
+      ],
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

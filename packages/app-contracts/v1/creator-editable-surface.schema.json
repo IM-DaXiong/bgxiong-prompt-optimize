@@ -1,0 +1,124 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-editable-surface.schema.json",
+  "title": "CreatorEditableSurfaceRef",
+  "type": "object",
+  "required": [
+    "surfaceId",
+    "ownerWindowLabel",
+    "surfaceKind",
+    "draftRevision",
+    "persistenceMode"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "surfaceId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "ownerWindowLabel": {
+      "type": "string",
+      "minLength": 1
+    },
+    "surfaceKind": {
+      "enum": [
+        "textField",
+        "form",
+        "canvas",
+        "picker",
+        "settings"
+      ]
+    },
+    "resourceRef": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "creator-resource-ref.schema.json"
+        }
+      ]
+    },
+    "fieldId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "workbench": {
+      "description": "Workbench that hosts this surface and its current user-visible parameters (e.g. FC video workbench: workflow/model, mode, aspect ratio, duration, reference image/audio refs). null when the surface is not inside a workbench.",
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "params"
+          ],
+          "properties": {
+            "kind": {
+              "$ref": "#/definitions/workbenchKind"
+            },
+            "params": {
+              "type": "object",
+              "additionalProperties": {
+                "oneOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "draftRevision": {
+      "type": "string",
+      "minLength": 1
+    },
+    "resourceRevision": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "minLength": 1
+        }
+      ],
+      "description": "Canonical persisted revision of resourceRef (S09). Distinct from draftRevision, which tracks unsaved edits; null/absent when the host has no canonical revision."
+    },
+    "persistenceMode": {
+      "enum": [
+        "draftThenPersist",
+        "persistedOnly",
+        "sessionOnly"
+      ]
+    }
+  },
+  "definitions": {
+    "workbenchKind": {
+      "enum": [
+        "fcVideo",
+        "fcImage",
+        "fcAudio",
+        "fcTextExtract",
+        "fcTextStoryboard",
+        "segmentImage",
+        "segmentAudio",
+        "singingRelyrics"
+      ],
+      "description": "Closed set of hosting workbenches (S09). storyboardShot = storyboard shot workbench; storyboardBatchStill = storyboard batch still panel; segmentDialogue = segment dialogue/TTS workbench; singingRelyrics = standalone singing re-lyrics workbench."
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "taskKinds": {
+    "image": "media_canvas_image",
+    "video": "media_canvas_video",
+    "batch": "media_canvas_batch",
+    "tts": "media_canvas_tts",
+    "promptPersona": "media_canvas_prompt_optimize_persona",
+    "promptGenerate": "media_canvas_prompt_generate"
+  }
+}

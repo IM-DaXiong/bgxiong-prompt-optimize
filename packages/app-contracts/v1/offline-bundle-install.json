@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "outcomes": [
+    "ok",
+    "skip",
+    "fail",
+    "busy",
+    "cancelled"
+  ],
+  "noticeCodes": [
+    "ARCHIVE_SHA256_ADVISORY",
+    "ASR_LAUNCHER_STAGED",
+    "ASR_MODEL_STAGED_AWAITING_COMPANION"
+  ],
+  "cancelledCodes": [
+    "OFFLINE_INSTALL_CANCELLED",
+    "DOWNLOAD_CANCELLED"
+  ],
+  "busyCodeSuffix": "_BUSY",
+  "stages": [
+    "envCreate",
+    "envDeps",
+    "envProbe",
+    "verifyWeights",
+    "register",
+    "cancelling"
+  ],
+  "selectionRelationships": {
+    "requiredBundleIds": "prerequisite_order",
+    "companionBundleIds": "same_batch_closure"
+  }
+}

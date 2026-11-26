@@ -1,0 +1,572 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-resource-ref.schema.json",
+  "title": "CreatorResourceRef",
+  "description": "Discriminated Creator resource locator (camelCase). SSOT for UI/F1/MCP. Identity strings are non-blank and at most 512 chars (S08).",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": [
+        "kind",
+        "storyId"
+      ],
+      "properties": {
+        "kind": {
+          "const": "story"
+        },
+        "storyId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "kind",
+        "storyId",
+        "nodeId"
+      ],
+      "properties": {
+        "kind": {
+          "const": "chapter"
+        },
+        "storyId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "kind",
+        "storyId",
+        "nodeId"
+      ],
+      "properties": {
+        "kind": {
+          "const": "role"
+        },
+        "storyId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "kind",
+        "storyId",
+        "assetKind",
+        "assetId"
+      ],
+      "properties": {
+        "kind": {
+          "const": "visualAsset"
+        },
+        "storyId": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "assetKind": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        },
+        "assetId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Scene or prop asset. storyId is required; null = global asset with no story link (props)."
+    },
+    {
+      "type": "object",
+      "required": [
+        "kind",
+        "projectId"
+      ],
+      "properties": {
+        "kind": {
+          "const": "canvasProject"
+        },
+        "projectId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "kind",
+        "projectId",
+        "nodeId"
+      ],
+      "properties": {
+        "kind": {
+          "const": "canvasNode"
+        },
+        "projectId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "kind",
+        "workspaceId",
+        "nodeId"
+      ],
+      "properties": {
+        "kind": {
+          "const": "clipNode"
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        },
+        "workspaceId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        }
+      },
+      "additionalProperties": false,
+      "description": "An actual node in the new Clip workspace; workspaceId is never a free-canvas project or a story ID."
+    },
+    {
+      "type": "object",
+      "required": [
+        "kind",
+        "projectId",
+        "edgeId"
+      ],
+      "properties": {
+        "kind": {
+          "const": "canvasEdge"
+        },
+        "projectId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        },
+        "edgeId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "kind",
+        "owner",
+        "versionId"
+      ],
+      "properties": {
+        "kind": {
+          "const": "mediaVersion"
+        },
+        "owner": {
+          "$ref": "#"
+        },
+        "versionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "kind",
+        "taskId"
+      ],
+      "properties": {
+        "kind": {
+          "const": "task"
+        },
+        "taskId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "kind",
+        "memoryId"
+      ],
+      "properties": {
+        "kind": {
+          "const": "memory"
+        },
+        "memoryId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        },
+        "scope": {
+          "enum": [
+            "global",
+            "story",
+            "session"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "kind",
+        "sessionId",
+        "attachmentId"
+      ],
+      "properties": {
+        "kind": {
+          "const": "chatAttachment"
+        },
+        "sessionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        },
+        "attachmentId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "kind",
+        "storyId",
+        "sourceVersionId"
+      ],
+      "properties": {
+        "kind": {
+          "const": "storySource"
+        },
+        "storyId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        },
+        "sourceVersionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Immutable novel source version. Body is paged by the novel-source reader; this ref is not a scene script."
+    },
+    {
+      "type": "object",
+      "required": [
+        "kind"
+      ],
+      "properties": {
+        "kind": {
+          "const": "projectRoot"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Host-bound checkout root. Absolute path is never client-asserted."
+    },
+    {
+      "type": "object",
+      "required": [
+        "kind",
+        "relativePath"
+      ],
+      "properties": {
+        "kind": {
+          "const": "projectFile"
+        },
+        "relativePath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024,
+          "pattern": "\\S"
+        }
+      },
+      "additionalProperties": false,
+      "description": "File or directory under the Host-bound project root. relativePath uses / separators and cannot leave the root."
+    },
+    {
+      "type": "object",
+      "required": [
+        "kind",
+        "storyId",
+        "nodeId"
+      ],
+      "properties": {
+        "kind": {
+          "const": "actor"
+        },
+        "storyId": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        }
+      },
+      "additionalProperties": false,
+      "description": "RC10/RC22: Cast actor. storyId is required; null = standalone actor with no story link."
+    },
+    {
+      "type": "object",
+      "required": [
+        "kind",
+        "deliveryId"
+      ],
+      "properties": {
+        "kind": {
+          "const": "delivery"
+        },
+        "deliveryId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        }
+      },
+      "additionalProperties": false,
+      "description": "RC56 (plan 3.10 scope registry): production delivery draft, owned by a free canvas project or a story. Not a canvas project or a story."
+    },
+    {
+      "type": "object",
+      "required": [
+        "kind",
+        "stableId"
+      ],
+      "properties": {
+        "kind": {
+          "const": "skill"
+        },
+        "stableId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        }
+      },
+      "additionalProperties": false,
+      "description": "RC56 (plan 3.10 scope registry): skill library entry by its stable id (e.g. user:<name>). Not a package digest."
+    },
+    {
+      "type": "object",
+      "required": [
+        "kind",
+        "draftId"
+      ],
+      "properties": {
+        "kind": {
+          "const": "skillDraft"
+        },
+        "draftId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        }
+      },
+      "additionalProperties": false,
+      "description": "RC56 (plan 3.10 scope registry): skill draft working copy by draft id. Not the published skill."
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "storyId",
+        "propId"
+      ],
+      "properties": {
+        "kind": {
+          "const": "storyProp"
+        },
+        "storyId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        },
+        "propId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "kind",
+        "id"
+      ],
+      "properties": {
+        "kind": {
+          "const": "motionTemplate"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Motion PLAN AM078: installed motion template package by content digest."
+    },
+    {
+      "type": "object",
+      "required": [
+        "kind",
+        "id"
+      ],
+      "properties": {
+        "kind": {
+          "const": "motionScene"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Motion PLAN AM078: saved motion card by scene id."
+    },
+    {
+      "type": "object",
+      "required": [
+        "kind",
+        "id"
+      ],
+      "properties": {
+        "kind": {
+          "const": "motionBundle"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Motion PLAN AM078: published motion render bundle by bundle id."
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "planId"
+      ],
+      "properties": {
+        "kind": {
+          "const": "singingPlan"
+        },
+        "planId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        }
+      },
+      "description": "SR39/S1: one singing re-lyrics plan by planId. Not a media source or generic editable asset."
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "sourceAudioPolicies": ["auto", "keep", "mute"],
+  "defaultSourceAudioPolicy": "keep",
+  "legacyAutoSourceAudioPolicy": "keep",
+  "contentFormats": ["short_form", "episodic"],
+  "statuses": ["draft", "ready", "archived"],
+  "ownerKinds": ["free_canvas", "chapter"],
+  "sourceRefKinds": ["fc_node", "chapter_segment"],
+  "fitModes": ["contain", "cover"],
+  "subtitlePolicies": ["none", "sidecar_srt"],
+  "labelPolicies": ["draft_internal", "publish_ready"],
+  "subtitleStatuses": ["draft", "aligned", "reviewed"],
+  "subtitleSources": ["provider_timestamps", "stt", "manual"],
+  "supportedFrameRates": [
+    { "num": 24, "den": 1 },
+    { "num": 25, "den": 1 },
+    { "num": 30, "den": 1 },
+    { "num": 30000, "den": 1001 }
+  ],
+  "audioSampleRates": [44100, 48000],
+  "audioChannelCounts": [1, 2],
+  "limits": {
+    "maxNameChars": 80,
+    "maxVideoItems": 200,
+    "maxTimelineMs": 7200000,
+    "minDimension": 64,
+    "maxDimension": 4096
+  }
+}

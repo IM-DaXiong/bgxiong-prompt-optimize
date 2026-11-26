@@ -1,0 +1,3621 @@
+{
+  "schemaVersion": 1,
+  "errors": [
+    {
+      "code": "SCENE_DESIGN_FAILED",
+      "userSpeechKey": "creator.error.sceneDesignFailed",
+      "userSpeech": "场景图操作未能完成，请核对方案和模型后重试。"
+    },
+    {"code":"DIRECTOR_REVISION_CONFLICT","userSpeechKey":"creator.error.directorRevisionConflict","userSpeech":"导演台已变化，请重新读取场景和保存目标后调整。"},
+    {"code":"DIRECTOR_EDIT_BUSY","userSpeechKey":"creator.error.directorEditBusy","userSpeech":"导演台正在编辑、保存或切换，请完成当前操作后继续。"},
+    {"code":"DIRECTOR_EDIT_DISABLED","userSpeechKey":"creator.error.directorEditDisabled","userSpeech":"用户已暂停智能体编辑，场景仍可读取。"},
+    {"code":"DIRECTOR_POSE_UNREACHABLE","userSpeechKey":"creator.error.directorPoseUnreachable","userSpeech":"当前姿态无法精确达到目标，请根据返回的残差调整目标。"},
+    {"code":"DIRECTOR_CONSTRAINT_CONFLICT","userSpeechKey":"creator.error.directorConstraintConflict","userSpeech":"本批姿态或构图约束不能同时满足，场景未提交。"},
+    {"code":"DIRECTOR_SESSION_CLOSED","userSpeechKey":"creator.error.directorSessionClosed","userSpeech":"原导演台会话已关闭或切换，请读取实际活动工程或重新打开准确来源。"},
+    {"code":"DIRECTOR_OUTCOME_UNKNOWN","userSpeechKey":"creator.error.directorOutcomeUnknown","userSpeech":"操作结果未确认，请先用原操作编号读取场景和保存回执，不要重复新建。"},
+    {"code":"DIRECTOR_IDEMPOTENCY_CONFLICT","userSpeechKey":"creator.error.directorIdempotencyConflict","userSpeech":"该操作编号已用于不同参数，请先核对原操作结果。"},
+    {"code":"DIRECTOR_IMAGE_BUDGET_EXCEEDED","userSpeechKey":"creator.error.directorImageBudgetExceeded","userSpeech":"预览图片超出传输预算，请降低预览尺寸后重新截图。"},
+    {"code":"DIRECTOR_IMAGE_SOURCE_CHANGED","userSpeechKey":"creator.error.directorImageSourceChanged","userSpeech":"当前显示图片已变化，请重新读取节点和版本后带入。"},
+    {"code":"DIRECTOR_IMAGE_SOURCE_MISSING","userSpeechKey":"creator.error.directorImageSourceMissing","userSpeech":"找不到指定的图片节点、版本或原文件。"},
+    {"code":"DIRECTOR_IMAGE_PROJECTION_INVALID","userSpeechKey":"creator.error.directorImageProjectionInvalid","userSpeech":"请核对图片投影及工程中的全景对象，或明确选择作为平面图。"},
+    {"code":"DIRECTOR_IMAGE_DECODE_FAILED","userSpeechKey":"creator.error.directorImageDecodeFailed","userSpeech":"图片无法解码，请核对文件格式和尺寸。"},
+    {"code":"DIRECTOR_IMAGE_RESOURCE_MISSING","userSpeechKey":"creator.error.directorImageResourceMissing","userSpeech":"工程的归档图片缺失或内容已变化，请从完整的工程备份恢复。"},
+    {"code":"DIRECTOR_CONTRACT_MISMATCH","userSpeechKey":"creator.error.directorContractMismatch","userSpeech":"主程序与导演台控制合同不匹配，请使用配套开发产物。"},
+    {"code":"DIRECTOR_NOT_READY","userSpeechKey":"creator.error.directorNotReady","userSpeech":"导演台控制桥尚未就绪，请稍后读取状态。"},
+    {"code":"DIRECTOR_INVALID_OPERATION","userSpeechKey":"creator.error.directorInvalidOperation","userSpeech":"导演台操作参数无效，请按当前工具合同和目录修正。"},
+    {"code":"DIRECTOR_SCULPT_ANCHOR_STALE","userSpeechKey":"creator.error.directorSculptAnchorStale","userSpeech":"塑形表面已更新，请重新读取。"},
+    {"code":"DIRECTOR_SCULPT_SOLVE_FAILED","userSpeechKey":"creator.error.directorSculptSolveFailed","userSpeech":"这笔塑形无法达到目标，请缩短位移或调整姿势。"},
+    {"code":"DIRECTOR_SCULPT_RESOURCE_INVALID","userSpeechKey":"creator.error.directorSculptResourceInvalid","userSpeech":"无法读取或保存人物塑形，请检查工程资源。"},
+    {"code":"DIRECTOR_SCULPT_BUDGET_EXCEEDED","userSpeechKey":"creator.error.directorSculptBudgetExceeded","userSpeech":"此场景已达到细分网格容量。"},
+    {"code":"DIRECTOR_SCULPT_MODEL_CHANGE_REQUIRES_CLEAR","userSpeechKey":"creator.error.directorSculptModelChangeRequiresClear","userSpeech":"切换白模需要确认清除该人物的塑形。"},
+    {"code":"DIRECTOR_OBJECT_NOT_FOUND","userSpeechKey":"creator.error.directorObjectNotFound","userSpeech":"指定人物或资产不存在，请重新读取场景中的对象编号。"},
+    {"code":"DIRECTOR_ASSET_UNAVAILABLE","userSpeechKey":"creator.error.directorAssetUnavailable","userSpeech":"指定资产或版本不可用，请从当前资产目录选择。"},
+    {"code":"DIRECTOR_CATALOG_CURSOR_STALE","userSpeechKey":"creator.error.directorCatalogCursorStale","userSpeech":"目录游标与本次查询不一致，请从目录第一页重新读取。"},
+    {"code":"DIRECTOR_OPERATION_EXPIRED","userSpeechKey":"creator.error.directorOperationExpired","userSpeech":"准备的场景操作已失效，请读取当前场景后重新规划。"},
+    {"code":"DIRECTOR_HISTORY_EMPTY","userSpeechKey":"creator.error.directorHistoryEmpty","userSpeech":"当前会话没有可执行的撤销或重做步骤。"},
+    {"code":"DIRECTOR_TARGET_MISMATCH","userSpeechKey":"creator.error.directorTargetMismatch","userSpeech":"当前工程没有可更新的图片目标，请保存到新节点。"},
+    {"code":"DIRECTOR_CAPTURE_FAILED","userSpeechKey":"creator.error.directorCaptureFailed","userSpeech":"导演台截图未完成，请检查窗口状态后重新截图。"},
+    {"code":"DIRECTOR_PUBLISH_FAILED","userSpeechKey":"creator.error.directorPublishFailed","userSpeech":"导演台保存未完成，草稿已保留，请核对返回的保存原因。"},
+    {"code":"DIRECTOR_RESTORE_FAILED","userSpeechKey":"creator.error.directorRestoreFailed","userSpeech":"未能撤销或重做导演台的保存。请确认当前画布和数据目录后重试。"},
+    {"code":"DIRECTOR_INVALID_RESPONSE","userSpeechKey":"creator.error.directorInvalidResponse","userSpeech":"导演台返回的回执不完整，请先读取状态核对结果。"},
+    {"code":"DIRECTOR_OPERATION_FAILED","userSpeechKey":"creator.error.directorOperationFailed","userSpeech":"导演台未完成本次操作，请核对状态与参数。"},
+    {"code":"DUBBING_WORKFLOW_FAILED","userSpeechKey":"creator.error.dubbingWorkflowFailed","userSpeech":"一键配音未提交，请检查项目修订、原稿和角色音色设置。"},
+    {"code":"DUBBING_HOST_REQUIRED","userSpeechKey":"creator.error.dubbingHostRequired","userSpeech":"配音工作台尚未连接，请先启动桌面程序。"},
+    {"code":"DUBBING_IMPORT_FAILED","userSpeechKey":"creator.error.dubbingImportFailed","userSpeech":"素材导入未完成，请核对文件授权、格式和磁盘空间。"},
+    {"code":"DUBBING_SUBMIT_FAILED","userSpeechKey":"creator.error.dubbingSubmitFailed","userSpeech":"配音未提交，请检查项目修订、台词时间和角色音色配置。"},
+    {"code":"DUBBING_READ_FAILED","userSpeechKey":"creator.error.dubbingReadFailed","userSpeech":"配音项目读取失败，请刷新项目列表后重试。"},
+    {"code":"DUBBING_SAVE_FAILED","userSpeechKey":"creator.error.dubbingSaveFailed","userSpeech":"配音项目保存失败。请重新读取项目，核对当前内容后再保存。"},
+    {"code":"DUBBING_DELETE_FAILED","userSpeechKey":"creator.error.dubbingDeleteFailed","userSpeech":"配音项目删除失败。请确认任务已结束，刷新项目列表后重试。"},
+    {"code":"DUBBING_PIPELINE_FAILED","userSpeechKey":"creator.error.dubbingPipelineFailed","userSpeech":"任务未提交，请检查项目修订、转写稿来源或已选择的模型。"},
+    {"code":"DUBBING_EXPORT_FAILED","userSpeechKey":"creator.error.dubbingExportFailed","userSpeech":"配音导出未提交，请先完成当前修订的全部台词并检查磁盘空间。"},
+    {"code":"DUBBING_SUBTITLE_INVALID","userSpeechKey":"creator.error.dubbingSubtitleInvalid","userSpeech":"字幕未导入，请检查时间码、台词内容和素材时长。"},
+    {
+      "code": "DIRECTOR_INVALID_ARGS",
+      "userSpeechKey": "creator.error.directorInvalidArgs",
+      "userSpeech": "导演台打开参数无效，请重新选择目标画布和场景。"
+    },
+    {
+      "code": "DIRECTOR_OPEN_FAILED",
+      "userSpeechKey": "creator.error.directorOpenFailed",
+      "userSpeech": "导演台未能打开，请确认场景可读取后重试。"
+    },
+    {
+      "code": "DIRECTOR_UNAVAILABLE",
+      "userSpeechKey": "creator.error.directorUnavailable",
+      "userSpeech": "导演台需要比格熊桌面程序，请启动桌面程序后重试。"
+    },
+    {"code":"SUBTITLE_FORMAT_FAILED","userSpeechKey":"creator.error.subtitleFormatFailed","userSpeech":"字幕语义整理未完成，请检查默认文本模型和原始时间附件；已有字幕保留。"},
+    {"code":"SCREENPLAY_CONTRACT_UNAVAILABLE","userSpeechKey":"creator.error.screenplayContractUnavailable","userSpeech":"剧本包格式指南暂时无法读取。请重新打开剧本导入后重试。"},
+    {"code":"SCREENPLAY_PREVIEW_FAILED","userSpeechKey":"creator.error.screenplayPreviewFailed","userSpeech":"无法预览剧本包。请检查文件是否可读取、格式是否正确。"},
+    {"code":"CALL_CONTEXT_VERSION_UNSUPPORTED","userSpeechKey":"creator.error.callContextVersionUnsupported","userSpeech":"请按当前工具目录使用 v4 调用上下文。"},
+    {"code":"CALL_CONTEXT_CONFLICT","userSpeechKey":"creator.error.callContextConflict","userSpeech":"请求身份与当前回合不一致，请核对当前请求。"},
+    {"code": "REFERENCE_IMAGE_CHANGE_FAILED", "userSpeechKey": "creator.error.referenceImageChangeFailed", "userSpeech": "参考图修改未完成，请刷新附件列表后重试。"},
+    {"code": "REFERENCE_IMAGE_READ_FAILED", "userSpeechKey": "creator.error.referenceImageReadFailed", "userSpeech": "参考图列表读取失败，请确认剧集仍然存在。"},
+    {"code": "REFERENCE_IMAGE_PORT_UNAVAILABLE", "userSpeechKey": "creator.error.referenceImagePortUnavailable", "userSpeech": "参考图服务尚未就绪，请重新打开工作区。"},
+    {"code":"CANVAS_DATASET_RESULT_UNKNOWN","userSpeechKey":"creator.error.canvasDatasetResultUnknown","userSpeech":"画布数据操作尚未收到最终确认，执行记录已保留。请先核对当前数据与原操作状态，暂勿重复提交。"},
+    {"code":"CLIP_WORKSPACE_NOT_FOUND","userSpeechKey":"creator.error.clipWorkspaceNotFound","userSpeech":"找不到指定的片段工作区。请刷新片段列表并重新选择。"},
+    {"code":"CONFIGURATION_HOST_UNAVAILABLE","userSpeechKey":"creator.error.configurationHostUnavailable","userSpeech":"画布配置服务暂时不可用。请重新打开画布后重试。"},
+    {"code":"CONFIGURATION_PATCH_EMPTY","userSpeechKey":"creator.error.configurationPatchEmpty","userSpeech":"没有要修改的配置。请至少填写一项参数或操作输入。"},
+    {"code":"CONFIGURATION_PREPARATION_MISSING","userSpeechKey":"creator.error.configurationPreparationMissing","userSpeech":"这次画布配置修改未能准备完成。请重新读取节点配置后再提交。"},
+    {"code":"CONFIGURATION_SAVE_FAILED","userSpeechKey":"creator.error.configurationSaveFailed","userSpeech":"本次画布配置修改未完成。请按错误详情中的原因和恢复动作处理。"},
+    {"code":"CONFIGURATION_SERVICE_UNAVAILABLE","userSpeechKey":"creator.error.configurationServiceUnavailable","userSpeech":"当前工作台暂时无法读取参数能力。请等模型配置服务恢复后重新读取。"},
+    {"code":"CONFIGURATION_WRITE_MISSING","userSpeechKey":"creator.error.configurationWriteMissing","userSpeech":"没有收到配置写入回执。请先重新读取节点配置，确认当前值后再提交。"},
+    {"code":"MODEL_SETTINGS_MISSING","userSpeechKey":"creator.error.modelSettingsMissing","userSpeech":"当前数据目录没有已保存的模型设置。请在设置中配置所需模型后重新打开工作台。"},
+    {"code":"MODEL_SETTINGS_UNAVAILABLE","userSpeechKey":"creator.error.modelSettingsUnavailable","userSpeech":"暂时无法读取模型设置。请重新打开桌面工作台后读取当前配置。"},
+    {"code":"WORKBENCH_CONFIG_DIGEST_MISSING","userSpeechKey":"creator.error.workbenchConfigDigestMissing","userSpeech":"工作台配置缺少校验凭证。请重新读取节点和模型设置后再修改。"},
+    {"code":"WORKBENCH_MODEL_MISSING","userSpeechKey":"creator.error.workbenchModelMissing","userSpeech":"当前配置没有完整的模型和操作绑定。请重新读取工作台模型并选择可用操作。"},
+    {"code":"IMAGE_READ_INVALID","userSpeechKey":"creator.error.imageReadInvalid","userSpeech":"请单独读取图片，将文档、文件或图片版本列表的分页另行提交。"},
+    {"code":"LLM_COMPLETION_IDEMPOTENCY_REQUIRED","userSpeechKey":"creator.error.llmCompletionIdempotencyRequired","userSpeech":"文本生成请求缺少操作编号。请在调用时补齐编号，并用同一编号重试原请求。"},
+    {"code":"ONLINE_SKILL_STATE_INVALID","userSpeechKey":"creator.error.onlineSkillStateInvalid","userSpeech":"在线技能目录或本机技能库的状态无法读取。请重新打开技能库并刷新目录。"},
+    {"code":"INVALID_ARGUMENTS","userSpeechKey":"creator.error.invalidArguments","userSpeech":"请求的参数不完整或格式不对。请检查后重试。"},
+    {"code":"VIDEO_EDIT_BATCH_FAILED","userSpeechKey":"creator.error.videoEditBatchFailed","userSpeech":"多人替换尚未继续，请查看批次状态和原任务；已经保存的成果会保留。"},
+    {"code":"REVIEW_SOURCE_REQUIREMENT_UNRESOLVED","userSpeechKey":"creator.error.reviewSourceRequirementUnresolved","userSpeech":"已有成果已保留，但原文读取凭证无法复核，审阅暂时受阻。请在读取服务恢复后继续审阅，无需重复改写或生成。"},
+    {"code":"LARGE_RESULT_SOURCE_UNVERIFIABLE","userSpeechKey":"creator.error.largeResultSourceUnverifiable","userSpeech":"这份结果缺少可复核的数据源授权，不能通过引用读取。"},
+    {"code":"LARGE_RESULT_SOURCE_OWNER_UNAVAILABLE","userSpeechKey":"creator.error.largeResultSourceOwnerUnavailable","userSpeech":"原数据源读取服务未就绪，暂时不能续读。"},
+    {"code":"LARGE_RESULT_NAMESPACE_UNAVAILABLE","userSpeechKey":"creator.error.largeResultNamespaceUnavailable","userSpeech":"原数据目录未就绪，暂时不能续读。"},
+    {"code":"LARGE_RESULT_NAMESPACE_MISMATCH","userSpeechKey":"creator.error.largeResultNamespaceMismatch","userSpeech":"这份结果不属于当前数据目录，不能读取。"},
+    {"code":"LARGE_RESULT_ACCESS_DENIED","userSpeechKey":"creator.error.largeResultAccessDenied","userSpeech":"当前身份不能读取这份工具结果。"},
+    {"code":"LARGE_RESULT_PRINCIPAL_REQUIRED","userSpeechKey":"creator.error.largeResultPrincipalRequired","userSpeech":"请通过已认证的工具连接读取结果。"},
+    {"code":"LARGE_RESULT_ARGS_INVALID","userSpeechKey":"creator.error.largeResultArgsInvalid","userSpeech":"工具结果分页参数不正确。"},
+    {"code":"LARGE_RESULT_OFFSET_INVALID","userSpeechKey":"creator.error.largeResultOffsetInvalid","userSpeech":"分页起点不是有效的UTF-8字节边界。"},
+    {"code":"LARGE_RESULT_REF_INVALID","userSpeechKey":"creator.error.largeResultRefInvalid","userSpeech":"工具结果引用无效。"},
+    {"code":"LARGE_RESULT_NOT_FOUND","userSpeechKey":"creator.error.largeResultNotFound","userSpeech":"没有找到这份工具结果。"},
+    {"code":"LARGE_RESULT_CORRUPT","userSpeechKey":"creator.error.largeResultCorrupt","userSpeech":"工具结果与保存的校验不一致。"},
+    {"code":"LARGE_RESULT_PERSIST_FAILED","userSpeechKey":"creator.error.largeResultPersistFailed","userSpeech":"工具结果未能完整保存，未发布分页引用。"},
+    {
+      "code": "CANVAS_IMAGE_PROJECTION_UNAVAILABLE",
+      "userSpeechKey": "creator.error.canvasImageProjectionUnavailable",
+      "userSpeech": "当前画布投影服务未就绪，请确认应用与工作区已打开后重试。"
+    },
+    {
+      "code": "CANVAS_IMAGE_PROJECTION_FAILED",
+      "userSpeechKey": "creator.error.canvasImageProjectionFailed",
+      "userSpeech": "全景标记或取景未完成，请检查源图片是否可读取、图片版本是否已变化以及取景参数。"
+    },
+    {
+      "code": "CANVAS_EDITOR_FAILED",
+      "userSpeechKey": "creator.error.canvasEditorFailed",
+      "userSpeech": "编辑器操作未完成，请查看具体错误；工程冲突需重新读取，已有处理任务应恢复原成果。"
+    },
+    {
+      "code": "CANVAS_AUDIO_EDIT_UNAVAILABLE",
+      "userSpeechKey": "creator.error.canvasAudioEditUnavailable",
+      "userSpeech": "音频剪辑服务未就绪，请确认应用与工作区已打开后重试。"
+    },
+    {
+      "code": "CANVAS_AUDIO_EDIT_REJECTED",
+      "userSpeechKey": "creator.error.canvasAudioEditRejected",
+      "userSpeech": "音频剪辑参数不正确，请检查片段、节点和源音频身份。"
+    },
+    {
+      "code": "CANVAS_AUDIO_EDIT_FAILED",
+      "userSpeechKey": "creator.error.canvasAudioEditFailed",
+      "userSpeech": "音频剪辑未完成。请确认源音频仍是打开时的版本，且节点没有被其他任务占用。"
+    },
+    {
+      "code": "DIALOGUE_EXTRACT_FAILED",
+      "userSpeechKey": "creator.error.dialogueExtractFailed",
+      "userSpeech": "对白提取未完成，原有正文和轨道已保留。请检查所选模型或任务状态后重试。"
+    },
+    {
+      "code": "DIALOGUE_EXTRACT_RESULT_INVALID",
+      "userSpeechKey": "creator.error.dialogueExtractResultInvalid",
+      "userSpeech": "对白提取的结果回执无法读取，请先检查任务状态。"
+    },
+    {
+      "code": "ASR_OPERATION_FAILED",
+      "userSpeechKey": "creator.error.asrOperationFailed",
+      "userSpeech": "语音识别操作未完成，请检查模型、运行环境与文件授权。"
+    },
+    {
+      "code": "UNKNOWN_TOOL",
+      "userSpeechKey": "creator.error.unknownTool",
+      "userSpeech": "没有这个工具。请只用已开放的读写与调度工具。"
+    },
+    {
+      "code": "WRITE_NOT_REQUESTED",
+      "userSpeechKey": "creator.error.writeNotRequested",
+      "userSpeech": "当前是「仅预览」模式，不能写入。请切换到执行模式后再试。"
+    },
+    {
+      "code": "AUTH_REQUIRED",
+      "userSpeechKey": "creator.error.authRequired",
+      "userSpeech": "需要先登录。登录后会从同一步继续。"
+    },
+    {
+      "code": "COST_GRANT_REQUIRED",
+      "userSpeechKey": "creator.error.costGrantRequired",
+      "userSpeech": "这次会调用远端计费服务。请先批准预算或次数上限。"
+    },
+    {
+      "code": "COST_UNKNOWN",
+      "userSpeechKey": "creator.error.costUnknown",
+      "userSpeech": "厂商未提供可验证估价。请批准可验证的调用次数或最高预算后再继续。"
+    },
+    {
+      "code": "COST_GRANT_NOT_HOST_ISSUED",
+      "userSpeechKey": "creator.error.costGrantNotHostIssued",
+      "userSpeech": "这份费用授权不是本机宿主签发的，不能用来提交付费生成。请在软件里确认费用后再试。"
+    },
+    {
+      "code": "COST_GRANT_BINDING_MISMATCH",
+      "userSpeechKey": "creator.error.costGrantBindingMismatch",
+      "userSpeech": "这份费用授权是给另一个服务的，不能用于这次生成。请为这次生成重新确认费用。"
+    },
+    {
+      "code": "COST_GRANT_EXPIRED",
+      "userSpeechKey": "creator.error.costGrantExpired",
+      "userSpeech": "费用授权已过期，请重新确认后再提交。"
+    },
+    {
+      "code": "CURSOR_STALE",
+      "userSpeechKey": "creator.error.cursorStale",
+      "userSpeech": "列表已变化，请重新查询。"
+    },
+    {
+      "code": "ITEM_TOO_LARGE",
+      "userSpeechKey": "creator.error.itemTooLarge",
+      "userSpeech": "单条内容太大，请缩小范围或分页读取。"
+    },
+    {
+      "code": "REVISION_STALE",
+      "userSpeechKey": "creator.error.revisionStale",
+      "userSpeech": "内容已被别人改过。请重新读取后再提交。"
+    },
+    {
+      "code": "IDEMPOTENCY_CONFLICT",
+      "userSpeechKey": "creator.error.idempotencyConflict",
+      "userSpeech": "同一个操作键参数不一致，已拒绝覆盖。请重新规划。"
+    },
+    {
+      "code": "CHANGE_SET_STALE",
+      "userSpeechKey": "creator.error.changeSetStale",
+      "userSpeech": "变更集已过期。请重新准备。"
+    },
+    {
+      "code": "CHANGE_SET_NOT_SEALED",
+      "userSpeechKey": "creator.error.changeSetNotSealed",
+      "userSpeech": "变更集尚未封存，不能应用。"
+    },
+    {
+      "code": "TOOL_USE_UNSUPPORTED",
+      "userSpeechKey": "creator.error.toolUseUnsupported",
+      "userSpeech": "当前所选模型不支持可靠工具调用。请另选已实测支持的模型，不会静默换模型。"
+    },
+    {
+      "code": "HOST_OFFLINE",
+      "userSpeechKey": "creator.error.hostOffline",
+      "userSpeech": "请先打开比格熊主程序，再连接 MCP。"
+    },
+    {
+      "code": "MCP_UNAUTHORIZED",
+      "userSpeechKey": "creator.error.mcpUnauthorized",
+      "userSpeech": "MCP 口令不对。请到比格熊设置里重新取口令。"
+    },
+    {
+      "code": "PAYLOAD_TOO_LARGE",
+      "userSpeechKey": "creator.error.payloadTooLarge",
+      "userSpeech": "请求太大。请分页或改用文件引用。"
+    },
+    {
+      "code": "INVALID_RESOURCE_REF",
+      "userSpeechKey": "creator.error.invalidResourceRef",
+      "userSpeech": "资源引用不完整或不合法。"
+    },
+    {
+      "code": "DOMAIN_RULE_VIOLATION",
+      "userSpeechKey": "creator.error.domainRuleViolation",
+      "userSpeech": "违反领域规则（图边/合同/成熟度等），未写入。"
+    },
+    {
+      "code": "NOT_IMPLEMENTED",
+      "userSpeechKey": "creator.error.notImplemented",
+      "userSpeech": "该能力尚未接入运行时目录。"
+    },
+    {
+      "code": "CONTEXT_SNAPSHOT_STALE",
+      "userSpeechKey": "creator.error.contextSnapshotStale",
+      "userSpeech": "界面上下文已过期。请让我重新读取当前窗口后再继续。"
+    },
+    {
+      "code": "CONTEXT_SNAPSHOT_TOO_LARGE",
+      "userSpeechKey": "creator.error.contextSnapshotTooLarge",
+      "userSpeech": "当前界面上下文太大，无法一次发送。请缩小选区或先指定资源后再试。"
+    },
+    {
+      "code": "UI_HOST_UNAVAILABLE",
+      "userSpeechKey": "creator.error.uiHostUnavailable",
+      "userSpeech": "主窗口当前不可用，无法切换界面。请打开主窗口后再试。"
+    },
+    {
+      "code": "UI_COMMAND_TIMEOUT",
+      "userSpeechKey": "creator.error.uiCommandTimeout",
+      "userSpeech": "界面操作超时，没有收到确认。请重试或手动切换后再告诉我。"
+    },
+    {
+      "code": "UI_TARGET_NOT_FOUND",
+      "userSpeechKey": "creator.error.uiTargetNotFound",
+      "userSpeech": "找不到要打开的界面目标。请确认故事/场次/画布仍然存在。"
+    },
+    {
+      "code": "UI_TARGET_NOT_HYDRATED",
+      "userSpeechKey": "creator.error.uiTargetNotHydrated",
+      "userSpeech": "目标界面还没加载完成。请稍等或手动打开后再试。"
+    },
+    {
+      "code": "SURFACE_NOT_REGISTERED",
+      "userSpeechKey": "creator.error.surfaceNotRegistered",
+      "userSpeech": "这个编辑面还没有接入助手。请用手动编辑，或换一个已支持的工作台。"
+    },
+    {
+      "code": "SURFACE_DRAFT_CONFLICT",
+      "userSpeechKey": "creator.error.surfaceDraftConflict",
+      "userSpeech": "工作台草稿与已保存内容冲突。请先保存或丢弃本地草稿后再让我修改。"
+    },
+    {
+      "code": "ACTION_REF_INVALID",
+      "userSpeechKey": "creator.error.actionRefInvalid",
+      "userSpeech": "步骤之间的引用无效。请重新规划这一组操作。"
+    },
+    {
+      "code": "ACTION_GRAPH_CYCLE",
+      "userSpeechKey": "creator.error.actionGraphCycle",
+      "userSpeech": "操作步骤存在循环依赖，无法执行。请重新规划。"
+    },
+    {
+      "code": "PARITY_ACTION_UNPUBLISHED",
+      "userSpeechKey": "creator.error.parityActionUnpublished",
+      "userSpeech": "这个用户动作尚未对助手开放。请用界面手动完成，或等待后续波次发布。"
+    },
+    {
+      "code": "MEMORY_EXPLICIT_CONSENT_REQUIRED",
+      "userSpeechKey": "creator.error.memoryExplicitConsentRequired",
+      "userSpeech": "需要你明确说“记住/永久记住”后，我才能写入长期记忆。"
+    },
+    {
+      "code": "MEMORY_SCOPE_INVALID",
+      "userSpeechKey": "creator.error.memoryScopeInvalid",
+      "userSpeech": "记忆作用域不正确。请说明是“所有故事”还是“只在这个故事”。"
+    },
+    {
+      "code": "MEMORY_CONFLICT",
+      "userSpeechKey": "creator.error.memoryConflict",
+      "userSpeech": "这条记忆与故事正文冲突。请选择更新正文，或修改/遗忘该记忆。"
+    },
+    {
+      "code": "MEMORY_SECRET_FORBIDDEN",
+      "userSpeechKey": "creator.error.memorySecretForbidden",
+      "userSpeech": "不能记忆密钥、令牌或授权信息。请改用设置页写入密钥。"
+    },
+    {
+      "code": "SECRET_READ_FORBIDDEN",
+      "userSpeechKey": "creator.error.secretReadForbidden",
+      "userSpeech": "不能读取密钥明文。我只能确认是否已配置或显示脱敏尾号。"
+    },
+    {
+      "code": "UNDO_UNSUPPORTED",
+      "userSpeechKey": "creator.error.undoUnsupported",
+      "userSpeech": "这次改动不能撤销（包含不可逆操作或由旧版本提交）。请用对应的编辑操作手动改回。"
+    },
+    {
+      "code": "UNDO_PARTIAL",
+      "userSpeechKey": "creator.error.undoPartial",
+      "userSpeech": "撤销没有全部完成，部分内容可能已被别处修改。请重新查看后手动核对。"
+    },
+    {
+      "code": "EDGE_NOT_FOUND",
+      "userSpeechKey": "creator.error.edgeNotFound",
+      "userSpeech": "这条连线已经不在画布上了。请刷新画布后再操作。"
+    },
+    {
+      "code": "NODE_NOT_FOUND",
+      "userSpeechKey": "creator.error.nodeNotFound",
+      "userSpeech": "没有找到这个节点，它可能已被删除。请刷新后再试。"
+    },
+    {
+      "code": "NODE_NOT_IN_PROJECT",
+      "userSpeechKey": "creator.error.nodeNotInProject",
+      "userSpeech": "这个节点不在当前画布里，不能在这里改它。"
+    },
+    {
+      "code": "NODE_TYPE_MISMATCH",
+      "userSpeechKey": "creator.error.nodeTypeMismatch",
+      "userSpeech": "这个节点的类型不支持这样改。"
+    },
+    {
+      "code": "PLACEMENT_ANCHOR_NOT_FOUND",
+      "userSpeechKey": "creator.error.placementAnchorNotFound",
+      "userSpeech": "要摆放的参考节点找不到了，请刷新画布后再试。"
+    },
+    {
+      "code": "PROJECT_NOT_FOUND",
+      "userSpeechKey": "creator.error.projectNotFound",
+      "userSpeech": "没有找到这个画布项目，它可能已被删除。"
+    },
+    {
+      "code": "ACTION_REF_UNRESOLVED",
+      "userSpeechKey": "creator.error.actionRefUnresolved",
+      "userSpeech": "这一步引用的前一步结果不存在，整批修改没有执行。"
+    },
+    {
+      "code": "GRAPH_TARGET_BUSY",
+      "userSpeechKey": "creator.error.graphTargetBusy",
+      "userSpeech": "这一场正在生成，暂时不能改画布。等生成结束后再试。"
+    },
+    {
+      "code": "UNDO_CONFLICT",
+      "userSpeechKey": "creator.error.undoConflict",
+      "userSpeech": "这次修改之后又有新的编辑，撤销已停止，没有覆盖后来的内容。请重新查看后手动调整。"
+    },
+    {
+      "code": "STORY_TAG_INVALID",
+      "userSpeechKey": "creator.error.storyTagInvalid",
+      "userSpeech": "标签不能为空、不能太长，也不能包含换行等特殊字符。"
+    },
+    {
+      "code": "STORY_TAG_DUPLICATE",
+      "userSpeechKey": "creator.error.storyTagDuplicate",
+      "userSpeech": "标签重复了，请去掉重复的标签后再保存。"
+    },
+    {
+      "code": "STORY_TAG_LIMIT",
+      "userSpeechKey": "creator.error.storyTagLimit",
+      "userSpeech": "标签数量超过上限，请删掉一些再保存。"
+    },
+    {
+      "code": "HOST_APP_UNAVAILABLE",
+      "userSpeechKey": "creator.error.hostAppUnavailable",
+      "userSpeech": "这个操作需要在主程序里执行，当前没有接入主程序，已拒绝执行。"
+    },
+    {
+      "code": "TWIN_ROUTE_MISSING",
+      "userSpeechKey": "creator.error.twinRouteMissing",
+      "userSpeech": "这个操作的执行通道没有接好，已拒绝执行（没有假装成功）。"
+    },
+    {
+      "code": "TWIN_SAGA_INCOMPLETE",
+      "userSpeechKey": "creator.error.twinSagaIncomplete",
+      "userSpeech": "上一次文件或远端步骤缺少完整提交回执，已保留原请求。请先核对持久执行状态后恢复，不要重复提交操作。"
+    },
+    {
+      "code": "TWIN_SAGA_REQUIRED",
+      "userSpeechKey": "creator.error.twinSagaRequired",
+      "userSpeech": "文件或远端步骤需要持久化的执行记录，当前没有接上，已拒绝执行。"
+    },
+    {
+      "code": "FILE_NOT_FOUND",
+      "userSpeechKey": "creator.error.fileNotFound",
+      "userSpeech": "找不到要处理的文件，请确认文件还在。"
+    },
+    {
+      "code": "ACTION_NOT_ALONE",
+      "userSpeechKey": "creator.error.actionNotAlone",
+      "userSpeech": "这个操作必须单独提交，不能和其他修改放在同一批里。"
+    },
+    {
+      "code": "IRREVERSIBLE_NOT_ALONE",
+      "userSpeechKey": "creator.error.irreversibleNotAlone",
+      "userSpeech": "不可撤销的操作必须单独提交。"
+    },
+    {
+      "code": "CONFIRM_REQUIRED",
+      "userSpeechKey": "creator.error.confirmRequired",
+      "userSpeech": "这个操作不可撤销，需要你明确确认后才能执行。"
+    },
+    {
+      "code": "INVALID_ACTION_FIELDS",
+      "userSpeechKey": "creator.error.invalidActionFields",
+      "userSpeech": "操作参数不正确或包含未知字段，已拒绝。"
+    },
+    {
+      "code": "TEXT_MODEL_UNAVAILABLE",
+      "userSpeechKey": "creator.error.textModelUnavailable",
+      "userSpeech": "没有可用的文本模型，请先在设置里配置。"
+    },
+    {
+      "code": "CONTENT_PREFLIGHT_BLOCKED",
+      "userSpeechKey": "creator.error.contentPreflightBlocked",
+      "userSpeech": "内容预检未通过，已停止生成。"
+    },
+    {
+      "code": "SUPERSEDED",
+      "userSpeechKey": "creator.error.superseded",
+      "userSpeech": "同一目标有更新的一次运行，这次结果已作废。"
+    },
+    {
+      "code": "PERSIST_FAILED",
+      "userSpeechKey": "creator.error.persistFailed",
+      "userSpeech": "结果保存失败，已回滚到之前的内容。"
+    },
+    {
+      "code": "BILLING_CLASS_MISMATCH",
+      "userSpeechKey": "creator.error.billingClassMismatch",
+      "userSpeech": "这类生成的计费方式由实际服务决定，不能自行声明为免费。请按远端计费重新提交并先批准预算。"
+    },
+    {
+      "code": "TASK_PORT_UNAVAILABLE",
+      "userSpeechKey": "creator.error.taskPortUnavailable",
+      "userSpeech": "任务服务没有接入，这次取消没有执行。"
+    },
+    {
+      "code": "TASK_NOT_FOUND",
+      "userSpeechKey": "creator.error.taskNotFound",
+      "userSpeech": "找不到这个任务，请确认任务编号。"
+    },
+    {
+      "code": "TASK_NOT_CANCELLABLE",
+      "userSpeechKey": "creator.error.taskNotCancellable",
+      "userSpeech": "这个任务没有可取消的后台执行。"
+    },
+    {
+      "code": "TASK_ALREADY_TERMINAL",
+      "userSpeechKey": "creator.error.taskAlreadyTerminal",
+      "userSpeech": "这个任务已经结束，无需取消；其他任务不受影响。"
+    },
+    {
+      "code": "RESOURCE_NOT_FOUND",
+      "userSpeechKey": "creator.error.resourceNotFound",
+      "userSpeech": "没有找到这个对象（可能已删除，或编号不对）。"
+    },
+    {
+      "code": "TOOL_ARGS_UNKNOWN_FIELD",
+      "userSpeechKey": "creator.error.toolArgsUnknownField",
+      "userSpeech": "工具参数里有不认识的字段，已拒绝执行。"
+    },
+    {
+      "code": "UI_TOOL_UNSUPPORTED",
+      "userSpeechKey": "creator.error.uiToolUnsupported",
+      "userSpeech": "当前界面不支持这个操作。"
+    },
+    {
+      "code": "SURFACE_PERSIST_UNSUPPORTED",
+      "userSpeechKey": "creator.error.surfacePersistUnsupported",
+      "userSpeech": "这个编辑框不支持直接保存，只能改草稿。"
+    },
+    {
+      "code": "REVISION_REQUIRED",
+      "userSpeechKey": "creator.error.revisionRequired",
+      "userSpeech": "缺少版本号，需要先读取当前内容再修改。"
+    },
+    {
+      "code": "TOOL_ARGS_MISSING_FIELD",
+      "userSpeechKey": "creator.error.toolArgsMissingField",
+      "userSpeech": "工具参数缺少必填字段，没有执行。"
+    },
+    {
+      "code": "TOOL_ARGS_INVALID",
+      "userSpeechKey": "creator.error.toolArgsInvalid",
+      "userSpeech": "工具参数格式不对，没有执行。"
+    },
+    {
+      "code": "DELIVERY_TOOL_UNAVAILABLE",
+      "userSpeech": "交付服务没有接入主程序，这次没有执行任何操作。",
+      "userSpeechKey": "creator.error.deliveryToolUnavailable"
+    },
+    {
+      "code": "DELIVERY_CONTEXT_REQUIRED",
+      "userSpeech": "交付工具只在自由画布、章节或交付页面里可用。请先打开对应页面再让我操作。",
+      "userSpeechKey": "creator.error.deliveryContextRequired"
+    },
+    {
+      "code": "DELIVERY_OP_NOT_ALLOWED",
+      "userSpeech": "导入素材和时间线编辑要分开做，这次没有执行。",
+      "userSpeechKey": "creator.error.deliveryOpNotAllowed"
+    },
+    {
+      "code": "DELIVERY_TICKET_INVALID",
+      "userSpeech": "导出确认已失效或已用过，请重新准备导出并确认。",
+      "userSpeechKey": "creator.error.deliveryTicketInvalid"
+    },
+    {
+      "code": "DELIVERY_PLAN_DRIFT",
+      "userSpeech": "交付草稿在确认后又被改过，已拒绝导出。请重新准备导出并确认。",
+      "userSpeechKey": "creator.error.deliveryPlanDrift"
+    },
+    {
+      "code": "MEDIA_DESCRIBE_REFS_OUT_OF_RANGE",
+      "userSpeechKey": "creator.error.mediaDescribeRefsOutOfRange",
+      "userSpeech": "识图一次最多 12 个引用。请缩小范围后重试。"
+    },
+    {
+      "code": "MEDIA_DESCRIBE_MODEL_UNSUPPORTED",
+      "userSpeechKey": "creator.error.mediaDescribeModelUnsupported",
+      "userSpeech": "当前绑定的模型不支持识图。请另选已实测支持视觉的模型，不会静默换模型。"
+    },
+    {
+      "code": "EXECUTION_BINDING_MISSING",
+      "userSpeechKey": "creator.error.executionBindingMissing",
+      "userSpeech": "还没有绑定可用的文本/识图模型，请先在设置里选好默认模型。"
+    },
+    {
+      "code": "EXECUTION_EXTERNAL_OVERRIDE_FORBIDDEN",
+      "userSpeechKey": "creator.error.executionExternalOverrideForbidden",
+      "userSpeech": "不允许从外部传入密钥或服务覆盖，请使用宿主已冻结的模型绑定。"
+    },
+    {
+      "code": "VISION_MODEL_NOT_CONFIGURED",
+      "userSpeechKey": "creator.error.visionModelNotConfigured",
+      "userSpeech": "还没有设置默认文本模型，暂时看不了图片。请在设置里选择默认文本模型后再试。"
+    },
+    {
+      "code": "VISION_UNSUPPORTED_BY_MODEL",
+      "userSpeechKey": "creator.error.visionUnsupportedByModel",
+      "userSpeech": "当前模型不支持识图。请换成已实测支持视觉的模型，不会静默换模型。"
+    },
+    {
+      "code": "LOCAL_BRIDGE_BINDING_FORBIDDEN",
+      "userSpeechKey": "creator.error.localBridgeBindingForbidden",
+      "userSpeech": "不能通过本地桥接或配置文件改用别的模型。请在设置里选择模型。"
+    },
+    {
+      "code": "COST_GRANT_DEFICIT",
+      "userSpeechKey": "creator.error.costGrantDeficit",
+      "userSpeech": "识图授权额度不足。请只批准缺少的批次后重试。"
+    },
+    {
+      "code": "MEDIA_DESCRIBE_MODEL_FAILED",
+      "userSpeechKey": "creator.error.mediaDescribeModelFailed",
+      "userSpeech": "识图模型调用失败。请查看详情后重试；未返回的项不会假装成功。"
+    },
+    {
+      "code": "MEDIA_DESCRIBE_ITEM_NOT_IMAGE",
+      "userSpeechKey": "creator.error.mediaDescribeItemNotImage",
+      "userSpeech": "该项不是可识图的图片资源。视频请提供明确帧资源；不会把海报当成整段视频。"
+    },
+    {
+      "code": "MEDIA_DESCRIBE_ITEM_MISSING",
+      "userSpeechKey": "creator.error.mediaDescribeItemMissing",
+      "userSpeech": "找不到该项的像素源。请确认版本仍存在。"
+    },
+    {
+      "code": "MEDIA_DESCRIBE_PREVIEW_UNAVAILABLE",
+      "userSpeechKey": "creator.error.mediaDescribePreviewUnavailable",
+      "userSpeech": "没有可用的受控预览，不能塞原图。请先生成预览或换用来源。"
+    },
+    {
+      "code": "MEDIA_DESCRIBE_BASE64_FORBIDDEN",
+      "userSpeechKey": "creator.error.mediaDescribeBase64Forbidden",
+      "userSpeech": "结构化识图结果不能携带 base64 原图。像素走独立预览通道。"
+    },
+    {
+      "code": "SHOT_RESTRUCTURE_SOURCE_SET_INVALID",
+      "userSpeechKey": "creator.error.shotRestructureSourceSetInvalid",
+      "userSpeech": "合并镜头需要 2–8 个不重复的来源镜头，且保留的锚点镜头必须在其中。"
+    },
+    {
+      "code": "SHOT_RESTRUCTURE_EXPECTED_REVISIONS_INCOMPLETE",
+      "userSpeechKey": "creator.error.shotRestructureExpectedRevisionsIncomplete",
+      "userSpeech": "镜头版本信息不完整或已变化，请刷新故事板后重试。"
+    },
+    {
+      "code": "SHOT_RESTRUCTURE_ASSET_OUTSIDE_SOURCES",
+      "userSpeechKey": "creator.error.shotRestructureAssetOutsideSources",
+      "userSpeech": "有素材不属于这次要合并/拆分的镜头，已拒绝，未做任何修改。"
+    },
+    {
+      "code": "SHOT_RESTRUCTURE_ASSET_DISPOSITION_INVALID",
+      "userSpeechKey": "creator.error.shotRestructureAssetDispositionInvalid",
+      "userSpeech": "素材的保留/归档方式不合法（素材不会被删除），请调整后重试。"
+    },
+    {
+      "code": "SHOT_RESTRUCTURE_PART_INVALID",
+      "userSpeechKey": "creator.error.shotRestructurePartInvalid",
+      "userSpeech": "拆分需要 2–8 个不重名的分段，且每个保留的素材都要指定去向分段。"
+    },
+    {
+      "code": "SHOT_RESTRUCTURE_ASSET_INVENTORY_STALE",
+      "userSpeechKey": "creator.error.shotRestructureAssetInventoryStale",
+      "userSpeech": "镜头里的素材在你确认后发生了变化，为避免丢素材已停止，请刷新后重新确认。"
+    },
+    {
+      "code": "SHOT_RESTRUCTURE_SOURCE_NOT_FOUND",
+      "userSpeechKey": "creator.error.shotRestructureSourceNotFound",
+      "userSpeech": "要合并/拆分的镜头不存在或已被删除，请刷新故事板后重新选择。"
+    },
+    {
+      "code": "SHOT_RESTRUCTURE_SOURCE_SCENE_MISMATCH",
+      "userSpeechKey": "creator.error.shotRestructureSourceSceneMismatch",
+      "userSpeech": "只能合并/拆分同一场次故事板里的镜头，所选镜头不在这一场。"
+    },
+    {
+      "code": "SHOT_RESTRUCTURE_TARGET_BUSY",
+      "userSpeechKey": "creator.error.shotRestructureTargetBusy",
+      "userSpeech": "这些镜头正在生成或被改写，暂时不能合并/拆分。等任务结束后再试。"
+    },
+    {
+      "code": "SHOT_RESTRUCTURE_PROPOSAL_INVALID",
+      "userSpeechKey": "creator.error.shotRestructureProposalInvalid",
+      "userSpeech": "模型给出的合并/拆分方案格式不对，已停止，没有做任何修改。"
+    },
+    {
+      "code": "SHOT_RESTRUCTURE_FABRICATED_REF",
+      "userSpeechKey": "creator.error.shotRestructureFabricatedRef",
+      "userSpeech": "方案里出现了原镜头没有的人物或素材，已拒绝，没有做任何修改。"
+    },
+    {
+      "code": "SHOT_RESTRUCTURE_MECHANICAL_SPLIT",
+      "userSpeechKey": "creator.error.shotRestructureMechanicalSplit",
+      "userSpeech": "方案只是按台词行或固定时长机械切分，没有采用。请换个说法再试。"
+    },
+    {
+      "code": "SHOT_RESTRUCTURE_REVIEW_BLOCKING",
+      "userSpeechKey": "creator.error.shotRestructureReviewBlocking",
+      "userSpeech": "评审发现方案会丢失或改动原镜头的关键内容，已停止，没有做任何修改。"
+    },
+    {
+      "code": "SHOT_RESTRUCTURE_REVIEW_INVALID",
+      "userSpeechKey": "creator.error.shotRestructureReviewInvalid",
+      "userSpeech": "方案评审结果格式不对，已停止，没有做任何修改。"
+    },
+    {
+      "code": "SHOT_RESTRUCTURE_PLAN_INVALID",
+      "userSpeechKey": "creator.error.shotRestructurePlanInvalid",
+      "userSpeech": "有素材没有明确去向，为避免丢素材已停止，没有做任何修改。"
+    },
+    {
+      "code": "SHOT_RESTRUCTURE_SOURCE_STALE",
+      "userSpeechKey": "creator.error.shotRestructureSourceStale",
+      "userSpeech": "这些镜头在审阅后又被改过，合并/拆分已停止，没有做任何修改。请重新预览后再试。"
+    },
+    {
+      "code": "SHOT_RESTRUCTURE_APPLY_FAILED",
+      "userSpeechKey": "creator.error.shotRestructureApplyFailed",
+      "userSpeech": "合并/拆分写入失败，已整体撤回，没有留下半截修改。"
+    },
+    {
+      "code": "SHOT_RESTRUCTURE_IDEMPOTENCY_CONFLICT",
+      "userSpeechKey": "creator.error.shotRestructureIdempotencyConflict",
+      "userSpeech": "这次请求的标识已经用于另一个合并/拆分方案，没有重复执行。"
+    },
+    {
+      "code": "SHOT_RESTRUCTURE_PROPOSAL_HASH_MISMATCH",
+      "userSpeechKey": "creator.error.shotRestructureProposalHashMismatch",
+      "userSpeech": "这份合并/拆分方案和审阅过的版本不一致（被改动过），已拒绝执行，没有做任何修改。请重新生成并审阅方案。"
+    },
+    {
+      "code": "SHOT_RESTRUCTURE_PROPOSAL_NOT_REVIEWED",
+      "userSpeechKey": "creator.error.shotRestructureProposalNotReviewed",
+      "userSpeech": "这份合并/拆分方案还没有通过本次会话的审阅，不能直接执行。请先重新预览并审阅。"
+    },
+    {
+      "code": "SHOT_RESTRUCTURE_UNDO_CONFLICT",
+      "userSpeechKey": "creator.error.shotRestructureUndoConflict",
+      "userSpeech": "合并/拆分之后这些镜头又被修改过，为避免覆盖你后来的编辑，撤销已停止，没有做任何修改。"
+    },
+    {
+      "code": "SHOT_RESTRUCTURE_UNDO_NOT_FOUND",
+      "userSpeechKey": "creator.error.shotRestructureUndoNotFound",
+      "userSpeech": "找不到可撤销的合并/拆分记录，没有做任何修改。"
+    },
+    {
+      "code": "RECIPE_CAPABILITY_UNKNOWN",
+      "userSpeechKey": "creator.error.recipeCapabilityUnknown",
+      "userSpeech": "配方里有未登记的能力，已拒绝执行。"
+    },
+    {
+      "code": "RECIPE_GRAPH_INVALID",
+      "userSpeechKey": "creator.error.recipeGraphInvalid",
+      "userSpeech": "配方步骤之间的依赖或引用不合法（循环、悬空或越级引用），已拒绝执行。"
+    },
+    {
+      "code": "RECIPE_NOT_RUNNABLE",
+      "userSpeechKey": "creator.error.recipeNotRunnable",
+      "userSpeech": "这个配方用到了尚未上线的能力，暂时不能运行。"
+    },
+    {
+      "code": "RUN_STEP_UNKNOWN",
+      "userSpeechKey": "creator.error.runStepUnknown",
+      "userSpeech": "运行记录里有不属于该配方的步骤，已拒绝。"
+    },
+    {
+      "code": "RUN_STATUS_INCONSISTENT",
+      "userSpeechKey": "creator.error.runStatusInconsistent",
+      "userSpeech": "运行记录的状态与各步骤结果不一致，已拒绝。"
+    },
+    {
+      "code": "MODULE_UNAVAILABLE",
+      "userSpeechKey": "creator.error.moduleUnavailable",
+      "userSpeech": "这部分功能的模块没有启动成功，暂时不能用；其他功能不受影响。请重启程序，若仍失败请查看日志。"
+    },
+    {
+      "code": "UNKNOWN_RESOURCE_KIND",
+      "userSpeechKey": "creator.error.unknownResourceKind",
+      "userSpeech": "不认识这个资源类型。请用已开放的资源引用。"
+    },
+    {
+      "code": "MODULE_RESOURCE_SCHEMA_INVALID",
+      "userSpeechKey": "creator.error.moduleResourceSchemaInvalid",
+      "userSpeech": "模块资源字段不合法（有未知字段或缺少必填项），已拒绝。"
+    },
+    {
+      "code": "AUTHZ_DENIED",
+      "userSpeechKey": "creator.error.authzDenied",
+      "userSpeech": "没有权限执行这个操作。"
+    },
+    {
+      "code": "SCOPE_UNSIGNED",
+      "userSpeechKey": "creator.error.scopeUnsigned",
+      "userSpeech": "写/界面/任务操作的执行范围必须由宿主签发，不能由 MCP 自行声明。"
+    },
+    {
+      "code": "REVISION_POLICY_MISMATCH",
+      "userSpeechKey": "creator.error.revisionPolicyMismatch",
+      "userSpeech": "提交的版本类型与该工具要求的不一致，请重新读取后再提交。"
+    },
+    {
+      "code": "CONTEXT_AMBIGUOUS_WINDOW",
+      "userSpeechKey": "creator.error.contextAmbiguousWindow",
+      "userSpeech": "当前有多个窗口有上下文，请先指定要操作的窗口。"
+    },
+    {
+      "code": "CONTEXT_WINDOW_CLOSED",
+      "userSpeechKey": "creator.error.contextWindowClosed",
+      "userSpeech": "目标窗口已关闭或还没有发布上下文。"
+    },
+    {
+      "code": "MODULE_MISSING",
+      "userSpeechKey": "creator.error.moduleMissing",
+      "userSpeech": "依赖的功能模块不可用，这条记录仍保留，但不会自动重跑。"
+    },
+    {
+      "code": "MODULE_VERSION_MISMATCH",
+      "userSpeechKey": "creator.error.moduleVersionMismatch",
+      "userSpeech": "计划是用旧版模块做的，当前版本不兼容，不会自动重跑。"
+    },
+    {
+      "code": "GRANT_STALE_AFTER_RESTART",
+      "userSpeechKey": "creator.error.grantStaleAfterRestart",
+      "userSpeech": "程序重启后旧的费用授权已失效，请重新批准后再继续。"
+    },
+    {
+      "code": "SHOT_RESTRUCTURE_RECEIPT_INCOMPLETE",
+      "userSpeechKey": "creator.error.shotRestructureReceiptIncomplete",
+      "userSpeech": "镜头重组回执不完整，已停止，未重复提交。"
+    },
+    {
+      "code": "SHOT_RESTRUCTURE_RECEIPT_DUPLICATE",
+      "userSpeechKey": "creator.error.shotRestructureReceiptDuplicate",
+      "userSpeech": "同一重组回执不能提交两次。"
+    },
+    {
+      "code": "ATOMICTY_MISREPRESENTED",
+      "userSpeechKey": "creator.error.atomicityMisrepresented",
+      "userSpeech": "不能把可补偿操作冒充成单库原子事务。"
+    },
+    {
+      "code": "WORKBENCH_NOT_AVAILABLE",
+      "userSpeechKey": "creator.error.workbenchNotAvailable",
+      "userSpeech": "这个工作台还没有接入结构化参数编辑。请打开对应工作台，或手动修改。"
+    },
+    {
+      "code": "WORKBENCH_DRAFT_REVISION_STALE",
+      "userSpeechKey": "creator.error.workbenchDraftRevisionStale",
+      "userSpeech": "工作台内容已变化（或已重新打开），本次修改未写入。请重新读取后再改。"
+    },
+    {
+      "code": "WORKBENCH_KIND_MISMATCH",
+      "userSpeechKey": "creator.error.workbenchKindMismatch",
+      "userSpeech": "修改的工作台类型与当前打开的不一致，未写入。"
+    },
+    {
+      "code": "WORKBENCH_PATCH_EMPTY",
+      "userSpeechKey": "creator.error.workbenchPatchEmpty",
+      "userSpeech": "没有要修改的字段。"
+    },
+    {
+      "code": "WORKBENCH_PERSIST_MODE_NOT_ALLOWED",
+      "userSpeechKey": "creator.error.workbenchPersistModeNotAllowed",
+      "userSpeech": "这个工作台不支持该保存方式，未写入。"
+    },
+    {
+      "code": "WORKBENCH_FIELD_UNKNOWN",
+      "userSpeechKey": "creator.error.workbenchFieldUnknown",
+      "userSpeech": "包含工作台不存在的字段，整批未写入。"
+    },
+    {
+      "code": "WORKBENCH_FIELD_CAP_TYPE_MISMATCH",
+      "userSpeechKey": "creator.error.workbenchFieldCapTypeMismatch",
+      "userSpeech": "字段类型与工作台能力不一致，整批未写入。"
+    },
+    {
+      "code": "WORKBENCH_FIELD_NOT_EDITABLE",
+      "userSpeechKey": "creator.error.workbenchFieldNotEditable",
+      "userSpeech": "当前模型或状态下该字段不可修改，整批未写入。"
+    },
+    {
+      "code": "WORKBENCH_FIELD_VALUE_NOT_ALLOWED",
+      "userSpeechKey": "creator.error.workbenchFieldValueNotAllowed",
+      "userSpeech": "该取值不在当前模型支持范围内，整批未写入。"
+    },
+    {
+      "code": "WORKBENCH_FIELD_OUT_OF_RANGE",
+      "userSpeechKey": "creator.error.workbenchFieldOutOfRange",
+      "userSpeech": "数值或数量超出当前模型允许范围，整批未写入。"
+    },
+    {
+      "code": "WORKBENCH_PERSIST_FAILED",
+      "userSpeechKey": "creator.error.workbenchPersistFailed",
+      "userSpeech": "草稿已更新，但保存失败。请检查后手动保存或重试。"
+    },
+    {
+      "code": "WORKBENCH_ACK_INVALID",
+      "userSpeechKey": "creator.error.workbenchAckInvalid",
+      "userSpeech": "工作台回执格式不正确，已按失败处理。"
+    },
+    {
+      "code": "WORKBENCH_ACK_MISMATCH",
+      "userSpeechKey": "creator.error.workbenchAckMismatch",
+      "userSpeech": "工作台回执与本次请求不对应（可能已切换或重新打开），已按失败处理。"
+    },
+    {
+      "code": "MEDIA_STILL_REFERENCED",
+      "userSpeechKey": "creator.error.mediaStillReferenced",
+      "userSpeech": "这个媒体文件仍被画布节点引用，不能直接删除文件。请先移除引用，再删除。"
+    },
+    {
+      "code": "CALL_CONTEXT_MISSING",
+      "userSpeechKey": "creator.error.callContextMissing",
+      "userSpeech": "这次操作缺少必要的调用信息，没有执行。助手会补全后重试。"
+    },
+    {
+      "code": "CALL_CONTEXT_INVALID",
+      "userSpeechKey": "creator.error.callContextInvalid",
+      "userSpeech": "这次操作的调用信息不符合约定，没有执行。助手会更正后重试。"
+    },
+    {
+      "code": "REQUEST_REF_REQUIRED",
+      "userSpeechKey": "creator.error.requestRefRequired",
+      "userSpeech": "这一步需要先关联到当前请求，所以没有执行。助手会先建立请求再继续。"
+    },
+    {
+      "code": "REQUEST_REF_NOT_ALLOWED",
+      "userSpeechKey": "creator.error.requestRefNotAllowed",
+      "userSpeech": "新建请求时不能带已有请求引用或目标，没有执行。"
+    },
+    {
+      "code": "REQUEST_NOT_FOUND",
+      "userSpeechKey": "creator.error.requestNotFound",
+      "userSpeech": "没有找到这个请求，这一步没有执行。请重新发送你的要求。"
+    },
+    {
+      "code": "REQUEST_REVISION_STALE",
+      "userSpeechKey": "creator.error.requestRevisionStale",
+      "userSpeech": "请求刚刚有了新进度，这一步没有执行。助手会读取最新进度后再提交。"
+    },
+    {
+      "code": "TURN_REQUEST_MISMATCH",
+      "userSpeechKey": "creator.error.turnRequestMismatch",
+      "userSpeech": "这次修改对应的不是本轮对话的请求，所以没有执行，已有的结果保持不变。助手会先读取本轮请求的最新进度再继续。"
+    },
+    {
+      "code": "CONVERSATION_NOT_FOUND",
+      "userSpeechKey": "creator.error.conversationNotFound",
+      "userSpeech": "没有找到这个对话，这一步没有执行。请先打开对话再继续。"
+    },
+    {
+      "code": "CONVERSATION_TURN_NOT_FOUND",
+      "userSpeechKey": "creator.error.conversationTurnNotFound",
+      "userSpeech": "这个对话里没有这一轮消息，这一步没有执行。请重新读取对话。"
+    },
+    {
+      "code": "CONVERSATION_TURN_UNRESOLVED",
+      "userSpeechKey": "creator.error.conversationTurnUnresolved",
+      "userSpeech": "这一轮消息还没有确定对应哪个请求，这一步没有执行。助手会先确认这一轮的意图。"
+    },
+    {
+      "code": "CONVERSATION_REVISION_STALE",
+      "userSpeechKey": "creator.error.conversationRevisionStale",
+      "userSpeech": "对话已经有了新的内容，这一步没有执行。助手会重新读取对话后再继续。"
+    },
+    {
+      "code": "CONVERSATION_IDEMPOTENCY_CONFLICT",
+      "userSpeechKey": "creator.error.conversationIdempotencyConflict",
+      "userSpeech": "同一次操作被用在了不同的内容上，这一步没有执行。助手会作为一次新操作重试。"
+    },
+    {
+      "code": "CONVERSATION_CURSOR_INVALID",
+      "userSpeechKey": "creator.error.conversationCursorInvalid",
+      "userSpeech": "对话翻页位置无效，没有读取。请从第一页重新读取。"
+    },
+    {
+      "code": "CONVERSATION_CURSOR_STALE",
+      "userSpeechKey": "creator.error.conversationCursorStale",
+      "userSpeech": "对话在翻页期间有了新内容，没有读取。请从第一页重新读取。"
+    },
+    {
+      "code": "CONVERSATION_INPUT_INVALID",
+      "userSpeechKey": "creator.error.conversationInputInvalid",
+      "userSpeech": "这条对话输入不符合要求（为空、过长或引用无效），没有保存。"
+    },
+    {
+      "code": "CONVERSATION_STORE_FAILED",
+      "userSpeechKey": "creator.error.conversationStoreFailed",
+      "userSpeech": "对话没有保存成功，这一步没有执行。可以稍后重试。"
+    },
+    {
+      "code": "CONVERSATION_RESOLUTION_REJECTED",
+      "userSpeechKey": "creator.error.conversationResolutionRejected",
+      "userSpeech": "没能确定这一轮消息的意图，没有创建或修改任何请求。可以换个说法再说一次。"
+    },
+    {
+      "code": "REQUEST_CLOSED",
+      "userSpeechKey": "creator.error.requestClosed",
+      "userSpeech": "这个请求已经结束（完成或取消），这一步没有执行。如需继续请新开一个请求。"
+    },
+    {
+      "code": "REQUEST_IDEMPOTENCY_CONFLICT",
+      "userSpeechKey": "creator.error.requestIdempotencyConflict",
+      "userSpeech": "同一次操作被用在了不同的内容上，这一步没有执行。助手会作为一次新操作重试。"
+    },
+    {
+      "code": "REQUEST_CHANGE_ALREADY_APPLIED",
+      "userSpeechKey": "creator.error.requestChangeAlreadyApplied",
+      "userSpeech": "这项修改在本次请求里已经做过了，这一步没有再改一遍。助手会直接说明已有的结果。"
+    },
+    {
+      "code": "REQUEST_TASK_ALREADY_ACCEPTED",
+      "userSpeechKey": "creator.error.requestTaskAlreadyAccepted",
+      "userSpeech": "这个目标已经提交过生成任务，这一步没有再次提交（不会重复扣费）。助手会先查看原任务的进度。"
+    },
+    {
+      "code": "REQUEST_STORE_FAILED",
+      "userSpeechKey": "creator.error.requestStoreFailed",
+      "userSpeech": "请求记录读写失败，这一步没有执行。请稍后重试；若一直失败请查看日志。"
+    },
+    {
+      "code": "REQUEST_EVIDENCE_NOT_RECORDED",
+      "userSpeechKey": "creator.error.requestEvidenceNotRecorded",
+      "userSpeech": "这一步已经执行了，但没能记到当前请求里。助手会先确认请求状态再继续。"
+    },
+    {
+      "code": "REQUEST_EVIDENCE_ROLLED_BACK",
+      "userSpeechKey": "creator.error.requestEvidenceRolledBack",
+      "userSpeech": "这一步没有生效：它没能记到当前请求里，改动已整体撤回，内容保持原样。助手会先确认请求状态再继续。"
+    },
+    {
+      "code": "EFFECT_NOT_RECORDED",
+      "userSpeechKey": "creator.error.effectNotRecorded",
+      "userSpeech": "这次修改没有保存：变更记录写入失败，已整体撤回，内容保持原样。请稍后重试；若一直失败请查看日志。"
+    },
+    {
+      "code": "EFFECT_NOT_RECORDED_AFTER_COMMIT",
+      "userSpeechKey": "creator.error.effectNotRecordedAfterCommit",
+      "userSpeech": "修改已经保存，但变更记录没写上，打开的页面可能不会自动刷新。请不要重复执行，先重新打开或刷新对应页面查看结果。"
+    },
+    {
+      "code": "EFFECT_STORE_UNAVAILABLE",
+      "userSpeechKey": "creator.error.effectStoreUnavailable",
+      "userSpeech": "变更记录暂时不可用，无法查询修改结果。请重启程序后再试。"
+    },
+    {
+      "code": "EFFECT_NOT_FOUND",
+      "userSpeechKey": "creator.error.effectNotFound",
+      "userSpeech": "没有找到这条修改记录，所以没法刷新画面。可以让助手查看最近的修改。"
+    },
+    {
+      "code": "UI_HOST_BINDING_REQUIRED",
+      "userSpeechKey": "creator.error.uiHostBindingRequired",
+      "userSpeech": "页面刷新登记只能由打开的窗口自己完成，助手只能查看刷新状态。"
+    },
+    {
+      "code": "VIEW_DELIVERY_REJECTED",
+      "userSpeechKey": "creator.error.viewDeliveryRejected",
+      "userSpeech": "页面刷新确认没有被接受（页面未登记、范围不符或还没刷新到这次修改）。页面会重新加载最新内容。"
+    },
+    {
+      "code": "REQUEST_CURSOR_INVALID",
+      "userSpeechKey": "creator.error.requestCursorInvalid",
+      "userSpeech": "分页位置已经失效，这一步没有读取。助手会从头重新读取。"
+    },
+    {
+      "code": "REQUEST_ARGS_INVALID",
+      "userSpeechKey": "creator.error.requestArgsInvalid",
+      "userSpeech": "请求参数不符合约定，没有执行。请按工具说明填写。"
+    },
+    {
+      "code": "REQUEST_PROJECTION_INVALID",
+      "userSpeechKey": "creator.error.requestProjectionInvalid",
+      "userSpeech": "请求状态无法按约定输出，没有返回。请查看日志。"
+    },
+    {
+      "code": "GOAL_REFS_REQUIRED",
+      "userSpeechKey": "creator.error.goalRefsRequired",
+      "userSpeech": "这次计量读取需要关联当前请求中待完成的读取目标。"
+    },
+    {
+      "code": "GOAL_REF_UNKNOWN",
+      "userSpeechKey": "creator.error.goalRefUnknown",
+      "userSpeech": "这次修改对应的目标不在当前请求里，所以没有执行。助手会先说明目标再修改。"
+    },
+    {
+      "code": "CHECKPOINT_INVALID",
+      "userSpeechKey": "creator.error.checkpointInvalid",
+      "userSpeech": "目标/决定登记不符合约定（重复、改写或引用无效），没有登记。"
+    },
+    {
+      "code": "REPLY_INVALID",
+      "userSpeechKey": "creator.error.replyInvalid",
+      "userSpeech": "回复的结构或引用不符合约定，本次说明未被接受。已保存的工作不受影响，请按具体错误修正说明。"
+    },
+    {
+      "code": "CONTINUATION_INVALID",
+      "userSpeechKey": "creator.error.continuationInvalid",
+      "userSpeech": "继续方式不符合约定或选项不存在，没有执行。"
+    },
+    {
+      "code": "REVIEW_INVENTORY_INVALID",
+      "userSpeechKey": "creator.error.reviewInventoryInvalid",
+      "userSpeech": "审阅材料目录无法核验，本次未能读取。已保存的成果不受影响。请重新查看请求状态并核对材料引用；仍失败请检查资料库。"
+    },
+    {
+      "code": "REVIEW_RECORDED_PROGRESS_INVALID",
+      "userSpeechKey": "creator.error.reviewRecordedProgressInvalid",
+      "userSpeech": "已有审阅进度无法核验，本次未确认已读范围。已保存的成果不受影响。请重新查看请求状态；仍失败请检查资料库。"
+    },
+    {
+      "code": "REVIEW_MODEL_UNAVAILABLE",
+      "userSpeechKey": "creator.error.reviewModelUnavailable",
+      "userSpeech": "没有可用的评审模型，评审没有运行。请在设置里配置支持工具调用的文本模型。"
+    },
+    {
+      "code": "CONTEXT_REVISION_REQUIRED",
+      "userSpeechKey": "creator.error.contextRevisionRequired",
+      "userSpeech": "这次界面操作必须带上刚读取到的界面版本号。"
+    },
+    {
+      "code": "CONTEXT_REVISION_STALE",
+      "userSpeechKey": "creator.error.contextRevisionStale",
+      "userSpeech": "界面已经变化，请重新读取上下文后再提交。"
+    },
+    {
+      "code": "CONTEXT_SNAPSHOT_MISSING",
+      "userSpeechKey": "creator.error.contextSnapshotMissing",
+      "userSpeech": "还没有界面快照，请先在软件里打开要操作的页面。"
+    },
+    {
+      "code": "OPERATION_IN_FLIGHT",
+      "userSpeechKey": "creator.error.operationInFlight",
+      "userSpeech": "同一个操作正在执行，请等它完成后查看结果，不要重复提交。"
+    },
+    {
+      "code": "OPERATION_OUTCOME_UNKNOWN",
+      "userSpeechKey": "creator.error.operationOutcomeUnknown",
+      "userSpeech": "上一次相同的操作没有确认结果。请先查看当前内容，确认后再重新操作。"
+    },
+    {
+      "code": "MODEL_BINDING_EXPIRED",
+      "userSpeechKey": "creator.error.modelBindingExpired",
+      "userSpeech": "这次请求用的模型连接已经结束（比如程序重启过）。请重新发送，会用你当前选择的模型继续，不会换成别的模型。"
+    },
+    {
+      "code": "MODEL_BINDING_UNKNOWN",
+      "userSpeechKey": "creator.error.modelBindingUnknown",
+      "userSpeech": "找不到这次请求指定的模型。请在设置里确认模型后重新发送。"
+    },
+    {
+      "code": "APP_DATA_RECOVERY_REQUIRED",
+      "userSpeechKey": "creator.error.appDataRecoveryRequired",
+      "userSpeech": "上次数据升级没有完成，程序现在只能查看、不能修改。请按恢复说明处理后重新打开程序。"
+    },
+    {
+      "code": "AGENT_SKILL_EFFECT_IDEMPOTENCY_CONFLICT",
+      "userSpeechKey": "creator.error.agentSkillEffectIdempotencyConflict",
+      "userSpeech": "同一个技能操作被用不同内容重复提交，已拒绝。请重新发起这次操作。"
+    },
+    {
+      "code": "AGENT_SKILL_EFFECT_PENDING",
+      "userSpeechKey": "creator.error.agentSkillEffectPending",
+      "userSpeech": "上一次技能写入还在确认中，请稍后再试。"
+    },
+    {
+      "code": "AGENT_SKILL_EFFECT_RECEIPT_INCOMPLETE",
+      "userSpeechKey": "creator.error.agentSkillEffectReceiptIncomplete",
+      "userSpeech": "技能操作的结果没有完整记录下来，无法确认是否完成。请刷新技能列表后核对。"
+    },
+    {
+      "code": "AGENT_SKILL_INSTALL_IO",
+      "userSpeechKey": "creator.error.agentSkillInstallIo",
+      "userSpeech": "技能库暂时无法读写。请检查磁盘空间和文件权限后再试。"
+    },
+    {
+      "code": "AGENT_SKILL_LIBRARY_UPGRADE_FAILED",
+      "userSpeechKey": "creator.error.agentSkillLibraryUpgradeFailed",
+      "userSpeech": "技能库升级没有完成，技能暂时不能修改。请重启程序后再试。"
+    },
+    {
+      "code": "AGENT_SKILL_MANAGEMENT_FAILED",
+      "userSpeechKey": "creator.error.agentSkillManagementFailed",
+      "userSpeech": "技能管理操作没有完成。请刷新技能列表后重试。"
+    },
+    {
+      "code": "AGENT_SKILL_PUBLISH_INVALID",
+      "userSpeechKey": "creator.error.agentSkillPublishInvalid",
+      "userSpeech": "这个技能草稿没有通过检查，不能发布。请按提示修改后再发布。"
+    },
+    {
+      "code": "AGENT_SKILL_PUBLISH_STALE",
+      "userSpeechKey": "creator.error.agentSkillPublishStale",
+      "userSpeech": "技能草稿已经变了或已不存在。请重新打开草稿后再发布。"
+    },
+    {
+      "code": "AGENT_SKILL_REVISION_STALE",
+      "userSpeechKey": "creator.error.agentSkillRevisionStale",
+      "userSpeech": "技能已被别处修改。请重新读取后再提交。"
+    },
+    {
+      "code": "AGENT_SKILL_STYLE_OVERLAY_MISSING",
+      "userSpeechKey": "creator.error.agentSkillStyleOverlayMissing",
+      "userSpeech": "技能需要的画风设定找不到了。请重新选择画风后再试。"
+    },
+    {
+      "code": "AGENT_SKILL_ANGLE_INVALID",
+      "userSpeechKey": "creator.error.agentSkillAngleInvalid",
+      "userSpeech": "技能里的视角设置不正确。请检查视角后再试。"
+    },
+    {
+      "code": "AGENT_SKILL_ASPECT_INVALID",
+      "userSpeechKey": "creator.error.agentSkillAspectInvalid",
+      "userSpeech": "画面比例设置不正确。请选择一个支持的画面比例。"
+    },
+    {
+      "code": "AGENT_SKILL_ASPECT_MISMATCH",
+      "userSpeechKey": "creator.error.agentSkillAspectMismatch",
+      "userSpeech": "画面比例和技能要求的不一致。请改成技能要求的比例后再试。"
+    },
+    {
+      "code": "AGENT_SKILL_HOST_UNSUPPORTED",
+      "userSpeechKey": "creator.error.agentSkillHostUnsupported",
+      "userSpeech": "这个技能不能在当前位置使用。请换到技能支持的画布或面板再试。"
+    },
+    {
+      "code": "AGENT_SKILL_IDENTITY_ANCHOR_MISSING",
+      "userSpeechKey": "creator.error.agentSkillIdentityAnchorMissing",
+      "userSpeech": "缺少角色的参考形象，无法保持人物一致。请先给角色设置参考图。"
+    },
+    {
+      "code": "AGENT_SKILL_ID_MISSING",
+      "userSpeechKey": "creator.error.agentSkillIdMissing",
+      "userSpeech": "没有指明要用哪个技能。请先选择技能。"
+    },
+    {
+      "code": "AGENT_SKILL_LAYOUT_INVALID",
+      "userSpeechKey": "creator.error.agentSkillLayoutInvalid",
+      "userSpeech": "技能的排版设置不正确。请检查排版后再试。"
+    },
+    {
+      "code": "AGENT_SKILL_LAYOUT_REQUIRED",
+      "userSpeechKey": "creator.error.agentSkillLayoutRequired",
+      "userSpeech": "这个技能需要先选择排版方式。"
+    },
+    {
+      "code": "AGENT_SKILL_POLICY_NOT_STANDARD",
+      "userSpeechKey": "creator.error.agentSkillPolicyNotStandard",
+      "userSpeech": "这个技能的生成规则不是标准格式，暂时不能直接使用。请升级或重新导入技能。"
+    },
+    {
+      "code": "AGENT_SKILL_SHEET_INVALID",
+      "userSpeechKey": "creator.error.agentSkillSheetInvalid",
+      "userSpeech": "技能的设定表内容不正确。请检查后再试。"
+    },
+    {
+      "code": "AGENT_SKILL_SHEET_MISSING",
+      "userSpeechKey": "creator.error.agentSkillSheetMissing",
+      "userSpeech": "缺少技能需要的设定表。请先补充设定表。"
+    },
+    {
+      "code": "AGENT_SKILL_SLOT_ANCHOR",
+      "userSpeechKey": "creator.error.agentSkillSlotAnchor",
+      "userSpeech": "技能里的参考位设置不正确。请检查参考图的放置位置。"
+    },
+    {
+      "code": "AGENT_SKILL_SLOT_COUNT",
+      "userSpeechKey": "creator.error.agentSkillSlotCount",
+      "userSpeech": "参考位的数量和技能要求的不一致。请调整数量后再试。"
+    },
+    {
+      "code": "AGENT_SKILL_SLOT_DETAIL_INVALID",
+      "userSpeechKey": "creator.error.agentSkillSlotDetailInvalid",
+      "userSpeech": "某个参考位的设置写得不对。请检查后再试。"
+    },
+    {
+      "code": "AGENT_SKILL_SLOT_DUPLICATE",
+      "userSpeechKey": "creator.error.agentSkillSlotDuplicate",
+      "userSpeech": "有重复的参考位。请去掉重复项后再试。"
+    },
+    {
+      "code": "AGENT_SKILL_SLOT_OVERRIDE_INVALID",
+      "userSpeechKey": "creator.error.agentSkillSlotOverrideInvalid",
+      "userSpeech": "对参考位的修改不符合技能要求。请检查后再试。"
+    },
+    {
+      "code": "AGENT_SKILL_SLOT_UNDEFINED",
+      "userSpeechKey": "creator.error.agentSkillSlotUndefined",
+      "userSpeech": "用到了技能里没有的参考位。请只用技能提供的参考位。"
+    },
+    {
+      "code": "AGENT_SKILL_SLOT_UNSUPPORTED_FOR_HOST",
+      "userSpeechKey": "creator.error.agentSkillSlotUnsupportedForHost",
+      "userSpeech": "这个参考位在当前位置不能用。请换到支持它的画布或面板。"
+    },
+    {
+      "code": "AGENT_SKILL_FILE_REF_UNKNOWN",
+      "userSpeechKey": "creator.error.agentSkillFileRefUnknown",
+      "userSpeech": "找不到技能要用的文件。请重新选择文件。"
+    },
+    {
+      "code": "AGENT_SKILL_FILE_REF_CHANGED",
+      "userSpeechKey": "creator.error.agentSkillFileRefChanged",
+      "userSpeech": "技能要用的文件在选择后被改过了。请重新选择文件。"
+    },
+    {
+      "code": "AGENT_SKILL_FILE_REF_TOO_LARGE",
+      "userSpeechKey": "creator.error.agentSkillFileRefTooLarge",
+      "userSpeech": "文件太大，技能不能读取。请换一个更小的文件。"
+    },
+    {
+      "code": "AGENT_SKILL_FILE_REF_IO",
+      "userSpeechKey": "creator.error.agentSkillFileRefIo",
+      "userSpeech": "技能要用的文件暂时读不了。请检查文件是否还在、是否有权限。"
+    },
+    {
+      "code": "AGENT_SKILL_DESTINATION_CHANGED",
+      "userSpeechKey": "creator.error.agentSkillDestinationChanged",
+      "userSpeech": "保存位置在确认后发生了变化。请重新选择保存位置。"
+    },
+    {
+      "code": "AGENT_SKILL_DESTINATION_INVALID",
+      "userSpeechKey": "creator.error.agentSkillDestinationInvalid",
+      "userSpeech": "保存的文件名不合法。请换一个文件名。"
+    },
+    {
+      "code": "AGENT_SKILL_PERMISSION_DENIED",
+      "userSpeechKey": "creator.error.agentSkillPermissionDenied",
+      "userSpeech": "这个技能没有获得运行所需的权限。请在技能设置里允许后再试。"
+    },
+    {
+      "code": "AGENT_SKILL_HELPER_NOT_IN_ACTIVATION",
+      "userSpeechKey": "creator.error.agentSkillHelperNotInActivation",
+      "userSpeech": "技能要运行的辅助程序不在本次启用的范围内，已拒绝运行。"
+    },
+    {
+      "code": "AGENT_SKILL_HELPER_NOT_PROGRAM",
+      "userSpeechKey": "creator.error.agentSkillHelperNotProgram",
+      "userSpeech": "技能指定的辅助文件不是可以运行的程序。"
+    },
+    {
+      "code": "AGENT_SKILL_HELPER_LANGUAGE_UNSUPPORTED",
+      "userSpeechKey": "creator.error.agentSkillHelperLanguageUnsupported",
+      "userSpeech": "技能的辅助程序使用了本机不支持的语言。"
+    },
+    {
+      "code": "AGENT_SKILL_RUNTIME_UNAVAILABLE",
+      "userSpeechKey": "creator.error.agentSkillRuntimeUnavailable",
+      "userSpeech": "本机缺少运行技能所需的组件。请重新安装或修复比格熊后再试。"
+    },
+    {
+      "code": "AGENT_SKILL_RESOURCE_UNAVAILABLE",
+      "userSpeechKey": "creator.error.agentSkillResourceUnavailable",
+      "userSpeech": "技能需要的资源暂时不可用。请稍后再试。"
+    },
+    {
+      "code": "AGENT_SKILL_PLAN_INVALID",
+      "userSpeechKey": "creator.error.agentSkillPlanInvalid",
+      "userSpeech": "技能给出的执行步骤不完整，没有执行。"
+    },
+    {
+      "code": "AGENT_SKILL_PLAN_REJECTED",
+      "userSpeechKey": "creator.error.agentSkillPlanRejected",
+      "userSpeech": "技能给出的执行步骤超出允许范围，已拒绝执行。"
+    },
+    {
+      "code": "ACTION_DAG_CYCLE",
+      "userSpeechKey": "creator.error.actionDagCycle",
+      "userSpeech": "这组修改步骤之间互相依赖成了一个圈，无法执行。请重新规划步骤顺序。"
+    },
+    {
+      "code": "ACTION_ID_DUPLICATE",
+      "userSpeechKey": "creator.error.actionIdDuplicate",
+      "userSpeech": "这组修改里有两个步骤用了同一个编号。请重新规划。"
+    },
+    {
+      "code": "ACTION_ID_REQUIRED",
+      "userSpeechKey": "creator.error.actionIdRequired",
+      "userSpeech": "这组修改里有步骤缺少编号，无法互相引用。请重新规划。"
+    },
+    {
+      "code": "ACTION_REF_DANGLING",
+      "userSpeechKey": "creator.error.actionRefDangling",
+      "userSpeech": "某个步骤引用了不存在的步骤。请重新规划。"
+    },
+    {
+      "code": "ACTION_REF_FIELD_INVALID",
+      "userSpeechKey": "creator.error.actionRefFieldInvalid",
+      "userSpeech": "某个步骤引用前面步骤结果的方式不对。请重新规划。"
+    },
+    {
+      "code": "ACTION_REF_MALFORMED",
+      "userSpeechKey": "creator.error.actionRefMalformed",
+      "userSpeech": "步骤之间的引用格式不对。请重新规划。"
+    },
+    {
+      "code": "ACTION_REF_SENTINEL_FORBIDDEN",
+      "userSpeechKey": "creator.error.actionRefSentinelForbidden",
+      "userSpeech": "修改步骤里用了旧式占位写法，不能执行。请重新规划。"
+    },
+    {
+      "code": "ACTION_REF_SLOT_INVALID",
+      "userSpeechKey": "creator.error.actionRefSlotInvalid",
+      "userSpeech": "某个步骤的这一项不能引用前面步骤的结果。请重新规划。"
+    },
+    {
+      "code": "AUTHZ_PORT_UNAVAILABLE",
+      "userSpeechKey": "creator.error.authzPortUnavailable",
+      "userSpeech": "权限检查暂时不可用，未写入。请稍后再试。"
+    },
+    {
+      "code": "BINDING_VALIDATE_FAILED",
+      "userSpeechKey": "creator.error.bindingValidateFailed",
+      "userSpeech": "这项设置没有通过校验，未保存。请检查填写的内容。"
+    },
+    {
+      "code": "CALL_CONTEXT_REQUIRED",
+      "userSpeechKey": "creator.error.callContextRequired",
+      "userSpeech": "这次操作缺少必要的调用信息，已拒绝。请重新发起。"
+    },
+    {
+      "code": "CHANGESET_STATUS_UNKNOWN",
+      "userSpeechKey": "creator.error.changesetStatusUnknown",
+      "userSpeech": "无法确认这组修改的状态。请刷新后核对内容，再决定是否重试。"
+    },
+    {
+      "code": "CONTEXT_ENCODE_FAILED",
+      "userSpeechKey": "creator.error.contextEncodeFailed",
+      "userSpeech": "场次上下文没能整理出来。请稍后重试。"
+    },
+    {
+      "code": "CONTEXT_PORT_MISSING",
+      "userSpeechKey": "creator.error.contextPortMissing",
+      "userSpeech": "现在没有连上故事库，读不了场次内容。请先打开故事。"
+    },
+    {
+      "code": "COST_PRICE_UNKNOWN",
+      "userSpeechKey": "creator.error.costPriceUnknown",
+      "userSpeech": "这次生成的价格未知。请先确认可接受的次数或预算后再提交。"
+    },
+    {
+      "code": "FC_VIDEO_SUBMIT_CLOSED",
+      "userSpeechKey": "creator.error.fcVideoSubmitClosed",
+      "userSpeech": "画布视频生成暂未开放。"
+    },
+    {
+      "code": "GENERATION_KIND_UNSUPPORTED",
+      "userSpeechKey": "creator.error.generationKindUnsupported",
+      "userSpeech": "不支持这种生成类型。"
+    },
+    {
+      "code": "GENERATION_SUBMIT_PORT_UNAVAILABLE",
+      "userSpeechKey": "creator.error.generationSubmitPortUnavailable",
+      "userSpeech": "生成服务暂时不可用。请稍后再试。"
+    },
+    {
+      "code": "IMAGE_SESSION_NOT_FROZEN",
+      "userSpeechKey": "creator.error.imageSessionNotFrozen",
+      "userSpeech": "图片生成的设置还没有确认，不能提交。请先确认设置。"
+    },
+    {
+      "code": "INVALID_ARGUMENT",
+      "userSpeechKey": "creator.error.invalidArgument",
+      "userSpeech": "请求的内容不完整或格式不对。请检查后再试。"
+    },
+    {
+      "code": "INVALID_FIELD_PATH",
+      "userSpeechKey": "creator.error.invalidFieldPath",
+      "userSpeech": "要修改的设置项不存在。请重新选择设置项。"
+    },
+    {
+      "code": "LEDGER_APPEND_FAILED",
+      "userSpeechKey": "creator.error.ledgerAppendFailed",
+      "userSpeech": "执行记录没能保存，这一步没有完成。请稍后重试。"
+    },
+    {
+      "code": "PICKER_KIND_UNSUPPORTED",
+      "userSpeechKey": "creator.error.pickerKindUnsupported",
+      "userSpeech": "这种选择方式暂不支持。"
+    },
+    {
+      "code": "PORT_UNAVAILABLE",
+      "userSpeechKey": "creator.error.portUnavailable",
+      "userSpeech": "需要的本地服务暂时不可用。请稍后再试。"
+    },
+    {
+      "code": "PROPOSAL_DRAFT_STALE",
+      "userSpeechKey": "creator.error.proposalDraftStale",
+      "userSpeech": "这份修改建议依据的草稿已经变了。请重新生成建议。"
+    },
+    {
+      "code": "PROPOSAL_RESOURCE_STALE",
+      "userSpeechKey": "creator.error.proposalResourceStale",
+      "userSpeech": "这份修改建议涉及的内容已经被改过。请重新读取后再生成建议。"
+    },
+    {
+      "code": "PROTOCOL_SERIALIZE",
+      "userSpeechKey": "creator.error.protocolSerialize",
+      "userSpeech": "结果没能整理成可显示的格式。请稍后重试。"
+    },
+    {
+      "code": "RECIPE_RUN_INCOMPLETE",
+      "userSpeechKey": "creator.error.recipeRunIncomplete",
+      "userSpeech": "创作流程还有步骤没完成。请先完成剩下的步骤。"
+    },
+    {
+      "code": "RECIPE_STEP_ALREADY_CLAIMED",
+      "userSpeechKey": "creator.error.recipeStepAlreadyClaimed",
+      "userSpeech": "这一步已经在别处执行了。请等它完成。"
+    },
+    {
+      "code": "RECIPE_STEP_NOT_CLAIMED",
+      "userSpeechKey": "creator.error.recipeStepNotClaimed",
+      "userSpeech": "这一步还没有开始，不能提交结果。"
+    },
+    {
+      "code": "REPLAN_CONTEXT_REJECTED",
+      "userSpeechKey": "creator.error.replanContextRejected",
+      "userSpeech": "读取场次内容的请求不完整。请重新选择场次。"
+    },
+    {
+      "code": "SECRET_PATH_FORBIDDEN",
+      "userSpeechKey": "creator.error.secretPathForbidden",
+      "userSpeech": "密钥类设置不能在这里读取或修改。请到设置页单独处理。"
+    },
+    {
+      "code": "SETTINGS_PORT_UNAVAILABLE",
+      "userSpeechKey": "creator.error.settingsPortUnavailable",
+      "userSpeech": "设置服务暂时不可用。请稍后再试。"
+    },
+    {
+      "code": "SETTINGS_FORBIDDEN",
+      "userSpeechKey": "creator.error.settingsForbidden",
+      "userSpeech": "当前账号不能修改设置。"
+    },
+    {
+      "code": "ACCOUNT_AUTH_AMBIGUOUS",
+      "userSpeechKey": "creator.error.accountAuthAmbiguous",
+      "userSpeech": "有多张账号使用相同的密钥，请指定要使用的那一张。"
+    },
+    {
+      "code": "ACCOUNT_IN_USE",
+      "userSpeechKey": "creator.error.accountInUse",
+      "userSpeech": "这张账号还在被使用，或有未完成的任务。请先换绑或等任务结束。"
+    },
+    {
+      "code": "ACCOUNT_PROTECTED",
+      "userSpeechKey": "creator.error.accountProtected",
+      "userSpeech": "这是系统预置账号，不能删除或被合并掉。"
+    },
+    {
+      "code": "ACCOUNT_NOT_FOUND",
+      "userSpeechKey": "creator.error.accountNotFound",
+      "userSpeech": "没有找到这张账号。"
+    },
+    {
+      "code": "ACCOUNT_SECRET_EMPTY",
+      "userSpeechKey": "creator.error.accountSecretEmpty",
+      "userSpeech": "请先填写密钥。"
+    },
+    {
+      "code": "ACCOUNT_DECRYPT_FAILED",
+      "userSpeechKey": "creator.error.accountDecryptFailed",
+      "userSpeech": "有一张账号的密钥暂时读不出来，请先在账号中心处理它。"
+    },
+    {
+      "code": "ACCOUNT_SETTINGS_INVALID",
+      "userSpeechKey": "creator.error.accountSettingsInvalid",
+      "userSpeech": "账号没有保存。请重试。"
+    },
+    {
+      "code": "ACCOUNT_IMPORT_DUPLICATE",
+      "userSpeechKey": "creator.error.accountImportDuplicate",
+      "userSpeech": "导入文件里有两张相同的密钥，请先留一张再导入。"
+    },
+    {
+      "code": "ACCOUNT_MERGE_RETRY",
+      "userSpeechKey": "creator.error.accountMergeRetry",
+      "userSpeech": "安装目录已经指向保留的账号，但设置还没改完。请再执行一次合并。"
+    },
+    {
+      "code": "TARGET_MUST_BE_SCENE",
+      "userSpeechKey": "creator.error.targetMustBeScene",
+      "userSpeech": "这里只能选择一个场次。"
+    },
+    {
+      "code": "TASK_CANCEL_FAILED",
+      "userSpeechKey": "creator.error.taskCancelFailed",
+      "userSpeech": "任务没能取消。请刷新任务状态后再试。"
+    },
+    {
+      "code": "CONTEXT_PACK_BUDGET_INVALID",
+      "userSpeechKey": "creator.error.contextPackBudgetInvalid",
+      "userSpeech": "要读取的参考范围设置不正确。请缩小范围后再试。"
+    },
+    {
+      "code": "CONTEXT_PACK_INVALID",
+      "userSpeechKey": "creator.error.contextPackInvalid",
+      "userSpeech": "整理出的创作参考不完整。请稍后重试。"
+    },
+    {
+      "code": "CONTEXT_PACK_SERIALIZE",
+      "userSpeechKey": "creator.error.contextPackSerialize",
+      "userSpeech": "创作参考没能整理出来。请稍后重试。"
+    },
+    {
+      "code": "CONTEXT_PACK_TARGET_REQUIRED",
+      "userSpeechKey": "creator.error.contextPackTargetRequired",
+      "userSpeech": "请先选择要参考的内容。"
+    },
+    {
+      "code": "CONTEXT_PACK_TOO_LARGE",
+      "userSpeechKey": "creator.error.contextPackTooLarge",
+      "userSpeech": "要参考的内容太多。请缩小范围或分批处理。"
+    },
+    {
+      "code": "CONTEXT_READ_FAILED",
+      "userSpeechKey": "creator.error.contextReadFailed",
+      "userSpeech": "场次内容暂时读不出来。请稍后重试。"
+    },
+    {
+      "code": "HOST_NODE_MISSING",
+      "userSpeechKey": "creator.error.hostNodeMissing",
+      "userSpeech": "找不到这个场次所在的画布节点。请刷新后重新选择。"
+    },
+    {
+      "code": "REPLAN_ARTIFACTS_CLOSED",
+      "userSpeechKey": "creator.error.replanArtifactsClosed",
+      "userSpeech": "单场重新规划只会生成分镜，不能扩大到其他场次或剧集。"
+    },
+    {
+      "code": "REPLAN_DIRECTION_MISMATCH",
+      "userSpeechKey": "creator.error.replanDirectionMismatch",
+      "userSpeech": "你的修改方向和之前确认的不一致。请重新确认方向。"
+    },
+    {
+      "code": "REPLAN_INTENT_MISMATCH",
+      "userSpeechKey": "creator.error.replanIntentMismatch",
+      "userSpeech": "重新规划的内容和之前确认的意图不一致。请重新确认。"
+    },
+    {
+      "code": "REPLAN_PAYLOAD_REJECTED",
+      "userSpeechKey": "creator.error.replanPayloadRejected",
+      "userSpeech": "重新规划的内容不完整。请重新发起。"
+    },
+    {
+      "code": "REPLAN_SOURCE_DIGEST_MISMATCH",
+      "userSpeechKey": "creator.error.replanSourceDigestMismatch",
+      "userSpeech": "原文在确认后被改过了。请重新读取原文后再规划。"
+    },
+    {
+      "code": "REPLAN_UNIT_MISMATCH",
+      "userSpeechKey": "creator.error.replanUnitMismatch",
+      "userSpeech": "引用的原文段落和之前确认的不一致。请重新读取后再规划。"
+    },
+    {
+      "code": "REPLAN_WRITE_MODE_CLOSED",
+      "userSpeechKey": "creator.error.replanWriteModeClosed",
+      "userSpeech": "单场重新规划只能替换这一场的分镜，不能改成别的范围。"
+    },
+    {
+      "code": "SCENE_CHAPTER_MISSING",
+      "userSpeechKey": "creator.error.sceneChapterMissing",
+      "userSpeech": "这个场次没有所属剧集。请先把它放进一个剧集。"
+    },
+    {
+      "code": "SCENE_NOT_IN_STORY",
+      "userSpeechKey": "creator.error.sceneNotInStory",
+      "userSpeech": "这个场次不在当前故事里。请重新选择。"
+    },
+    {
+      "code": "SNAPSHOT_STALE",
+      "userSpeechKey": "creator.error.snapshotStale",
+      "userSpeech": "场次内容在读取后变了。请重新读取。"
+    },
+    {
+      "code": "SOURCE_CHAPTER_MISMATCH",
+      "userSpeechKey": "creator.error.sourceChapterMismatch",
+      "userSpeech": "场次关联的原文章节对不上。请检查原文关联。"
+    },
+    {
+      "code": "SOURCE_LINK_MISSING",
+      "userSpeechKey": "creator.error.sourceLinkMissing",
+      "userSpeech": "还没有关联小说原文，不能按原文重做。请先关联原文。"
+    },
+    {
+      "code": "SOURCE_MODE_UNKNOWN",
+      "userSpeechKey": "creator.error.sourceModeUnknown",
+      "userSpeech": "只能选择按小说原文或按场次剧本来重做。"
+    },
+    {
+      "code": "SOURCE_VERSION_NOT_FOUND",
+      "userSpeechKey": "creator.error.sourceVersionNotFound",
+      "userSpeech": "场次关联的原文版本找不到了。请重新关联原文。"
+    },
+    {
+      "code": "MEDIA_CONCAT_MIN",
+      "userSpeechKey": "creator.error.mediaConcatMin",
+      "userSpeech": "至少选两段同类型成片才能拼接。"
+    },
+    {
+      "code": "MEDIA_CONCAT_LIMIT",
+      "userSpeechKey": "creator.error.mediaConcatLimit",
+      "userSpeech": "一次拼接的素材太多，请分批处理。"
+    },
+    {
+      "code": "MEDIA_CONCAT_PATH",
+      "userSpeechKey": "creator.error.mediaConcatPath",
+      "userSpeech": "有素材找不到或不在本机媒体目录，无法拼接。请改用软件里的素材。"
+    },
+    {
+      "code": "MEDIA_CONCAT_PROBE",
+      "userSpeechKey": "creator.error.mediaConcatProbe",
+      "userSpeech": "有一段素材无法读取，请检查源文件。"
+    },
+    {
+      "code": "MEDIA_CONCAT_KIND",
+      "userSpeechKey": "creator.error.mediaConcatKind",
+      "userSpeech": "视频和音频请分开拼接。"
+    },
+    {
+      "code": "MEDIA_CONCAT_FFMPEG",
+      "userSpeechKey": "creator.error.mediaConcatFfmpeg",
+      "userSpeech": "本机缺少视频工具，无法拼接。"
+    },
+    {
+      "code": "MEDIA_CONCAT_ENCODE",
+      "userSpeechKey": "creator.error.mediaConcatEncode",
+      "userSpeech": "拼接失败，请更换素材或稍后重试。"
+    },
+    {
+      "code": "MEDIA_CONCAT_INGEST",
+      "userSpeechKey": "creator.error.mediaConcatIngest",
+      "userSpeech": "拼接好的文件没能放到画布上，临时文件已清理。请确认目标画布后重试。"
+    },
+    {
+      "code": "REQUEST_COMPLETION_SNAPSHOT_STALE",
+      "userSpeechKey": "creator.error.requestCompletionSnapshotStale",
+      "userSpeech": "请求里的成果刚刚变了，刚才那次检查作废。请按最新结果再看一次，不会重做已经完成的修改。"
+    },
+    {
+      "code": "REQUEST_COMPLETION_CONTRACT_UNSUPPORTED",
+      "userSpeechKey": "creator.error.requestCompletionContractUnsupported",
+      "userSpeech": "这次请求用的是旧格式，没有执行。请刷新后再继续。"
+    },
+    {
+      "code": "REQUEST_COMPLETION_PROOF_INVALID",
+      "userSpeechKey": "creator.error.requestCompletionProofInvalid",
+      "userSpeech": "这次结果缺少可核对的完成证明，没有记为已完成。"
+    },
+    {
+      "code": "REQUEST_QUESTION_NOT_CURRENT",
+      "userSpeechKey": "creator.error.requestQuestionNotCurrent",
+      "userSpeech": "这个问题已经不是当前要回答的那个，这次选择没有生效。"
+    },
+    {
+      "code": "REQUEST_RETRY_SCOPE_INVALID",
+      "userSpeechKey": "creator.error.requestRetryScopeInvalid",
+      "userSpeech": "这一步只能重写说明或重新检查，不能再改已经完成的内容。"
+    },
+    {
+      "code": "REQUEST_TASK_SNAPSHOT_FAILED",
+      "userSpeechKey": "creator.error.requestTaskSnapshotFailed",
+      "userSpeech": "没能读到任务的当前状态，这一步没有把它当成成功或失败。请稍后重试。"
+    },
+    {
+      "code": "AGENT_SKILL_TOOL_UNAVAILABLE",
+      "userSpeechKey": "creator.error.agentSkillToolUnavailable",
+      "userSpeech": "技能服务暂时无法使用，请检查技能库后重试。"
+    },
+    {
+      "code": "PROJECTION_BINDING_DUPLICATE_ITEM",
+      "userSpeechKey": "creator.error.projectionBindingDuplicateItem",
+      "userSpeech": "这个方法绑定中有重复项目，请移除重复项后保存。"
+    },
+    {
+      "code": "PROJECTION_BINDING_OUT_OF_RANGE",
+      "userSpeechKey": "creator.error.projectionBindingOutOfRange",
+      "userSpeech": "方法绑定的版本或数量超出允许范围，请检查后保存。"
+    },
+    {
+      "code": "PROJECTION_BINDING_UNKNOWN_PROFILE",
+      "userSpeechKey": "creator.error.projectionBindingUnknownProfile",
+      "userSpeech": "这个投影格式尚未开放，请选择已支持的格式。"
+    },
+    {
+      "code": "PROJECTION_BINDING_RESOURCE_MISSING",
+      "userSpeechKey": "creator.error.projectionBindingResourceMissing",
+      "userSpeech": "方法绑定所需的资源缺失，请补齐资源后保存。"
+    },
+    {
+      "code": "PROJECTION_BINDING_DUPLICATE_PROFILE_VERSION",
+      "userSpeechKey": "creator.error.projectionBindingDuplicateProfileVersion",
+      "userSpeech": "同一投影格式和版本不能重复绑定，请检查后保存。"
+    },
+    {
+      "code": "PROJECTION_BINDING_INPUT_MODE_UNSUPPORTED",
+      "userSpeechKey": "creator.error.projectionBindingInputModeUnsupported",
+      "userSpeech": "这个投影方法不支持所选输入方式，请重新选择。"
+    },
+    {
+      "code": "PROJECTION_BINDING_INVALID_RESOURCE_REF",
+      "userSpeechKey": "creator.error.projectionBindingInvalidResourceRef",
+      "userSpeech": "方法资源的引用无效，请重新选择资源。"
+    },
+    {
+      "code": "PROJECTION_BINDING_MANIFEST_MISMATCH",
+      "userSpeechKey": "creator.error.projectionBindingManifestMismatch",
+      "userSpeech": "方法绑定与技能包的声明不一致，请检查技能包后重试。"
+    },
+    {
+      "code": "PROJECTION_METHOD_LIBRARY_CHANGED",
+      "userSpeechKey": "creator.error.projectionMethodLibraryChanged",
+      "userSpeech": "技能库已变化，请刷新并重新选择投影方法。"
+    },
+    {
+      "code": "PROJECTION_METHOD_NOT_BOUND",
+      "userSpeechKey": "creator.error.projectionMethodNotBound",
+      "userSpeech": "这个方法尚未绑定所选投影格式和输入方式，请先完成绑定。"
+    },
+    {
+      "code": "PROJECTION_TARGET_PROJECTOR_NOT_REGISTERED",
+      "userSpeechKey": "creator.error.projectionTargetProjectorNotRegistered",
+      "userSpeech": "所选视频目标尚未提供投影格式，请重新选择目标。"
+    },
+    {
+      "code": "PROJECTION_DEFAULT_METHOD_NOT_INSTALLED",
+      "userSpeechKey": "creator.error.projectionDefaultMethodNotInstalled",
+      "userSpeech": "所选目标的默认提示词方法尚未安装，请先安装对应技能包。"
+    },
+    {
+      "code": "PROJECTION_CUSTOM_METHOD_NOT_INSTALLED",
+      "userSpeechKey": "creator.error.projectionCustomMethodNotInstalled",
+      "userSpeech": "所选自定义方法尚未安装，请安装后重新选择。"
+    },
+    {
+      "code": "PROJECTION_CUSTOM_DIGEST_MISMATCH",
+      "userSpeechKey": "creator.error.projectionCustomDigestMismatch",
+      "userSpeech": "所选方法的内容已变化，请刷新后重新确认。"
+    },
+    {
+      "code": "PROJECTION_METHOD_RECORD_UNREADABLE",
+      "userSpeechKey": "creator.error.projectionMethodRecordUnreadable",
+      "userSpeech": "无法读取所选方法，请检查技能包后重试。"
+    },
+    {
+      "code": "PROJECTION_METHOD_LIBRARY_UNAVAILABLE",
+      "userSpeechKey": "creator.error.projectionMethodLibraryUnavailable",
+      "userSpeech": "暂时无法读取技能库，请检查后重试。"
+    },
+    {
+      "code": "PROJECTION_RESOURCE_BUDGET_EXCEEDED",
+      "userSpeechKey": "creator.error.projectionResourceBudgetExceeded",
+      "userSpeech": "方法资源超过本次读取容量，请缩小资源范围后重试。"
+    },
+    {
+      "code": "PROJECTION_RESOURCE_DUPLICATE",
+      "userSpeechKey": "creator.error.projectionResourceDuplicate",
+      "userSpeech": "方法资源有重复引用，请移除重复项后重试。"
+    },
+    {
+      "code": "PROJECTION_RESOURCE_NOT_BOUND",
+      "userSpeechKey": "creator.error.projectionResourceNotBound",
+      "userSpeech": "这个资源尚未绑定到所选方法，请先完成绑定。"
+    },
+    {
+      "code": "PROJECTION_RESOURCE_NOT_TEXT",
+      "userSpeechKey": "creator.error.projectionResourceNotText",
+      "userSpeech": "所选方法需要文字资源，请选择支持的文字文件。"
+    },
+    {
+      "code": "PROJECTION_RESOURCE_PAGE_INCONSISTENT",
+      "userSpeechKey": "creator.error.projectionResourcePageInconsistent",
+      "userSpeech": "资源列表在读取时发生变化，请刷新后重试。"
+    },
+    {
+      "code": "SPAN_READ_SET_STALE",
+      "userSpeechKey": "creator.error.spanReadSetStale",
+      "userSpeech": "视频片段结构刚刚有变化，请再试一次。"
+    },
+    {
+      "code": "SPAN_PREPARE_SINGLE_INTENT",
+      "userSpeechKey": "creator.error.spanPrepareSingleIntent",
+      "userSpeech": "一次只能提交一个视频片段结构改动，请分开提交。"
+    },
+    {
+      "code": "SPAN_PORT_UNAVAILABLE",
+      "userSpeechKey": "creator.error.spanPortUnavailable",
+      "userSpeech": "视频片段服务暂不可用，请重启软件后再试。"
+    },
+    {
+      "code": "SPAN_PLAN_NO_CHANGE",
+      "userSpeechKey": "creator.error.spanPlanNoChange",
+      "userSpeech": "这个改动不会改变视频片段覆盖，无需提交。"
+    },
+    {
+      "code": "SPAN_PLAN_HASH_MISMATCH",
+      "userSpeechKey": "creator.error.spanPlanHashMismatch",
+      "userSpeech": "视频片段改动预览已过期，请重新预览后再确认。"
+    },
+    {
+      "code": "SPAN_CONTEXT_INCOMPLETE",
+      "userSpeechKey": "creator.error.spanContextIncomplete",
+      "userSpeech": "视频片段还没有读完整，请继续读取剩余部分后再改动。"
+    },
+    {
+      "code": "SPAN_CONTEXT_PAGE_MISMATCH",
+      "userSpeechKey": "creator.error.spanContextPageMismatch",
+      "userSpeech": "视频片段的分页内容前后不一致，请从第一页重新读取。"
+    },
+    {
+      "code": "SPAN_SOURCE_NOT_IN_SCENE",
+      "userSpeechKey": "creator.error.spanSourceNotInScene",
+      "userSpeech": "所选镜头不在当前场次里，请在同一场次内选择。"
+    },
+    {
+      "code": "SPAN_NOT_FOUND",
+      "userSpeechKey": "creator.error.spanNotFound",
+      "userSpeech": "找不到这个视频片段，请刷新后重新选择。"
+    },
+    {
+      "code": "SPAN_NOT_ACTIVE",
+      "userSpeechKey": "creator.error.spanNotActive",
+      "userSpeech": "这个视频片段已归档，不能直接修改，请先恢复或选择其他片段。"
+    },
+    {
+      "code": "SPAN_MERGE_NEEDS_TWO_SOURCES",
+      "userSpeechKey": "creator.error.spanMergeNeedsTwoSources",
+      "userSpeech": "合并至少需要选择两个镜头。"
+    },
+    {
+      "code": "SPAN_ANCHOR_NOT_ELIGIBLE",
+      "userSpeechKey": "creator.error.spanAnchorNotEligible",
+      "userSpeech": "所选片段不能作为合并后的保留片段，请改选或让软件自动选择。"
+    },
+    {
+      "code": "SPAN_SPLIT_BOUNDARY_INVALID",
+      "userSpeechKey": "creator.error.spanSplitBoundaryInvalid",
+      "userSpeech": "拆分位置不在这个片段的镜头之间，请重新选择拆分点。"
+    },
+    {
+      "code": "SPAN_MIGRATION_RESOLUTION_REQUIRED",
+      "userSpeechKey": "creator.error.spanMigrationResolutionRequired",
+      "userSpeech": "旧数据导入需要先确认处理方式，请在导入预览中逐项确认。"
+    },
+    {
+      "code": "SPAN_STORAGE",
+      "userSpeechKey": "creator.error.spanStorage",
+      "userSpeech": "视频片段数据读写失败，请重试；如果反复出现请提交问题报告。"
+    },
+    {
+      "code": "VIDEO_SUBMIT_GATE_ARTIFACT_ABSENT",
+      "userSpeechKey": "creator.error.videoSubmitGateArtifactAbsent",
+      "userSpeech": "还没有可提交的视频稿，请先完成合稿或手工定稿。"
+    },
+    {
+      "code": "VIDEO_SUBMIT_GATE_STALE_ACK_REQUIRED",
+      "userSpeechKey": "creator.error.videoSubmitGateStaleAckRequired",
+      "userSpeech": "视频稿已过期，确认后请重新提交。"
+    },
+    {
+      "code": "VIDEO_SUBMIT_GATE_ARCHIVED",
+      "userSpeechKey": "creator.error.videoSubmitGateArchived",
+      "userSpeech": "该视频片段已归档，不能继续生成。"
+    },
+    {
+      "code": "VIDEO_SUBMIT_GATE_ACK_INVALID",
+      "userSpeechKey": "creator.error.videoSubmitGateAckInvalid",
+      "userSpeech": "过期确认参数无效，请重新确认后再提交。"
+    },
+    {
+      "code": "VIDEO_SUBMIT_GATE_SPAN_AMBIGUOUS",
+      "userSpeechKey": "creator.error.videoSubmitGateSpanAmbiguous",
+      "userSpeech": "同一视频节点对应多个活动片段，无法提交。"
+    },
+    {
+      "code": "SNAPSHOT_SPAN_COVERAGE_MISSING",
+      "userSpeechKey": "creator.error.snapshotSpanCoverageMissing",
+      "userSpeech": "旧快照不含视频片段覆盖信息，请先预览并显式迁移。"
+    },
+    {
+      "code": "SNAPSHOT_SPAN_REVISION_CONFLICT",
+      "userSpeechKey": "creator.error.snapshotSpanRevisionConflict",
+      "userSpeech": "快照之后视频片段已变化，恢复会复活旧结构，已拒绝。"
+    },
+    {
+      "code": "SNAPSHOT_SPAN_COVERAGE_INVALID",
+      "userSpeechKey": "creator.error.snapshotSpanCoverageInvalid",
+      "userSpeech": "快照的视频片段覆盖字段无效。"
+    },
+    {
+      "code": "DIALOGUE_SEED_SCOPE_MISSING",
+      "userSpeechKey": "creator.error.dialogueSeedScopeMissing",
+      "userSpeech": "导入对白缺少场景或片段范围。"
+    },
+    {
+      "code": "DIALOGUE_SEED_EMPTY_LINE",
+      "userSpeechKey": "creator.error.dialogueSeedEmptyLine",
+      "userSpeech": "对白种子行不能为空。"
+    },
+    {
+      "code": "DIALOGUE_SEED_DUPLICATE_LINE",
+      "userSpeechKey": "creator.error.dialogueSeedDuplicateLine",
+      "userSpeech": "同一镜头同一行号重复出现，已拒绝。"
+    },
+    {
+      "code": "DIALOGUE_SEED_OWNER_CONFLICT",
+      "userSpeechKey": "creator.error.dialogueSeedOwnerConflict",
+      "userSpeech": "对白轨已属于其他片段，不能改绑。"
+    },
+    {
+      "code": "BATCH_SPAN_DUPLICATE_ENTRY",
+      "userSpeechKey": "creator.error.batchSpanDuplicateEntry",
+      "userSpeech": "批量计划里同一视频节点出现两次；一个片段只能有一个任务。"
+    },
+    {
+      "code": "BATCH_SPAN_REVISION_CHANGED",
+      "userSpeechKey": "creator.error.batchSpanRevisionChanged",
+      "userSpeech": "批量开始后该视频片段已变化，此项不提交。"
+    },
+    {
+      "code": "FC_TARGET_PORT_INVALID",
+      "userSpeechKey": "creator.error.fcTargetPortInvalid",
+      "userSpeech": "自由画布端口号无效，必须是非负整数。"
+    },
+    {
+      "code": "SPAN_FRAMEWORK_EXISTING_COVERAGE_REQUIRES_RESOLUTION",
+      "userSpeechKey": "creator.error.spanFrameworkExistingCoverage",
+      "userSpeech": "这场已经有还在画布上的视频片段。请先处理现有片段，再生成框架。"
+    },
+    {
+      "code": "SPAN_FRAMEWORK_EXISTING_CANVAS_REQUIRES_RESOLUTION",
+      "userSpeechKey": "creator.error.spanFrameworkExistingCanvas",
+      "userSpeech": "这场画布上还有节点。请先移走或处理它们，再生成框架。"
+    },
+    {
+      "code": "SPAN_FRAMEWORK_CANVAS_RACE",
+      "userSpeechKey": "creator.error.spanFrameworkCanvasRace",
+      "userSpeech": "画布在准备之后有变化。请重新生成一次。"
+    },
+    {
+      "code": "SPAN_FRAMEWORK_EMPTY_SCENE",
+      "userSpeechKey": "creator.error.spanFrameworkEmptyScene",
+      "userSpeech": "这个场次还没有分镜，无法生成视频框架。"
+    },
+    {
+      "code": "SPAN_FRAMEWORK_SOURCE_MISSING",
+      "userSpeechKey": "creator.error.spanFrameworkSourceMissing",
+      "userSpeech": "有的分镜内容读不到，这次没有生成框架。"
+    },
+    {
+      "code": "SPAN_FRAMEWORK_CHAPTER_MISSING",
+      "userSpeechKey": "creator.error.spanFrameworkChapterMissing",
+      "userSpeech": "这个场次还没有所属剧集，无法生成框架。"
+    },
+    {
+      "code": "SPAN_FRAMEWORK_IMPORT_INVALID",
+      "userSpeechKey": "creator.error.spanFrameworkImportInvalid",
+      "userSpeech": "这次框架请求不完整。请重新打开确认后再生成。"
+    },
+    {
+      "code": "SPAN_FRAMEWORK_INCOMPLETE_COVERAGE",
+      "userSpeechKey": "creator.error.spanFrameworkIncompleteCoverage",
+      "userSpeech": "分镜没有被完整覆盖，这次没有生成框架。"
+    },
+    {
+      "code": "SPAN_FRAMEWORK_GROUP_REF_INVALID",
+      "userSpeechKey": "creator.error.spanFrameworkGroupRefInvalid",
+      "userSpeech": "分镜分组引用无效，这次没有生成框架。"
+    },
+    {
+      "code": "SPAN_FRAMEWORK_PAD_ENVELOPE_INVALID",
+      "userSpeechKey": "creator.error.spanFrameworkPadEnvelopeInvalid",
+      "userSpeech": "有的分镜参考图记录损坏，这次没有带上参考。"
+    },
+    {
+      "code": "SPAN_SOURCE_ALREADY_OWNED",
+      "userSpeechKey": "creator.error.spanSourceAlreadyOwned",
+      "userSpeech": "有的分镜已经属于另一个视频片段，这次没有生成。"
+    },
+    {
+      "code": "SPAN_MEMBERS_NOT_CONTIGUOUS",
+      "userSpeechKey": "creator.error.spanMembersNotContiguous",
+      "userSpeech": "选中的分镜不连续，这次没有生成片段。"
+    },
+    {
+      "code": "SPAN_DIALOGUE_SEED_NO_SPAN",
+      "userSpeechKey": "creator.error.spanDialogueSeedNoSpan",
+      "userSpeech": "还没有对应的视频片段，无法写入对白。"
+    },
+    {
+      "code": "SPAN_CONTENT_CHANGED",
+      "userSpeechKey": "creator.error.spanContentChanged",
+      "userSpeech": "分镜内容在准备之后变了。请重新生成。"
+    },
+    {
+      "code": "SPAN_MEMBERSHIP_INTENT_REQUIRED",
+      "userSpeechKey": "creator.error.spanMembershipIntentRequired",
+      "userSpeech": "这次操作没有说明要怎样调整片段成员。"
+    },
+    {
+      "code": "SPAN_COMPOSE_MODEL_REQUIRED",
+      "userSpeechKey": "creator.error.spanComposeModelRequired",
+      "userSpeech": "合成这个视频片段需要先选好文本模型。请在设置里选择后再试。"
+    },
+    {
+      "code": "CONTENT_RUN_ASYNC_SPAWN_FAILED",
+      "userSpeechKey": "creator.error.contentRunAsyncSpawnFailed",
+      "userSpeech": "内容生产任务没能启动。请稍后再试。"
+    },
+    {
+      "code": "RESOURCE_SEARCH_KIND_UNKNOWN",
+      "userSpeechKey": "creator.error.resourceSearchKindUnknown",
+      "userSpeech": "搜索的对象类型无法识别，没有返回结果。"
+    },
+    {
+      "code": "RESOURCE_SEARCH_KIND_UNSUPPORTED",
+      "userSpeechKey": "creator.error.resourceSearchKindUnsupported",
+      "userSpeech": "这种对象暂时不能按名称搜索。"
+    },
+    {
+      "code": "RESOURCE_SEARCH_FAILED",
+      "userSpeechKey": "creator.error.resourceSearchFailed",
+      "userSpeech": "搜索没有完成。请查看日志后重试。"
+    },
+    {
+      "code": "LOCAL_SOURCE_NOT_GRANTED",
+      "userSpeechKey": "creator.error.localSourceNotGranted",
+      "userSpeech": "这个文件夹还没有授权。请先在设置里为智能体授权该目录。"
+    },
+    {
+      "code": "LOCAL_SOURCE_REVOKED",
+      "userSpeechKey": "creator.error.localSourceRevoked",
+      "userSpeech": "这个文件夹的授权已被撤销。需要时请重新授权。"
+    },
+    {
+      "code": "LOCAL_SOURCE_PRINCIPAL_MISMATCH",
+      "userSpeechKey": "creator.error.localSourcePrincipalMismatch",
+      "userSpeech": "这个授权没有共享给当前的智能体连接，或当前连接无法确认身份。请在设置里检查授权范围。"
+    },
+    {
+      "code": "LOCAL_SOURCE_ROOT_CHANGED",
+      "userSpeechKey": "creator.error.localSourceRootChanged",
+      "userSpeech": "授权的文件夹位置已经变化或无法访问，请重新授权。"
+    },
+    {
+      "code": "LOCAL_SOURCE_PATH_DENIED",
+      "userSpeechKey": "creator.error.localSourcePathDenied",
+      "userSpeech": "这个路径不在授权范围内，或经过了快捷方式/链接，已被拒绝。"
+    },
+    {
+      "code": "LOCAL_SOURCE_UNSUPPORTED_FORMAT",
+      "userSpeechKey": "creator.error.localSourceUnsupportedFormat",
+      "userSpeech": "暂不支持读取这种格式的文件（例如 PDF、旧版 doc），请转成 txt、md 或 docx 后再试。"
+    },
+    {
+      "code": "LOCAL_SOURCE_UNSUPPORTED_ENCODING",
+      "userSpeechKey": "creator.error.localSourceUnsupportedEncoding",
+      "userSpeech": "无法识别这个文件的文字编码（JSON、YAML 需要 UTF-8）。"
+    },
+    {
+      "code": "LOCAL_SOURCE_BUDGET_EXCEEDED",
+      "userSpeechKey": "creator.error.localSourceBudgetExceeded",
+      "userSpeech": "文件、目录或数量超过了单次读取的上限，请缩小范围后分页读取。"
+    },
+    {
+      "code": "LOCAL_SOURCE_SNAPSHOT_EXPIRED",
+      "userSpeechKey": "creator.error.localSourceSnapshotExpired",
+      "userSpeech": "目录快照已过期或授权已变化，请重新列出目录。"
+    },
+    {
+      "code": "LOCAL_SOURCE_SOURCE_CHANGED",
+      "userSpeechKey": "creator.error.localSourceSourceChanged",
+      "userSpeech": "文件在读取期间或之后发生了变化，请重新列出目录后再读取。"
+    },
+    {
+      "code": "LOCAL_SOURCE_MODEL_READ_DENIED",
+      "userSpeechKey": "creator.error.localSourceModelReadDenied",
+      "userSpeech": "这个目录只允许在本机查看，没有允许智能体读取内容。如需让智能体读取，请在授权设置里开启。"
+    },
+    {
+      "code": "TURN_PHASE_MISMATCH",
+      "userSpeechKey": "creator.error.tURN_PHASE_MISMATCH",
+      "userSpeech": "当前阶段不能做这一步。"
+    },
+    {
+      "code": "STORYBOARD_HANDOFF_NOT_FOUND",
+      "userSpeechKey": "creator.error.storyboardHandoffNotFound",
+      "userSpeech": "没有找到这次分镜交接，请重新发起。"
+    },
+    {
+      "code": "STORYBOARD_HANDOFF_CLOSED",
+      "userSpeechKey": "creator.error.storyboardHandoffClosed",
+      "userSpeech": "这次分镜交接已经关闭，不能再继续。"
+    },
+    {
+      "code": "STORYBOARD_HANDOFF_NO_SHOTS",
+      "userSpeechKey": "creator.error.storyboardHandoffNoShots",
+      "userSpeech": "这个场次里还没有镜头，没有可交接的内容。"
+    },
+    {
+      "code": "STORYBOARD_HANDOFF_STRUCTURE_CHANGED",
+      "userSpeechKey": "creator.error.storyboardHandoffStructureChanged",
+      "userSpeech": "场次里的镜头已经增减或调换顺序，请重新发起交接。"
+    },
+    {
+      "code": "STORYBOARD_HANDOFF_CREATE_KEY_CONFLICT",
+      "userSpeechKey": "creator.error.storyboardHandoffCreateKeyConflict",
+      "userSpeech": "这个发起标记已被另一次不同的交接使用，请换一个。"
+    },
+    {
+      "code": "STORYBOARD_HANDOFF_SUBMIT_KEY_CONFLICT",
+      "userSpeechKey": "creator.error.storyboardHandoffSubmitKeyConflict",
+      "userSpeech": "这个提交标记已被另一份不同的内容使用，请换一个。"
+    },
+    {
+      "code": "STORYBOARD_HANDOFF_BASIS_STALE",
+      "userSpeechKey": "creator.error.storyboardHandoffBasisStale",
+      "userSpeech": "交接依据已经变化，请重新读取资料后再提交。"
+    },
+    {
+      "code": "STORYBOARD_HANDOFF_ID_MISMATCH",
+      "userSpeechKey": "creator.error.storyboardHandoffIdMismatch",
+      "userSpeech": "提交的镜头编号或交接编号和原来的不一致，没有接收。"
+    },
+    {
+      "code": "STORYBOARD_HANDOFF_SCOPE_INCOMPLETE",
+      "userSpeechKey": "creator.error.storyboardHandoffScopeIncomplete",
+      "userSpeech": "提交的镜头数量或范围与交接不符，没有接收。"
+    },
+    {
+      "code": "STORYBOARD_HANDOFF_CANDIDATE_NOT_FOUND",
+      "userSpeechKey": "creator.error.storyboardHandoffCandidateNotFound",
+      "userSpeech": "没有找到这份待导入内容。"
+    },
+    {
+      "code": "STORYBOARD_HANDOFF_CANDIDATE_NOT_COLLECTING",
+      "userSpeechKey": "creator.error.storyboardHandoffCandidateNotCollecting",
+      "userSpeech": "这份待导入内容已封存或已结束，不能再追加。"
+    },
+    {
+      "code": "STORYBOARD_HANDOFF_CANDIDATE_NOT_SEALED",
+      "userSpeechKey": "creator.error.storyboardHandoffCandidateNotSealed",
+      "userSpeech": "这份待导入内容还没封存，暂时不能预览或应用。"
+    },
+    {
+      "code": "STORYBOARD_HANDOFF_CANDIDATE_INCOMPLETE",
+      "userSpeechKey": "creator.error.storyboardHandoffCandidateIncomplete",
+      "userSpeech": "还有镜头或字段没提交完整，不能封存。"
+    },
+    {
+      "code": "STORYBOARD_HANDOFF_CANDIDATE_APPLIED",
+      "userSpeechKey": "creator.error.storyboardHandoffCandidateApplied",
+      "userSpeech": "这份待导入内容已经应用过了。"
+    },
+    {
+      "code": "STORYBOARD_HANDOFF_CHUNK_CONFLICT",
+      "userSpeechKey": "creator.error.storyboardHandoffChunkConflict",
+      "userSpeech": "同一批次标记提交了不同的内容，没有接收。"
+    },
+    {
+      "code": "STORYBOARD_HANDOFF_FIELD_ALREADY_COMPLETE",
+      "userSpeechKey": "creator.error.storyboardHandoffFieldAlreadyComplete",
+      "userSpeech": "这个字段已经提交完整，不能再追加。"
+    },
+    {
+      "code": "STORYBOARD_HANDOFF_FRAGMENT_GAP_OR_OVERLAP",
+      "userSpeechKey": "creator.error.storyboardHandoffFragmentGapOrOverlap",
+      "userSpeech": "分段提交的位置有缺口或重叠，没有接收。"
+    },
+    {
+      "code": "STORYBOARD_HANDOFF_PAGE_STALE",
+      "userSpeechKey": "creator.error.storyboardHandoffPageStale",
+      "userSpeech": "读取期间内容发生了变化，请从头重新读取。"
+    },
+    {
+      "code": "STORYBOARD_HANDOFF_PAGE_CURSOR_INVALID",
+      "userSpeechKey": "creator.error.storyboardHandoffPageCursorInvalid",
+      "userSpeech": "翻页标记无效或已过期，请重新读取。"
+    },
+    {
+      "code": "STORYBOARD_HANDOFF_PAGE_BUDGET_TOO_SMALL",
+      "userSpeechKey": "creator.error.storyboardHandoffPageBudgetTooSmall",
+      "userSpeech": "单页容量太小，放不下一个字符。"
+    },
+    {
+      "code": "STORYBOARD_HANDOFF_RESOURCE_NOT_FOUND",
+      "userSpeechKey": "creator.error.storyboardHandoffResourceNotFound",
+      "userSpeech": "没有找到要读取的资料，或它不属于这个故事。"
+    },
+    {
+      "code": "STORYBOARD_HANDOFF_HISTORY_MISMATCH",
+      "userSpeechKey": "creator.error.storyboardHandoffHistoryMismatch",
+      "userSpeech": "这条历史版本不属于指定的资料。"
+    },
+    {
+      "code": "STORYBOARD_HANDOFF_SCHEMA_OFFLINE_MIGRATION_REQUIRED",
+      "userSpeechKey": "creator.error.storyboardHandoffSchemaOfflineMigrationRequired",
+      "userSpeech": "本机数据库还没升级到支持分镜交接，请先运行离线升级。"
+    },
+    {
+      "code": "STORYBOARD_HANDOFF_INVALID_ARGUMENTS",
+      "userSpeechKey": "creator.error.storyboardHandoffInvalidArguments",
+      "userSpeech": "提交的参数不完整或格式不对，没有执行。"
+    },
+    {
+      "code": "STORYBOARD_HANDOFF_FAILED",
+      "userSpeechKey": "creator.error.storyboardHandoffFailed",
+      "userSpeech": "分镜交接没有完成，请稍后重试。"
+    },
+    {
+      "code": "ARTIFACT_NOT_FOUND",
+      "userSpeechKey": "creator.error.aRTIFACT_NOT_FOUND",
+      "userSpeech": "没有找到这张图片，没有继续。"
+    },
+    {
+      "code": "ARTIFACT_BUDGET_EXCEEDED",
+      "userSpeechKey": "creator.error.aRTIFACT_BUDGET_EXCEEDED",
+      "userSpeech": "图片太大或是空文件，没有接收。"
+    },
+    {
+      "code": "ARTIFACT_SOURCE_UNREADABLE",
+      "userSpeechKey": "creator.error.aRTIFACT_SOURCE_UNREADABLE",
+      "userSpeech": "读不到这张图片的原件，没有接收。"
+    },
+    {
+      "code": "ARTIFACT_PATH_REJECTED",
+      "userSpeechKey": "creator.error.aRTIFACT_PATH_REJECTED",
+      "userSpeech": "不能把本机绝对路径当成可读取的图片。"
+    },
+    {
+      "code": "ARTIFACT_HASH_MISMATCH",
+      "userSpeechKey": "creator.error.aRTIFACT_HASH_MISMATCH",
+      "userSpeech": "图片内容和校验不一致，没有接收。"
+    },
+    {
+      "code": "ARTIFACT_UPLOAD_INCOMPLETE",
+      "userSpeechKey": "creator.error.aRTIFACT_UPLOAD_INCOMPLETE",
+      "userSpeech": "图片还没传完，没有入库。"
+    },
+    {
+      "code": "ARTIFACT_INPUT_INVALID",
+      "userSpeechKey": "creator.error.aRTIFACT_INPUT_INVALID",
+      "userSpeech": "图片参数不符合约定，没有接收。"
+    },
+    {
+      "code": "ARTIFACT_CHUNK_BUDGET_EXCEEDED",
+      "userSpeechKey": "creator.error.artifactChunkBudgetExceeded",
+      "userSpeech": "这段上传内容超过单次允许大小，请缩小后重试。"
+    },
+    {
+      "code": "ARTIFACT_CHUNK_CONFLICT",
+      "userSpeechKey": "creator.error.artifactChunkConflict",
+      "userSpeech": "同一位置已经上传了不同内容，请重新开始上传。"
+    },
+    {
+      "code": "ARTIFACT_CHUNK_HASH_MISMATCH",
+      "userSpeechKey": "creator.error.artifactChunkHashMismatch",
+      "userSpeech": "这段上传内容的校验不一致，请重新上传这一段。"
+    },
+    {
+      "code": "ARTIFACT_CHUNK_OUT_OF_RANGE",
+      "userSpeechKey": "creator.error.artifactChunkOutOfRange",
+      "userSpeech": "这段上传内容超出了文件范围，请检查位置和大小。"
+    },
+    {
+      "code": "ARTIFACT_HASH_INVALID",
+      "userSpeechKey": "creator.error.artifactHashInvalid",
+      "userSpeech": "文件校验值格式不正确，请重新提交。"
+    },
+    {
+      "code": "ARTIFACT_STORE_FAILED",
+      "userSpeechKey": "creator.error.artifactStoreFailed",
+      "userSpeech": "保存图片时遇到问题，请稍后重试。"
+    },
+    {
+      "code": "ARTIFACT_UNREADABLE",
+      "userSpeechKey": "creator.error.artifactUnreadable",
+      "userSpeech": "无法读取这张图片，请确认文件完整后重试。"
+    },
+    {
+      "code": "ARTIFACT_UPLOAD_CONFLICT",
+      "userSpeechKey": "creator.error.artifactUploadConflict",
+      "userSpeech": "这次上传与已有记录不一致，请重新开始上传。"
+    },
+    {
+      "code": "ARTIFACT_UPLOAD_LEASE_EXPIRED",
+      "userSpeechKey": "creator.error.artifactUploadLeaseExpired",
+      "userSpeech": "这次上传已超时，请重新开始上传。"
+    },
+    {
+      "code": "ARTIFACT_UPLOAD_NOT_FOUND",
+      "userSpeechKey": "creator.error.artifactUploadNotFound",
+      "userSpeech": "没有找到这次上传，请重新开始上传。"
+    },
+    {
+      "code": "ARTIFACT_UPLOAD_NOT_OPEN",
+      "userSpeechKey": "creator.error.artifactUploadNotOpen",
+      "userSpeech": "这次上传已经结束，不能继续写入。"
+    },
+    {
+      "code": "IMAGE_ACTIVE_POLICY_UNSUPPORTED",
+      "userSpeechKey": "creator.error.imageActivePolicyUnsupported",
+      "userSpeech": "当前不支持这种主图选择方式，请改用已开放的方式。"
+    },
+    {
+      "code": "IMAGE_REF_INVALID",
+      "userSpeechKey": "creator.error.imageRefInvalid",
+      "userSpeech": "图片引用不正确，请重新选择图片。"
+    },
+    {
+      "code": "IMAGE_TARGET_INVALID",
+      "userSpeechKey": "creator.error.imageTargetInvalid",
+      "userSpeech": "图片目标不正确，请重新选择要写入的对象。"
+    },
+    {
+      "code": "IMAGE_VERSION_POLICY_UNSUPPORTED",
+      "userSpeechKey": "creator.error.imageVersionPolicyUnsupported",
+      "userSpeech": "当前不支持这种图片版本处理方式，请改用已开放的方式。"
+    },
+    {
+      "code": "IMAGE_NOT_ON_TARGET",
+      "userSpeechKey": "creator.error.iMAGE_NOT_ON_TARGET",
+      "userSpeech": "这张图不属于这个对象，没有设为默认图。"
+    },
+    {
+      "code": "IMAGE_TARGET_INCOMPATIBLE",
+      "userSpeechKey": "creator.error.iMAGE_TARGET_INCOMPATIBLE",
+      "userSpeech": "这个对象不能把图片当成主图。"
+    },
+    {
+      "code": "IMAGE_TARGET_NOT_FOUND",
+      "userSpeechKey": "creator.error.iMAGE_TARGET_NOT_FOUND",
+      "userSpeech": "没有找到要写入的对象。"
+    },
+    {
+      "code": "LOCAL_IMPORT_PROPOSAL_INVALID",
+      "userSpeechKey": "creator.error.localImportProposalInvalid",
+      "userSpeech": "导入方案不符合要求（引用了未读取的内容、重复或不存在的条目，或提示词方式与你的选择不一致），请重新生成方案。"
+    },
+    {
+      "code": "LOCAL_IMPORT_PROPOSAL_NOT_FOUND",
+      "userSpeechKey": "creator.error.localImportProposalNotFound",
+      "userSpeech": "找不到这个导入方案，或方案已过期，请重新生成。"
+    },
+    {
+      "code": "LOCAL_IMPORT_QUOTA_EXCEEDED",
+      "userSpeechKey": "creator.error.localImportQuotaExceeded",
+      "userSpeech": "待处理的导入方案过多，请先应用或等待旧方案过期。"
+    },
+    {
+      "code": "LOCAL_IMPORT_REVIEW_INVALID",
+      "userSpeechKey": "creator.error.localImportReviewInvalid",
+      "userSpeech": "方案的复核结果无效或存在必须修正的问题，需要修改方案后重新复核。"
+    },
+    {
+      "code": "LOCAL_IMPORT_FINGERPRINT_MISMATCH",
+      "userSpeechKey": "creator.error.localImportFingerprintMismatch",
+      "userSpeech": "方案在复核之后发生了变化，请基于最新方案重新复核。"
+    },
+    {
+      "code": "SEGMENT_LINK_SAME_NODE",
+      "userSpeechKey": "creator.error.segmentLinkSameNode",
+      "userSpeech": "不能把一个片段节点连到它自己，没有做任何修改。"
+    },
+    {
+      "code": "SEGMENT_LINK_REJECTED",
+      "userSpeechKey": "creator.error.segmentLinkRejected",
+      "userSpeech": "这两个节点之间的连线规则不允许，没有做任何修改。"
+    },
+    {
+      "code": "SEGMENT_LINK_NEED_FRAMEWORK",
+      "userSpeechKey": "creator.error.segmentLinkNeedFramework",
+      "userSpeech": "转场连线的两端必须是片段或分镜节点，没有做任何修改。"
+    },
+    {
+      "code": "SEGMENT_LINK_DUPLICATE",
+      "userSpeechKey": "creator.error.segmentLinkDuplicate",
+      "userSpeech": "这两个节点之间已经有同类连线，没有重复添加。"
+    },
+    {
+      "code": "SEGMENT_LINK_PORT_INVALID",
+      "userSpeechKey": "creator.error.segmentLinkPortInvalid",
+      "userSpeech": "目标端口不存在或不可用，没有做任何修改。"
+    },
+    {
+      "code": "SEGMENT_LINK_NODE_NOT_FOUND",
+      "userSpeechKey": "creator.error.segmentLinkNodeNotFound",
+      "userSpeech": "连线涉及的节点已经不存在，没有做任何修改。请重新查看画布。"
+    },
+    {
+      "code": "SEGMENT_LINK_SCOPE_MISMATCH",
+      "userSpeechKey": "creator.error.segmentLinkScopeMismatch",
+      "userSpeech": "连线的两端或这条边不在同一个场次画布内，不能跨场次连线，没有做任何修改。"
+    },
+    {
+      "code": "SEGMENT_LINK_EDGE_NOT_FOUND",
+      "userSpeechKey": "creator.error.segmentLinkEdgeNotFound",
+      "userSpeech": "要操作的这条连线已经不存在，没有做任何修改。请重新查看画布。"
+    },
+    {
+      "code": "SEGMENT_LINK_SCOPE_INVALID",
+      "userSpeechKey": "creator.error.segmentLinkScopeInvalid",
+      "userSpeech": "缺少故事或画布范围信息，没有做任何修改。"
+    },
+    {
+      "code": "SEGMENT_LINK_SCOPE_REQUIRED",
+      "userSpeechKey": "creator.error.segmentLinkScopeRequired",
+      "userSpeech": "缺少场次范围信息，没有做任何修改。"
+    },
+    {
+      "code": "SEGMENT_LINK_NODE_ID_REQUIRED",
+      "userSpeechKey": "creator.error.segmentLinkNodeIdRequired",
+      "userSpeech": "缺少连线两端的节点，没有做任何修改。"
+    },
+    {
+      "code": "SEGMENT_LINK_EDGE_ID_REQUIRED",
+      "userSpeechKey": "creator.error.segmentLinkEdgeIdRequired",
+      "userSpeech": "缺少要操作的连线，没有做任何修改。"
+    },
+    {
+      "code": "SEGMENT_LINK_SHOT_NUMBER_MISSING",
+      "userSpeechKey": "creator.error.segmentLinkShotNumberMissing",
+      "userSpeech": "这个分镜还没有镜号，不能作为转场连线的一端。请先在故事板里给它编号。"
+    },
+    {
+      "code": "SEGMENT_LINK_IMAGE_NO_HEAD",
+      "userSpeechKey": "creator.error.segmentLinkImageNoHead",
+      "userSpeech": "连线已经建立，但来源图片节点还没有可用的图片，参考图没有同步。"
+    },
+    {
+      "code": "SEGMENT_LINK_PAD_REF_UNRESOLVED",
+      "userSpeechKey": "creator.error.segmentLinkPadRefUnresolved",
+      "userSpeech": "连线已经建立，但没能找到对应的参考图，参考图没有同步。"
+    },
+    {
+      "code": "SEGMENT_LINK_PAD_SYNC_FAILED",
+      "userSpeechKey": "creator.error.segmentLinkPadSyncFailed",
+      "userSpeech": "连线已经建立，但参考图同步失败，请检查后手动补上。"
+    },
+    {
+      "code": "PRESENTER_REVISION_CONFLICT",
+      "userSpeechKey": "creator.error.presenterRevisionConflict",
+      "userSpeech": "这份偏好已经被更新，请重新读取后再保存。"
+    },
+    {
+      "code": "PRESENTER_PLAN_NOT_FOUND",
+      "userSpeechKey": "creator.error.presenterPlanNotFound",
+      "userSpeech": "还没有这份口播计划。请先准备方案。"
+    },
+    {
+      "code": "PRESENTER_PLANNING_MODEL_UNBOUND",
+      "userSpeechKey": "creator.error.presenterPlanningModelUnbound",
+      "userSpeech": "规划需要已选定的文本模型，当前还没有绑定，没有开始生成。"
+    },
+    {
+      "code": "PRESENTER_APPROVAL_REQUIRED",
+      "userSpeechKey": "creator.error.presenterApprovalRequired",
+      "userSpeech": "还没有批准这份计划，不能开始生成。"
+    },
+    {
+      "code": "PRESENTER_INPUT_INCOMPLETE",
+      "userSpeechKey": "creator.error.presenterInputIncomplete",
+      "userSpeech": "这次生成缺少项目、目标和已确认的参数，没有创建任务。"
+    },
+    {
+      "code": "PRESENTER_LOW_LEVEL_UNAVAILABLE",
+      "userSpeechKey": "creator.error.presenterLowLevelUnavailable",
+      "userSpeech": "自由画布生成还没有接到现有服务，没有创建任务。"
+    },
+    {
+      "code": "PRESENTER_PREFERENCE_SCOPE",
+      "userSpeechKey": "creator.error.presenterPreferenceScope",
+      "userSpeech": "偏好范围不完整，没有写入。"
+    },
+    {
+      "code": "PRESENTER_PREPARE_UNAUTHORIZED",
+      "userSpeechKey": "creator.error.presenterPrepareUnauthorized",
+      "userSpeech": "准备运行环境还没有单独授权，没有启动。"
+    },
+    {
+      "code": "PRESENTER_SCHEMA_UNAVAILABLE",
+      "userSpeechKey": "creator.error.presenterSchemaUnavailable",
+      "userSpeech": "偏好存储暂时不可用，没有写入。"
+    },
+    {
+      "code": "IMAGE_METADATA_NOT_OF_ARTIFACT",
+      "userSpeechKey": "creator.error.imageMetadataNotOfArtifact",
+      "userSpeech": "这份图片说明不属于要导入的这张图，没有写入。请重新读取这张图后再试。"
+    },
+    {
+      "code": "IMAGE_TARGET_FIELD_UNSUPPORTED",
+      "userSpeechKey": "creator.error.imageTargetFieldUnsupported",
+      "userSpeech": "这里只能把图片存进目标的图片版本里，不能写到别的位置，没有写入。"
+    },
+    {
+      "code": "IMAGE_RESOURCE_REVISION_INVALID",
+      "userSpeechKey": "creator.error.imageResourceRevisionInvalid",
+      "userSpeech": "目标图片的版本标记无效，没有写入。请重新读取目标后再试。"
+    },
+    {
+      "code": "DEFAULT_POINTER_UNREADABLE",
+      "userSpeechKey": "creator.error.defaultPointerUnreadable",
+      "userSpeech": "默认图记录读不出来或已损坏，为了不覆盖现有设置，这次没有写入。"
+    },
+    {
+      "code": "PLAN_INTENT_SUPERSEDED",
+      "userSpeechKey": "creator.error.planIntentSuperseded",
+      "userSpeech": "你已经修改了这项任务的要求，之前准备的改动不再执行，会按新要求重新准备。"
+    },
+    {
+      "code": "IMAGE_DELIVERY_FILE_PERSIST_FAILED",
+      "userSpeechKey": "creator.error.imageDeliveryFilePersistFailed",
+      "userSpeech": "图片文件没能保存到本地，这次导入没有完整完成。请检查磁盘空间或权限后重试。"
+    },
+    {
+      "code": "CONVERSATION_MATERIALS_STALE",
+      "userSpeechKey": "creator.error.conversationMaterialsStale",
+      "userSpeech": "对话内容在你判断归属后又有了变化，这次判断没有记录。请按最新的对话材料重新判断。"
+    },
+    {
+      "code": "MODEL_OUTPUT_SHAPE_REJECTED",
+      "userSpeechKey": "creator.error.modelOutputShapeRejected",
+      "userSpeech": "这次工具参数不符合约定，相关调用还没有执行。已有内容保持不变；可以直接重试或换一种说法。"
+    },
+    {
+      "code": "MODEL_PROTOCOL_INVALID",
+      "userSpeechKey": "creator.error.modelProtocolInvalid",
+      "userSpeech": "模型服务返回的内容不符合接口约定，这一步还没有开始。可以稍后重试。"
+    },
+    {
+      "code": "MODEL_TRANSPORT_FAILED",
+      "userSpeechKey": "creator.error.modelTransportFailed",
+      "userSpeech": "连接模型服务失败（网络、超时或限流），这一步还没有开始。可以稍后重试。"
+    },
+    {
+      "code": "MODEL_CALL_AUDIT_FAILED",
+      "userSpeechKey": "creator.error.modelCallAuditFailed",
+      "userSpeech": "模型调用记录没能保存，为了不丢失证据，这一步没有继续。请稍后重试；若一直失败请查看日志。"
+    },
+    {
+      "code": "REPLY_REQUIRED",
+      "userSpeechKey": "creator.error.replyRequired",
+      "userSpeech": "这次请求还没有给出说明，助手会先提交说明再结束。"
+    },
+    {
+      "code": "CREATOR_CONTRACT_INVALID",
+      "userSpeechKey": "creator.error.contractInvalid",
+      "userSpeech": "创作合同校验未通过，暂时无法使用创作工具。请更新到最新版本或重新安装后重启比格熊。"
+    },
+    {
+      "code": "CREATOR_STORAGE_UPGRADE_REQUIRED",
+      "userSpeechKey": "creator.error.storageUpgradeRequired",
+      "userSpeech": "数据升级还没完成，暂时不能继续。请先完成数据升级，然后再试。",
+      "userSpeechLocales": {
+        "zh-CN": "数据升级还没完成，暂时不能继续。请先完成数据升级，然后再试。",
+        "en": "The data upgrade is not finished, so this cannot continue. Finish the data upgrade, then try again."
+      }
+    },
+    {
+      "code": "CREATOR_MEDIA_GENERATION_DEFERRED",
+      "userSpeechKey": "creator.error.mediaGenerationDeferred",
+      "userSpeech": "当前聊天未开放直接的原始生图/生视频提交，这次没有提交该类任务。若工作台已保存模型与参数，可通过已注册的按记忆配置提交入口或界面工作台操作；这不是“全部生成能力都禁用”。",
+      "userSpeechLocales": {
+        "zh-CN": "当前聊天未开放直接的原始生图/生视频提交，这次没有提交该类任务。若工作台已保存模型与参数，可通过已注册的按记忆配置提交入口或界面工作台操作；这不是“全部生成能力都禁用”。",
+        "en": "Raw direct image/video submit is not open in this chat, and nothing was submitted on that path. When the workbench already has saved model/settings, use the registered remembered-config submit tools or the UI workbench. This is not a blanket 'all generation disabled'."
+      }
+    },
+    {
+      "code": "RUNTIME_INTAKE_INVALID_INPUT",
+      "userSpeechKey": "creator.error.runtimeIntakeInvalidInput",
+      "userSpeech": "运行时交付的参数不符合约定，已拒绝。请按工具说明补齐后再试。"
+    },
+    {
+      "code": "RUNTIME_INTAKE_CONTRACT_VIOLATION",
+      "userSpeechKey": "creator.error.runtimeIntakeContractViolation",
+      "userSpeech": "程序内部的运行时约定校验没有通过，这次结果不能当作成功。请把错误详情反馈给我们。"
+    },
+    {
+      "code": "RUNTIME_INTAKE_STALE_REVISION",
+      "userSpeechKey": "creator.error.runtimeIntakeStaleRevision",
+      "userSpeech": "你手里的状态已经过期，请重新读取清单或回执后再试。"
+    },
+    {
+      "code": "RUNTIME_INTAKE_NOT_FOUND",
+      "userSpeechKey": "creator.error.runtimeIntakeNotFound",
+      "userSpeech": "找不到这张票据或这条回执，请重新读取后再试。"
+    },
+    {
+      "code": "RUNTIME_INTAKE_IO",
+      "userSpeechKey": "creator.error.runtimeIntakeIo",
+      "userSpeech": "读写本机运行时目录或查看本地服务时出错，这一步没有完成。"
+    },
+    {
+      "code": "AGENT_SKILL_NO_CHANGES",
+      "userSpeechKey": "creator.error.agentSkillNoChanges",
+      "userSpeech": "这次没有任何改动，技能保持原样。"
+    },
+    {
+      "code": "AGENT_SKILL_VERSION_DUPLICATE",
+      "userSpeechKey": "creator.error.agentSkillVersionDuplicate",
+      "userSpeech": "这个技能版本号已经存在，请换一个更高的版本号。"
+    },
+    {
+      "code": "AGENT_SKILL_VERSION_INVALID",
+      "userSpeechKey": "creator.error.agentSkillVersionInvalid",
+      "userSpeech": "技能版本号格式不对，没有保存。"
+    },
+    {
+      "code": "AGENT_SKILL_VERSION_MANUAL_REQUIRED",
+      "userSpeechKey": "creator.error.agentSkillVersionManualRequired",
+      "userSpeech": "这个技能需要你手动填写新版本号后再保存。"
+    },
+    {
+      "code": "AGENT_SKILL_VERSION_METADATA_NOT_EDITABLE",
+      "userSpeechKey": "creator.error.agentSkillVersionMetadataNotEditable",
+      "userSpeech": "这个技能的版本信息不能在这里修改。"
+    },
+    {
+      "code": "AGENT_SKILL_VERSION_NOT_INCREASED",
+      "userSpeechKey": "creator.error.agentSkillVersionNotIncreased",
+      "userSpeech": "新版本号必须比当前版本高，没有保存。"
+    },
+    {
+      "code": "CLAIM_IN_FLIGHT",
+      "userSpeechKey": "creator.error.claimInFlight",
+      "userSpeech": "同一处修改正在进行中，这次没有重复执行，请稍后再试。"
+    },
+    {
+      "code": "CONTEXT_EMPTY",
+      "userSpeechKey": "creator.error.contextEmpty",
+      "userSpeech": "当前没有可读取的界面内容。"
+    },
+    {
+      "code": "CONTEXT_PUBLISH_EPOCH_REASSIGNED",
+      "userSpeechKey": "creator.error.contextPublishEpochReassigned",
+      "userSpeech": "窗口状态已被重新分配，这次更新没有采用。"
+    },
+    {
+      "code": "CONTEXT_PUBLISH_IMPERSONATION",
+      "userSpeechKey": "creator.error.contextPublishImpersonation",
+      "userSpeech": "这次界面状态来自不匹配的窗口，已拒绝。"
+    },
+    {
+      "code": "CONTEXT_PUBLISH_INVALID",
+      "userSpeechKey": "creator.error.contextPublishInvalid",
+      "userSpeech": "界面状态格式不对，没有采用。"
+    },
+    {
+      "code": "CONTEXT_PUBLISH_ORIGIN",
+      "userSpeechKey": "creator.error.contextPublishOrigin",
+      "userSpeech": "界面状态的来源不被允许，没有采用。"
+    },
+    {
+      "code": "CONTEXT_PUBLISH_STALE_EPOCH",
+      "userSpeechKey": "creator.error.contextPublishStaleEpoch",
+      "userSpeech": "界面状态已过期，没有采用。"
+    },
+    {
+      "code": "CONTEXT_PUBLISH_STALE_SEQ",
+      "userSpeechKey": "creator.error.contextPublishStaleSeq",
+      "userSpeech": "收到的界面状态比当前的旧，没有采用。"
+    },
+    {
+      "code": "GENERATION_NEEDS_STORY",
+      "userSpeechKey": "creator.error.generationNeedsStory",
+      "userSpeech": "这次生成需要先选定一个故事。"
+    },
+    {
+      "code": "MEDIA_FILE_MISSING",
+      "userSpeechKey": "creator.error.mediaFileMissing",
+      "userSpeech": "找不到对应的媒体文件，没有执行。"
+    },
+    {
+      "code": "MEDIA_IMPORT_CANCELLED",
+      "userSpeechKey": "creator.error.mediaImportCancelled",
+      "userSpeech": "媒体导入已取消，没有做任何修改。"
+    },
+    {
+      "code": "MEDIA_IMPORT_PROJECT_MISMATCH",
+      "userSpeechKey": "creator.error.mediaImportProjectMismatch",
+      "userSpeech": "这个媒体属于另一个项目，没有导入。"
+    },
+    {
+      "code": "MEDIA_TARGET_INCOMPATIBLE",
+      "userSpeechKey": "creator.error.mediaTargetIncompatible",
+      "userSpeech": "这个媒体不能用在所选位置，没有执行。"
+    },
+    {
+      "code": "MEDIA_VERSION_STALE",
+      "userSpeechKey": "creator.error.mediaVersionStale",
+      "userSpeech": "媒体版本已经变化，请刷新后再试。"
+    },
+    {
+      "code": "MODEL_EVIDENCE_PERSIST_FAILED",
+      "userSpeechKey": "creator.error.modelEvidencePersistFailed",
+      "userSpeech": "模型调用记录没能保存，这一步没有完成。"
+    },
+    {
+      "code": "SURFACE_WINDOW_MISMATCH",
+      "userSpeechKey": "creator.error.surfaceWindowMismatch",
+      "userSpeech": "操作针对的窗口与当前窗口不一致，没有执行。"
+    },
+    {
+      "code": "TTS_BINDING_MISSING",
+      "userSpeechKey": "creator.error.ttsBindingMissing",
+      "userSpeech": "还没有为配音选择可用的语音服务。"
+    },
+    {
+      "code": "TTS_ENGINE_MISMATCH",
+      "userSpeechKey": "creator.error.ttsEngineMismatch",
+      "userSpeech": "所选语音与当前配音引擎不匹配，没有执行。"
+    },
+    {
+      "code": "TTS_ENGINE_TYPE_MISSING",
+      "userSpeechKey": "creator.error.ttsEngineTypeMissing",
+      "userSpeech": "配音引擎类型缺失，没有执行。"
+    },
+    {
+      "code": "TTS_NOT_LOCAL",
+      "userSpeechKey": "creator.error.ttsNotLocal",
+      "userSpeech": "这个配音需要本机语音引擎，当前选择的不是本地引擎。"
+    },
+    {
+      "code": "TTS_PROVIDER_UNKNOWN",
+      "userSpeechKey": "creator.error.ttsProviderUnknown",
+      "userSpeech": "不认识这个配音服务，没有执行。"
+    },
+    {
+      "code": "TEXT_ORGANIZE_SURFACE_UNAVAILABLE",
+      "userSpeechKey": "creator.error.textOrganizeSurfaceUnavailable",
+      "userSpeech": "当前窗口没有可整理的文本区。",
+      "userSpeechLocales": {
+        "zh-CN": "当前窗口没有可整理的文本区。",
+        "en": "No text surface is available to organize here."
+      }
+    },
+    {
+      "code": "TEXT_ORGANIZE_TASK_START_FAILED",
+      "userSpeechKey": "creator.error.textOrganizeTaskStartFailed",
+      "userSpeech": "整理任务没能启动，请稍后重试。",
+      "userSpeechLocales": {
+        "zh-CN": "整理任务没能启动，请稍后重试。",
+        "en": "The organize task could not start. Please try again."
+      }
+    },
+    {
+      "code": "TEXT_ORGANIZE_CANDIDATE_NOT_FOUND",
+      "userSpeechKey": "creator.error.textOrganizeCandidateNotFound",
+      "userSpeech": "找不到这份整理候选。",
+      "userSpeechLocales": {
+        "zh-CN": "找不到这份整理候选。",
+        "en": "That organize candidate was not found."
+      }
+    },
+    {
+      "code": "TEXT_ORGANIZE_FEATURE_DISABLED",
+      "userSpeechKey": "creator.error.textOrganizeFeatureDisabled",
+      "userSpeech": "整理文本功能未开启。",
+      "userSpeechLocales": {
+        "zh-CN": "整理文本功能未开启。",
+        "en": "Text organizing is turned off."
+      }
+    },
+    {
+      "code": "TEXT_ORGANIZE_NO_MODEL",
+      "userSpeechKey": "creator.error.textOrganizeNoModel",
+      "userSpeech": "没有可用的文本模型，请先在设置里配置。",
+      "userSpeechLocales": {
+        "zh-CN": "没有可用的文本模型，请先在设置里配置。",
+        "en": "No text model is available. Set one up in Settings first."
+      }
+    },
+    {
+      "code": "TEXT_ORGANIZE_CONTEXT_OVERFLOW",
+      "userSpeechKey": "creator.error.textOrganizeContextOverflow",
+      "userSpeech": "整理要求太长，当前模型放不下。",
+      "userSpeechLocales": {
+        "zh-CN": "整理要求太长，当前模型放不下。",
+        "en": "The instructions are too long for the current model."
+      }
+    },
+    {
+      "code": "TEXT_ORGANIZE_OUTPUT_TRUNCATED",
+      "userSpeechKey": "creator.error.textOrganizeOutputTruncated",
+      "userSpeech": "模型输出被截断，原文未改动。",
+      "userSpeechLocales": {
+        "zh-CN": "模型输出被截断，原文未改动。",
+        "en": "The model output was cut off. The original text was not changed."
+      }
+    },
+    {
+      "code": "TEXT_ORGANIZE_PROMPT_CONFIG_INVALID",
+      "userSpeechKey": "creator.error.textOrganizePromptConfigInvalid",
+      "userSpeech": "整理规则无法加载，请检查内部提示词配置；原文未改动。",
+      "userSpeechLocales": {
+        "zh-CN": "整理规则无法加载，请检查内部提示词配置；原文未改动。",
+        "en": "The organizing rules could not be loaded. Check internal prompt configuration; the original text was not changed."
+      }
+    },
+    {
+      "code": "TEXT_ORGANIZE_OUTPUT_SCHEMA_INVALID",
+      "userSpeechKey": "creator.error.textOrganizeOutputSchemaInvalid",
+      "userSpeech": "模型输出格式不合格，原文未改动。",
+      "userSpeechLocales": {
+        "zh-CN": "模型输出格式不合格，原文未改动。",
+        "en": "The model output was not in the expected format. The original text was not changed."
+      }
+    },
+    {
+      "code": "TEXT_ORGANIZE_UNKNOWN_ID",
+      "userSpeechKey": "creator.error.textOrganizeUnknownId",
+      "userSpeech": "模型引用了不存在的原文片段，原文未改动。",
+      "userSpeechLocales": {
+        "zh-CN": "模型引用了不存在的原文片段，原文未改动。",
+        "en": "The model referred to text that does not exist. The original text was not changed."
+      }
+    },
+    {
+      "code": "TEXT_ORGANIZE_REVIEW_BLOCKING",
+      "userSpeechKey": "creator.error.textOrganizeReviewBlocking",
+      "userSpeech": "整理没有成功，原文未改动。",
+      "userSpeechLocales": {
+        "zh-CN": "整理没有成功，原文未改动。",
+        "en": "Tidy didn't succeed; your original text is unchanged."
+      }
+    },
+    {
+      "code": "TEXT_ORGANIZE_VENDOR_FAILED",
+      "userSpeechKey": "creator.error.textOrganizeVendorFailed",
+      "userSpeech": "模型服务调用失败。",
+      "userSpeechLocales": {
+        "zh-CN": "模型服务调用失败。",
+        "en": "The model service call failed."
+      }
+    },
+    {
+      "code": "TEXT_ORGANIZE_AUTH_FAILED",
+      "userSpeechKey": "creator.error.textOrganizeAuthFailed",
+      "userSpeech": "模型鉴权或权限失败，无法继续未获授权的请求；已生成内容已保留（若有）。",
+      "userSpeechLocales": {
+        "zh-CN": "模型鉴权或权限失败，无法继续未获授权的请求；已生成内容已保留（若有）。",
+        "en": "Model auth or permission failed; unauthorized requests will not continue. Any generated text is retained."
+      }
+    },
+    {
+      "code": "TEXT_ORGANIZE_TASK_WRITE_FAILED",
+      "userSpeechKey": "creator.error.textOrganizeTaskWriteFailed",
+      "userSpeech": "任务或证据写入失败，原文未改动。",
+      "userSpeechLocales": {
+        "zh-CN": "任务或证据写入失败，原文未改动。",
+        "en": "Task or evidence could not be written; the original text was not changed."
+      }
+    },
+    {
+      "code": "TEXT_ORGANIZE_CANCELLED",
+      "userSpeechKey": "creator.error.textOrganizeCancelled",
+      "userSpeech": "已取消，原文未改动。",
+      "userSpeechLocales": {
+        "zh-CN": "已取消，原文未改动。",
+        "en": "Cancelled. The original text was not changed."
+      }
+    },
+    {
+      "code": "TEXT_ORGANIZE_SURFACE_BUSY",
+      "userSpeechKey": "creator.error.textOrganizeSurfaceBusy",
+      "userSpeech": "文本正被其它操作占用。",
+      "userSpeechLocales": {
+        "zh-CN": "文本正被其它操作占用。",
+        "en": "The text is in use by another operation."
+      }
+    },
+    {
+      "code": "TEXT_ORGANIZE_SURFACE_CONFLICT",
+      "userSpeechKey": "creator.error.textOrganizeSurfaceConflict",
+      "userSpeech": "文本已被修改，请重试。",
+      "userSpeechLocales": {
+        "zh-CN": "文本已被修改，请重试。",
+        "en": "The text has changed. Please try again."
+      }
+    },
+    {
+      "code": "TEXT_ORGANIZE_EMPTY_SOURCE",
+      "userSpeechKey": "creator.error.textOrganizeEmptySource",
+      "userSpeech": "没有可整理的文字。",
+      "userSpeechLocales": {
+        "zh-CN": "没有可整理的文字。",
+        "en": "There is no text to organize."
+      }
+    },
+    {
+      "code": "CURSOR_INVALID",
+      "userSpeechKey": "creator.error.cursor_invalid",
+      "userSpeech": "分页位置无效，请重新读取。"
+    },
+    {
+      "code": "TOOL_DESCRIPTOR_TOO_LARGE",
+      "userSpeechKey": "creator.error.tool_descriptor_too_large",
+      "userSpeech": "这项工具说明超出单页容量，请联系开发者。"
+    },
+    {
+      "code": "TOOL_CONTEXT_BUDGET_EXCEEDED",
+      "userSpeechKey": "creator.error.tool_context_budget_exceeded",
+      "userSpeech": "当前所需工具超出上下文容量，请缩小本次任务范围。"
+    },
+    {
+      "code": "TOOL_RULE_TOO_LARGE",
+      "userSpeechKey": "creator.error.toolRuleTooLarge",
+      "userSpeech": "这条规则超出单页容量，请联系开发者。"
+    },
+    {
+      "code": "REVISION_DOMAIN_MISMATCH",
+      "userSpeechKey": "creator.error.revisionDomainMismatch",
+      "userSpeech": "这次修改使用了其他对象的版本信息，尚未保存。请重新读取目标内容后再修改。"
+    },
+    {
+      "code": "EDIT_SOURCE_INVALID",
+      "userSpeechKey": "creator.error.editSourceInvalid",
+      "userSpeech": "编辑来源已失效，请重新读取原字段后继续。"
+    },
+    {
+      "code": "EDIT_FIELD_UNSUPPORTED",
+      "userSpeechKey": "creator.error.editFieldUnsupported",
+      "userSpeech": "这个字段暂不支持所选的编辑或保存方式。"
+    },
+    {
+      "code": "EDIT_SOURCE_TOO_LARGE",
+      "userSpeechKey": "creator.error.editSourceTooLarge",
+      "userSpeech": "本次内容超过调用或分页的载荷上限，请缩小本次编辑范围；原文未被截断。"
+    },
+    {
+      "code": "EDIT_CANDIDATE_UNAVAILABLE",
+      "userSpeechKey": "creator.error.editCandidateUnavailable",
+      "userSpeech": "候选稿未能保存，原字段没有改动。请稍后重试。"
+    },
+    {
+      "code": "EDIT_CANDIDATE_PRESERVED",
+      "userSpeechKey": "creator.error.editCandidatePreserved",
+      "userSpeech": "The candidate is preserved; the original field has not been changed."
+    },
+    {
+      "code": "REQUEST_CANCELLED",
+      "userSpeechKey": "creator.error.requestCancelled",
+      "userSpeech": "The request was stopped. Saved results are retained."
+    },
+    {
+      "code": "SC_SOURCE_CONFLICT",
+      "userSpeechKey": "creator.error.scSourceConflict",
+      "userSpeech": "这份内容在你读取之后已被修改，这次没有覆盖。请重新读取最新内容后再操作。"
+    },
+    {
+      "code": "SC_TARGET_CONFLICT",
+      "userSpeechKey": "creator.error.scTargetConflict",
+      "userSpeech": "要写入的位置在这段时间里被改动过，这次没有保存。请重新选择范围后再生成。"
+    },
+    {
+      "code": "SC_REGISTRY_CONFLICT",
+      "userSpeechKey": "creator.error.scRegistryConflict",
+      "userSpeech": "本故事的角色或道具名单在这期间有变化，这次没有套用。请重新读取名单后再整合。"
+    },
+    {
+      "code": "SC_SCOPE_BUSY",
+      "userSpeechKey": "creator.error.scScopeBusy",
+      "userSpeech": "这个范围正在被另一个任务处理，请等它结束或取消后再试。"
+    },
+    {
+      "code": "SC_REFERENCE_PROTECTED",
+      "userSpeechKey": "creator.error.scReferenceProtected",
+      "userSpeech": "还有图片、历史或其他引用在使用这个对象，为避免丢失，这次没有改动。"
+    },
+    {
+      "code": "SC_INPUT_TOO_LARGE",
+      "userSpeechKey": "creator.error.scInputTooLarge",
+      "userSpeech": "要发给模型的内容超过所选模型能容纳的长度，这次没有发送，已保存的文字不受影响。请换一个容量更大的模型。"
+    },
+    {
+      "code": "SC_MODEL_UNAVAILABLE",
+      "userSpeechKey": "creator.error.scModelUnavailable",
+      "userSpeech": "所选模型暂时不可用，这次没有生成。请检查模型设置后再试。"
+    },
+    {
+      "code": "SC_SKILL_INCOMPATIBLE",
+      "userSpeechKey": "creator.error.scSkillIncompatible",
+      "userSpeech": "所选创作方法不适用于这一步，或已无法读取。请重新选择创作方法。"
+    },
+    {
+      "code": "SC_RESPONSE_JSON",
+      "userSpeechKey": "creator.error.scResponseJson",
+      "userSpeech": "模型返回的内容不是约定的 JSON，没有保存。可以重新生成。"
+    },
+    {
+      "code": "SC_RESPONSE_SCHEMA",
+      "userSpeechKey": "creator.error.scResponseSchema",
+      "userSpeech": "模型返回的内容不符合约定结构，没有保存。可以重新生成。"
+    },
+    {
+      "code": "SC_OUTPUT_TRUNCATED",
+      "userSpeechKey": "creator.error.scOutputTruncated",
+      "userSpeech": "模型的输出被截断了，没有保存。可以换容量更大的模型，或缩小范围后重试。"
+    },
+    {
+      "code": "SC_IDENTITY_REFERENCE",
+      "userSpeechKey": "creator.error.scIdentityReference",
+      "userSpeech": "启动占用、提交范围或对象身份校验未通过，本次没有保存。请检查选定范围后重试。"
+    },
+    {
+      "code": "SC_STORAGE_FAILED",
+      "userSpeechKey": "creator.error.scStorageFailed",
+      "userSpeech": "保存时本机数据库出错，这次没有保存。已保存的内容不受影响，请稍后重试。"
+    },
+    {
+      "code": "SC_CANCELLED",
+      "userSpeechKey": "creator.error.scCancelled",
+      "userSpeech": "这次任务已取消，已经保存的成果保留。"
+    },
+    {
+      "code": "SC_OUTCOME_UNKNOWN",
+      "userSpeechKey": "creator.error.scOutcomeUnknown",
+      "userSpeech": "请求已发出，但无法确认模型是否已经完成，没有自动重发。请在任务里明确选择重新提交。"
+    },
+    {
+      "code": "SC_PROTOCOL_RETIRED",
+      "userSpeechKey": "creator.error.scProtocolRetired",
+      "userSpeech": "旧的故事生成方式已经停用，请使用新的故事创作功能。"
+    },
+    {
+      "code": "SC_IDEMPOTENCY_CONFLICT",
+      "userSpeechKey": "creator.error.scIdempotencyConflict",
+      "userSpeech": "同一个操作键被用在了不同的内容上，这次没有执行。请作为新操作重试。"
+    },
+    {
+      "code": "SC_RUN_REVISION_STALE",
+      "userSpeechKey": "creator.error.scRunRevisionStale",
+      "userSpeech": "任务在你查看之后已经有了变化，这次没有继续。请刷新任务状态后再选择继续。"
+    },
+    {
+      "code": "ROLE_PROMPT_RECEIPT_INVALID",
+      "userSpeechKey": "creator.error.rolePromptReceiptInvalid",
+      "userSpeech": "角色提示词处理已返回，但结果确认失败。请刷新角色和任务列表查看已有成果。"
+    },
+    {
+      "code": "TASK_NOT_IN_REQUEST",
+      "userSpeechKey": "creator.error.taskNotInRequest",
+      "userSpeech": "该任务不属于这次请求，未执行操作；请用本次请求返回的任务编号。"
+    },
+    {
+      "code": "VIDEO_PROMPT_FAILED",
+      "userSpeechKey": "creator.error.videoPromptFailed",
+      "userSpeech": "视频提示词生成未完成，原因见任务说明；可修改后重新提交。"
+    },
+    {
+      "code": "INVALID_ARGS",
+      "userSpeechKey": "creator.error.invalidArgs",
+      "userSpeech": "这次提交的内容不完整或格式不对，请检查后重试。"
+    },
+    {
+      "code": "NOT_FOUND",
+      "userSpeechKey": "creator.error.notFound",
+      "userSpeech": "找不到要操作的对象，请刷新后重新选择。"
+    },
+    {
+      "code": "MOTION_TOOL_UNAVAILABLE",
+      "userSpeechKey": "creator.error.motionToolUnavailable",
+      "userSpeech": "动态模板服务暂不可用，请重新打开软件后再试。"
+    },
+    {
+      "code": "MOTION_READ_FAILED",
+      "userSpeechKey": "creator.error.motionReadFailed",
+      "userSpeech": "读取动态模板内容失败，请稍后重试。"
+    },
+    {
+      "code": "MOTION_WRITE_FAILED",
+      "userSpeechKey": "creator.error.motionWriteFailed",
+      "userSpeech": "动态模板修改未能保存，请重试。"
+    },
+    {
+      "code": "MOTION_IMPORT_FAILED",
+      "userSpeechKey": "creator.error.motionImportFailed",
+      "userSpeech": "动态模板导入失败，请选择有效的模板包。"
+    },
+    {
+      "code": "MOTION_ASSET_FAILED",
+      "userSpeechKey": "creator.error.motionAssetFailed",
+      "userSpeech": "动态模板素材处理失败，请检查素材文件。"
+    },
+    {
+      "code": "MOTION_TASK_JOIN",
+      "userSpeechKey": "creator.error.motionTaskJoin",
+      "userSpeech": "动态模板后台任务被中断，请重试。"
+    },
+    {
+      "code": "MOTION_AUTHOR_DEV_GUI",
+      "userSpeechKey": "creator.error.motionAuthorDevGui",
+      "userSpeech": "开发预览需要从桌面应用的作者工具中打开。"
+    },
+    {
+      "code": "MOTION_AUTHOR_DIR_REQUIRED",
+      "userSpeechKey": "creator.error.motionAuthorDirRequired",
+      "userSpeech": "请通过文件夹选择窗口指定作者工程目录。"
+    },
+    {
+      "code": "MOTION_AUTHOR_FAILED",
+      "userSpeechKey": "creator.error.motionAuthorFailed",
+      "userSpeech": "作者工具的运行环境尚未准备好，请先检查运行环境。"
+    },
+    {
+      "code": "MOTION_AUTHOR_SPAWN_FAILED",
+      "userSpeechKey": "creator.error.motionAuthorSpawnFailed",
+      "userSpeech": "作者工具未能启动，请检查运行环境后重试。"
+    },
+    {
+      "code": "MOTION_AUTHOR_EXIT_NONZERO",
+      "userSpeechKey": "creator.error.motionAuthorExitNonzero",
+      "userSpeech": "作者工具执行失败，请查看输出日志后重试。"
+    },
+    {
+      "code": "MOTION_AUTHOR_NO_EXIT_CODE",
+      "userSpeechKey": "creator.error.motionAuthorNoExitCode",
+      "userSpeech": "作者工具被中断，未能确认执行结果，请查看输出日志。"
+    },
+    {
+      "code": "MOTION_DESIGN_INVALID",
+      "userSpeechKey": "creator.error.motionDesignInvalid",
+      "userSpeech": "设计参数不符合模板要求，请修改后重试。"
+    },
+    {
+      "code": "MOTION_DESIGN_FAILED",
+      "userSpeechKey": "creator.error.motionDesignFailed",
+      "userSpeech": "自动设计未能准备好，请检查设置后重试。"
+    },
+    {
+      "code": "MOTION_DESIGN_MODEL_REQUIRED",
+      "userSpeechKey": "creator.error.motionDesignModelRequired",
+      "userSpeech": "自动设计需要可用的文本模型，请先在设置中完成配置。"
+    },
+    {
+      "code": "MOTION_DESIGN_NO_TEMPLATES",
+      "userSpeechKey": "creator.error.motionDesignNoTemplates",
+      "userSpeech": "没有已安装且与运行环境兼容的模板，请先安装可用模板。"
+    },
+    {
+      "code": "MOTION_RENDER_ALREADY_TERMINAL",
+      "userSpeechKey": "creator.error.motionRenderAlreadyTerminal",
+      "userSpeech": "这个渲染任务已经结束，无需再次取消。"
+    },
+    {
+      "code": "MOTION_DELIVERY_FAILED",
+      "userSpeechKey": "creator.error.motionDeliveryFailed",
+      "userSpeech": "动态模板成果未能全部送达，请查看任务详情。"
+    },
+    {
+      "code": "MOTION_PACKAGE_INVALID",
+      "userSpeechKey": "creator.error.motionPackageInvalid",
+      "userSpeech": "模板包格式不正确，请选择有效的模板包。"
+    },
+    {
+      "code": "MOTION_PACKAGE_VERSION_CONFLICT",
+      "userSpeechKey": "creator.error.motionPackageVersionConflict",
+      "userSpeech": "这个版本已安装了不同内容的模板包，请更换版本。"
+    },
+    {
+      "code": "MOTION_PACKAGE_BUDGET_EXCEEDED",
+      "userSpeechKey": "creator.error.motionPackageBudgetExceeded",
+      "userSpeech": "模板包超过大小或文件数量限制，请缩小后重试。"
+    },
+    {
+      "code": "MOTION_FEATURE_UNSUPPORTED",
+      "userSpeechKey": "creator.error.motionFeatureUnsupported",
+      "userSpeech": "当前运行环境不支持这个模板所需的功能。"
+    },
+    {
+      "code": "MOTION_PROPS_INVALID",
+      "userSpeechKey": "creator.error.motionPropsInvalid",
+      "userSpeech": "卡片内容不符合模板要求，请修改后重试。"
+    },
+    {
+      "code": "MOTION_SCENE_INVALID",
+      "userSpeechKey": "creator.error.motionSceneInvalid",
+      "userSpeech": "卡片设置不完整，没有提交渲染，请检查后重试。"
+    },
+    {
+      "code": "MOTION_SCENE_REVISION_CONFLICT",
+      "userSpeechKey": "creator.error.motionSceneRevisionConflict",
+      "userSpeech": "这张卡片已经变化，请刷新后重新提交。"
+    },
+    {
+      "code": "MOTION_TIMING_OUT_OF_RANGE",
+      "userSpeechKey": "creator.error.motionTimingOutOfRange",
+      "userSpeech": "卡片时间超出允许范围或不足一帧，请调整时间。"
+    },
+    {
+      "code": "MOTION_ASSET_MISSING",
+      "userSpeechKey": "creator.error.motionAssetMissing",
+      "userSpeech": "找不到模板所需的素材，请重新选择素材文件。"
+    },
+    {
+      "code": "MOTION_ASSET_HASH_MISMATCH",
+      "userSpeechKey": "creator.error.motionAssetHashMismatch",
+      "userSpeech": "素材文件与保存时不一致，请重新确认素材。"
+    },
+    {
+      "code": "MOTION_FONT_MISSING",
+      "userSpeechKey": "creator.error.motionFontMissing",
+      "userSpeech": "缺少模板所需的字体，请先安装对应字体。"
+    },
+    {
+      "code": "MOTION_PREVIEW_STALE",
+      "userSpeechKey": "creator.error.motionPreviewStale",
+      "userSpeech": "预览画面已过期，请刷新预览后继续。"
+    },
+    {
+      "code": "MOTION_RUNTIME_NOT_READY",
+      "userSpeechKey": "creator.error.motionRuntimeNotReady",
+      "userSpeech": "动态模板运行环境还没准备好，请先完成安装。"
+    },
+    {
+      "code": "MOTION_PROTOCOL_MISMATCH",
+      "userSpeechKey": "creator.error.motionProtocolMismatch",
+      "userSpeech": "渲染环境与主程序版本不匹配，请更新运行环境。"
+    },
+    {
+      "code": "MOTION_WORKER_CRASHED",
+      "userSpeechKey": "creator.error.motionWorkerCrashed",
+      "userSpeech": "渲染进程意外退出，未完成的任务可以重试。"
+    },
+    {
+      "code": "MOTION_RENDER_FAILED",
+      "userSpeechKey": "creator.error.motionRenderFailed",
+      "userSpeech": "渲染失败，请查看任务详情后重试。"
+    },
+    {
+      "code": "MOTION_READINESS_TIMEOUT",
+      "userSpeechKey": "creator.error.motionReadinessTimeout",
+      "userSpeech": "渲染环境未能及时响应，请稍后重试。"
+    },
+    {
+      "code": "MOTION_CANCELLED",
+      "userSpeechKey": "creator.error.motionCancelled",
+      "userSpeech": "这次动态模板任务已取消。"
+    },
+    {
+      "code": "MOTION_DISK_INSUFFICIENT",
+      "userSpeechKey": "creator.error.motionDiskInsufficient",
+      "userSpeech": "磁盘空间不足，请释放空间后重试。"
+    },
+    {
+      "code": "MOTION_BUDGET_EXCEEDED",
+      "userSpeechKey": "creator.error.motionBudgetExceeded",
+      "userSpeech": "任务超过渲染资源限制，请缩小范围后重试。"
+    },
+    {
+      "code": "MOTION_BUNDLE_INCOMPLETE",
+      "userSpeechKey": "creator.error.motionBundleIncomplete",
+      "userSpeech": "成果包不完整，请重新生成或导出。"
+    },
+    {
+      "code": "MOTION_ARTIFACT_PROBE_FAILED",
+      "userSpeechKey": "creator.error.motionArtifactProbeFailed",
+      "userSpeech": "渲染成果未通过检查，请查看任务详情。"
+    },
+    {
+      "code": "MOTION_EXPORT_FAILED",
+      "userSpeechKey": "creator.error.motionExportFailed",
+      "userSpeech": "成果导出失败，请检查保存位置后重试。"
+    },
+    {
+      "code": "MOTION_EDITOR_UNSUPPORTED",
+      "userSpeechKey": "creator.error.motionEditorUnsupported",
+      "userSpeech": "暂不支持发送到这个剪辑软件，请先导出再手动导入。"
+    },
+    {
+      "code": "MOTION_DELIVERY_PARTIAL",
+      "userSpeechKey": "creator.error.motionDeliveryPartial",
+      "userSpeech": "部分成果未送达，请查看任务详情并重试未完成的部分。"
+    },
+    {
+      "code": "MOTION_REFERENCE_IN_USE",
+      "userSpeechKey": "creator.error.motionReferenceInUse",
+      "userSpeech": "还有内容在使用这个对象，请先解除引用。"
+    },
+    {
+      "code": "MOTION_DESIGN_OUTPUT_INVALID",
+      "userSpeechKey": "creator.error.motionDesignOutputInvalid",
+      "userSpeech": "自动设计结果不符合要求，没有采用，请重试。"
+    },
+    {
+      "code": "SOUND_DESIGN_FAILED",
+      "userSpeechKey": "creator.error.soundDesignFailed",
+      "userSpeech": "音效设计操作未完成，请查看日志后重试。"
+    },
+    {
+      "code": "SOUND_DESIGN_UNAVAILABLE",
+      "userSpeechKey": "creator.error.soundDesignUnavailable",
+      "userSpeech": "音效设计服务暂不可用，请重新打开软件后重试。"
+    },
+    {
+      "code": "CANVAS_WORKBENCH_FAILED",
+      "userSpeechKey": "creator.error.canvasWorkbenchFailed",
+      "userSpeech": "工作台操作未完成，当前选择已保留，请查看详情后重试。"
+    },
+    {
+      "code": "CANVAS_WORKBENCH_UNAVAILABLE",
+      "userSpeechKey": "creator.error.canvasWorkbenchUnavailable",
+      "userSpeech": "画布工作台服务尚未就绪，请重新打开软件后重试。"
+    },
+    {
+      "code": "SINGING_RUNTIME_NOT_INSTALLED",
+      "userSpeechKey": "creator.error.singingRuntimeNotInstalled",
+      "userSpeech": "尚未安装翻录转唱模块，请先到「可选模块」中安装。"
+    },
+    {
+      "code": "SINGING_ENVIRONMENT_NOT_READY",
+      "userSpeechKey": "creator.error.singingEnvironmentNotReady",
+      "userSpeech": "翻录转唱运行环境未就绪，请先完成环境准备。"
+    },
+    {
+      "code": "SINGING_MODEL_NOT_READY",
+      "userSpeechKey": "creator.error.singingModelNotReady",
+      "userSpeech": "翻录转唱模型未就绪，请先准备模型。"
+    },
+    {
+      "code": "SINGING_GPU_BUSY",
+      "userSpeechKey": "creator.error.singingGpuBusy",
+      "userSpeech": "显卡正忙，请等当前任务完成后再试。"
+    },
+    {
+      "code": "SINGING_LYRICS_EMPTY",
+      "userSpeechKey": "creator.error.singingLyricsEmpty",
+      "userSpeech": "歌词为空，请先填写原歌词和新歌词。"
+    },
+    {
+      "code": "SINGING_LYRICS_BLANK_LINE",
+      "userSpeechKey": "creator.error.singingLyricsBlankLine",
+      "userSpeech": "存在空歌词行，请删除空行或补全文案。"
+    },
+    {
+      "code": "SINGING_LYRICS_ROW_COUNT_MISMATCH",
+      "userSpeechKey": "creator.error.singingLyricsRowCountMismatch",
+      "userSpeech": "原歌词与新歌词行数不一致，请核对后重试。"
+    },
+    {
+      "code": "SINGING_VOICE_LYRICS_REQUIRED",
+      "userSpeechKey": "creator.error.singingVoiceLyricsRequired",
+      "userSpeech": "使用外部音色时必须提供与该音色对应的歌词。"
+    },
+    {
+      "code": "SINGING_ALIGNMENT_REQUIRED",
+      "userSpeechKey": "creator.error.singingAlignmentRequired",
+      "userSpeech": "请先完成歌词时间轴对齐。"
+    },
+    {
+      "code": "SINGING_ALIGNMENT_INCOMPLETE",
+      "userSpeechKey": "creator.error.singingAlignmentIncomplete",
+      "userSpeech": "有歌词行没有对齐时间，请先校对并确认。"
+    },
+    {
+      "code": "SINGING_TIMELINE_INVALID",
+      "userSpeechKey": "creator.error.singingTimelineInvalid",
+      "userSpeech": "时间轴不合法，请检查字幕区间后重试。"
+    },
+    {
+      "code": "SINGING_PLAN_STALE",
+      "userSpeechKey": "creator.error.singingPlanStale",
+      "userSpeech": "素材已在别处更新，请刷新计划后重新确认。"
+    },
+    {
+      "code": "SINGING_ENGINE_CAPACITY_EXCEEDED",
+      "userSpeechKey": "creator.error.singingEngineCapacityExceeded",
+      "userSpeech": "某一句超出模型可处理的长度，请缩短后再试。"
+    },
+    {
+      "code": "SINGING_PHRASE_OVERFLOW",
+      "userSpeechKey": "creator.error.singingPhraseOverflow",
+      "userSpeech": "某一句的歌词放不进对应时间，请改短歌词或拉长时间。"
+    },
+    {
+      "code": "SINGING_INFERENCE_FAILED",
+      "userSpeechKey": "creator.error.singingInferenceFailed",
+      "userSpeech": "翻录转唱推理失败，请稍后重试。"
+    },
+    {
+      "code": "SINGING_LYRICS_RESOURCE_CONFLICT",
+      "userSpeechKey": "creator.error.singingLyricsResourceConflict",
+      "userSpeech": "原歌词和新歌词选用了同一个文本素材，请分别选择原歌词和新歌词。"
+    },
+    {
+      "code": "SINGING_INVALID_INPUT",
+      "userSpeechKey": "creator.error.singingInvalidInput",
+      "userSpeech": "翻录转唱输入无效，请检查素材与参数后重试。"
+    },
+    {
+      "code": "SINGING_ASSET_FAILED",
+      "userSpeechKey": "creator.error.singingAssetFailed",
+      "userSpeech": "翻录转唱素材读取失败，请检查所选素材后重试。"
+    },
+    {
+      "code": "SINGING_STORAGE_FAILED",
+      "userSpeechKey": "creator.error.singingStorageFailed",
+      "userSpeech": "翻录转唱保存失败，请稍后重试。"
+    },
+    {
+      "code": "SINGING_OUTPUT_INVALID",
+      "userSpeechKey": "creator.error.singingOutputInvalid",
+      "userSpeech": "翻录转唱结果无效，请检查生成结果后重试。"
+    },
+    {
+      "code": "SINGING_JOB_CONFLICT",
+      "userSpeechKey": "creator.error.singingJobConflict",
+      "userSpeech": "已有相同的翻录转唱任务在进行。"
+    },
+    {
+      "code": "RECEIPT_INTEGRITY_ERROR",
+      "userSpeechKey": "creator.error.receiptIntegrityError",
+      "userSpeech": "操作回执的数据不完整或已变化，请保留现场并检查记录；不要重复执行原操作。"
+    },
+    {
+      "code": "RECEIPT_SCOPE_DENIED",
+      "userSpeechKey": "creator.error.receiptScopeDenied",
+      "userSpeech": "这份结果不属于所选操作或工作区，请通过原操作记录读取。"
+    },
+    {
+      "code": "RECEIPT_CURSOR_INVALID",
+      "userSpeechKey": "creator.error.receiptCursorInvalid",
+      "userSpeech": "结果续读位置无效或已属于另一份结果，请从原操作重新读取。"
+    },
+    {
+      "code": "RECEIPT_HASH_COLLISION",
+      "userSpeechKey": "creator.error.receiptHashCollision",
+      "userSpeech": "操作回执未能登记，请保留现场并核实原操作状态，不要重复提交。"
+    },
+    {
+      "code": "RECEIPT_OWNER_MISSING",
+      "userSpeechKey": "creator.error.receiptOwnerMissing",
+      "userSpeech": "操作回执未能登记，请保留现场并核实原操作状态，不要重复提交。"
+    },
+    {
+      "code": "RECEIPT_TRANSACTION_REQUIRED",
+      "userSpeechKey": "creator.error.receiptTransactionRequired",
+      "userSpeech": "操作回执未能登记，请保留现场并核实原操作状态，不要重复提交。"
+    },
+    {
+      "code": "RECEIPT_KIND_INVALID",
+      "userSpeechKey": "creator.error.receiptKindInvalid",
+      "userSpeech": "操作回执未能登记，请保留现场并核实原操作状态，不要重复提交。"
+    },
+    {
+      "code": "RECEIPT_SLOT_INVALID",
+      "userSpeechKey": "creator.error.receiptSlotInvalid",
+      "userSpeech": "操作回执未能登记，请保留现场并核实原操作状态，不要重复提交。"
+    },
+    {
+      "code": "CHANGE_SET_READ_FAILED",
+      "userSpeechKey": "creator.error.changeSetReadFailed",
+      "userSpeech": "无法读取操作记录，请检查日志并保留当前编辑。"
+    },
+    {
+      "code": "AMBIENT_PLAN_FOREIGN_DB",
+      "userSpeechKey": "creator.error.ambientPlanForeignDb",
+      "userSpeech": "当前操作与请求不属于同一资料库，未提交变更。请重新打开目标工作区后重试。"
+    },
+    {
+      "code": "CLIP_CHANGE_FAILED",
+      "userSpeechKey": "creator.error.clipChangeFailed",
+      "userSpeech": "片段修改未完成，请确认片段仍存在且版本未变化，再重试。"
+    },
+    {
+      "code": "CLIP_READ_FAILED",
+      "userSpeechKey": "creator.error.clipReadFailed",
+      "userSpeech": "片段读取失败，请重新打开目标片段并检查本地资料库。"
+    },
+    {
+      "code": "CLIP_SERVICE_UNAVAILABLE",
+      "userSpeechKey": "creator.error.clipServiceUnavailable",
+      "userSpeech": "片段服务尚未就绪，请确认应用与目标工作区已打开。"
+    },
+    {
+      "code": "CREATOR_TOOL_FAILED",
+      "userSpeechKey": "creator.error.creatorToolFailed",
+      "userSpeech": "操作未完成，请查看任务详情，确认目标资源和当前状态后重试。"
+    },
+    {
+      "code": "MEDIA_IMPORT_READ_FAILED",
+      "userSpeechKey": "creator.error.mediaImportReadFailed",
+      "userSpeech": "导入素材读取失败，请确认文件存在且可读取。"
+    },
+    {
+      "code": "MEDIA_PATH_DENIED",
+      "userSpeechKey": "creator.error.mediaPathDenied",
+      "userSpeech": "当前素材路径不可访问，请通过素材导入入口选择获准使用的文件。"
+    },
+    {
+      "code": "NOT_SUPPORTED",
+      "userSpeechKey": "creator.error.notSupported",
+      "userSpeech": "当前能力不支持这项操作，请选择已声明支持的操作。"
+    },
+    {
+      "code": "PROMPT_SNAPSHOT_FOREIGN_TURN",
+      "userSpeechKey": "creator.error.promptSnapshotForeignTurn",
+      "userSpeech": "提示词快照不属于当前对话轮次，未执行调用。请在当前对话重新发起。"
+    },
+    {
+      "code": "PROMPT_SNAPSHOT_STORE_FAILED",
+      "userSpeechKey": "creator.error.promptSnapshotStoreFailed",
+      "userSpeech": "提示词快照保存失败，未执行调用。请检查资料库和磁盘状态后重试。"
+    },
+    {
+      "code": "REQUEST_PROMPT_SNAPSHOT_NOT_FOUND",
+      "userSpeechKey": "creator.error.requestPromptSnapshotNotFound",
+      "userSpeech": "当前请求的提示词快照不存在，请核实请求记录后重新发起。"
+    },
+    {
+      "code": "TTS_SPEECH_SELECTION_REJECTED",
+      "userSpeechKey": "creator.error.ttsSpeechSelectionRejected",
+      "userSpeech": "语音模型选择不可用，请在语音设置中选择有效模型与音色后重试。"
+    },
+    {
+      "code": "TURN_PROMPT_SNAPSHOT_NOT_FOUND",
+      "userSpeechKey": "creator.error.turnPromptSnapshotNotFound",
+      "userSpeech": "当前对话轮次的提示词快照不存在，请在当前对话重新发起。"
+    },
+    {
+      "code": "CHAPTER_ROLE_PORTRAIT_BATCH",
+      "userSpeechKey": "creator.error.chapterRolePortraitBatch",
+      "userSpeech": "本集定妆批量操作没有完成。请检查后重试。"
+    },
+    {
+      "code": "CHAPTER_ROLE_PORTRAIT_PORT_UNAVAILABLE",
+      "userSpeechKey": "creator.error.chapterRolePortraitPortUnavailable",
+      "userSpeech": "本集定妆服务当前不可用。请稍后重试或重启应用。"
+    },
+    {
+      "code": "CHAPTER_ROLE_PORTRAIT_READ",
+      "userSpeechKey": "creator.error.chapterRolePortraitRead",
+      "userSpeech": "本集定妆信息读取失败。请刷新后再试。"
+    }
+  ]
+}

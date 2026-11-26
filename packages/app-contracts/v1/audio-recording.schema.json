@@ -1,0 +1,627 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "audio-recording.schema.json",
+  "title": "Audio recording contract (constants + IPC DTOs)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractId",
+    "enabled",
+    "commands",
+    "sessionStates",
+    "outputFormats",
+    "defaults",
+    "allowedSampleRatesHz",
+    "allowedMp3BitratesKbps",
+    "transport",
+    "disk",
+    "preferencesKey",
+    "devicePreferenceKey",
+    "errors",
+    "errorLocaleKeys"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "contractId": {
+      "const": "audio-recording"
+    },
+    "enabled": {
+      "type": "boolean"
+    },
+    "commands": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^audio_recording_[a-z_]+$"
+      },
+      "uniqueItems": true,
+      "minItems": 8,
+      "maxItems": 8
+    },
+    "sessionStates": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/SessionState"
+      },
+      "uniqueItems": true
+    },
+    "outputFormats": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/OutputFormat"
+      },
+      "uniqueItems": true
+    },
+    "defaults": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format",
+        "sampleRateHz",
+        "channels",
+        "pcmBitDepth",
+        "mp3BitrateKbps"
+      ],
+      "properties": {
+        "format": {
+          "const": "wav"
+        },
+        "sampleRateHz": {
+          "const": 48000
+        },
+        "channels": {
+          "const": 1
+        },
+        "pcmBitDepth": {
+          "const": 16
+        },
+        "mp3BitrateKbps": {
+          "const": 192
+        }
+      }
+    },
+    "allowedSampleRatesHz": {
+      "type": "array",
+      "items": {
+        "enum": [
+          44100,
+          48000
+        ]
+      },
+      "uniqueItems": true,
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "allowedMp3BitratesKbps": {
+      "type": "array",
+      "items": {
+        "enum": [
+          128,
+          192,
+          320
+        ]
+      },
+      "uniqueItems": true,
+      "minItems": 3,
+      "maxItems": 3
+    },
+    "transport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "maxChunkPayloadBytes",
+        "maxPendingPcmBytes",
+        "maxInFlightInvokes",
+        "maxJsonRequestBytes",
+        "appendTimeoutMs",
+        "checkpointInputSeconds",
+        "bytesPerSample"
+      ],
+      "properties": {
+        "maxChunkPayloadBytes": {
+          "const": 65536
+        },
+        "maxPendingPcmBytes": {
+          "const": 2097152
+        },
+        "maxInFlightInvokes": {
+          "const": 1
+        },
+        "maxJsonRequestBytes": {
+          "const": 131072
+        },
+        "appendTimeoutMs": {
+          "const": 10000
+        },
+        "checkpointInputSeconds": {
+          "const": 2
+        },
+        "bytesPerSample": {
+          "const": 4
+        }
+      }
+    },
+    "disk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "minFreeBytesReserve",
+        "sessionsDirName"
+      ],
+      "properties": {
+        "minFreeBytesReserve": {
+          "const": 268435456
+        },
+        "sessionsDirName": {
+          "const": "audio_recording"
+        }
+      }
+    },
+    "preferencesKey": {
+      "const": "bgxiong.audioRecording.outputPreferences"
+    },
+    "devicePreferenceKey": {
+      "const": "bgxiong.micCapture.devicePreference"
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ErrorCode"
+      },
+      "uniqueItems": true
+    },
+    "errorLocaleKeys": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/ErrorCode"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^audioRecording\\.err\\.[A-Za-z]+$"
+      }
+    }
+  },
+  "$defs": {
+    "SessionState": {
+      "enum": [
+        "ready",
+        "recording",
+        "finalizing",
+        "saved",
+        "interrupted",
+        "failed",
+        "discarded"
+      ]
+    },
+    "OutputFormat": {
+      "enum": [
+        "wav",
+        "mp3",
+        "flac"
+      ]
+    },
+    "ErrorCode": {
+      "enum": [
+        "featureDisabled",
+        "runtimeMissing",
+        "encoderMissing",
+        "sessionBusy",
+        "sessionNotFound",
+        "ownerMismatch",
+        "invalidFormat",
+        "invalidSequence",
+        "invalidSampleRate",
+        "invalidChunk",
+        "queueFull",
+        "diskFull",
+        "ioError",
+        "encodeFailed",
+        "importFailed",
+        "casConflict",
+        "targetGone",
+        "cancelled",
+        "probeFailed",
+        "notRecoverable",
+        "busy"
+      ]
+    },
+    "NonNegInt": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "Id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "WorkspaceKind": {
+      "enum": [
+        "freeCanvas",
+        "clips"
+      ]
+    },
+    "OutputSettings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format",
+        "sampleRateHz",
+        "mp3BitrateKbps"
+      ],
+      "properties": {
+        "format": {
+          "$ref": "#/$defs/OutputFormat"
+        },
+        "sampleRateHz": {
+          "enum": [
+            44100,
+            48000
+          ]
+        },
+        "mp3BitrateKbps": {
+          "enum": [
+            128,
+            192,
+            320
+          ]
+        }
+      }
+    },
+    "TargetSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "workspaceKind",
+        "workspaceId",
+        "nodeId",
+        "mediaRel",
+        "activeVersionId"
+      ],
+      "properties": {
+        "workspaceKind": {
+          "$ref": "#/$defs/WorkspaceKind"
+        },
+        "workspaceId": {
+          "$ref": "#/$defs/Id"
+        },
+        "nodeId": {
+          "$ref": "#/$defs/Id"
+        },
+        "mediaRel": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "activeVersionId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "CommandError": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "stage",
+        "recoverable"
+      ],
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/ErrorCode"
+        },
+        "stage": {
+          "type": "string"
+        },
+        "recoverable": {
+          "type": "boolean"
+        },
+        "logDetail": {
+          "type": "string"
+        }
+      }
+    },
+    "ProbeResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ffmpegReady",
+        "formats"
+      ],
+      "properties": {
+        "ffmpegReady": {
+          "type": "boolean"
+        },
+        "runtimeVersion": {
+          "type": "string"
+        },
+        "formats": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "wav",
+            "mp3",
+            "flac"
+          ],
+          "properties": {
+            "wav": {
+              "type": "boolean"
+            },
+            "mp3": {
+              "type": "boolean"
+            },
+            "flac": {
+              "type": "boolean"
+            }
+          }
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "StartRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "settings",
+        "inputSampleRateHz"
+      ],
+      "properties": {
+        "target": {
+          "$ref": "#/$defs/TargetSnapshot"
+        },
+        "settings": {
+          "$ref": "#/$defs/OutputSettings"
+        },
+        "inputSampleRateHz": {
+          "type": "integer",
+          "minimum": 8000,
+          "maximum": 192000
+        }
+      }
+    },
+    "StartResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sessionId",
+        "state",
+        "inputSampleRateHz",
+        "settings"
+      ],
+      "properties": {
+        "sessionId": {
+          "$ref": "#/$defs/Id"
+        },
+        "state": {
+          "$ref": "#/$defs/SessionState"
+        },
+        "inputSampleRateHz": {
+          "type": "integer"
+        },
+        "settings": {
+          "$ref": "#/$defs/OutputSettings"
+        }
+      }
+    },
+    "AppendRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sessionId",
+        "seq",
+        "sampleCount",
+        "pcmBase64"
+      ],
+      "properties": {
+        "sessionId": {
+          "$ref": "#/$defs/Id"
+        },
+        "seq": {
+          "$ref": "#/$defs/NonNegInt"
+        },
+        "sampleCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "pcmBase64": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "AppendResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "acceptedSeq",
+        "acceptedSamples",
+        "durableSamples"
+      ],
+      "properties": {
+        "acceptedSeq": {
+          "$ref": "#/$defs/NonNegInt"
+        },
+        "acceptedSamples": {
+          "$ref": "#/$defs/NonNegInt"
+        },
+        "durableSamples": {
+          "$ref": "#/$defs/NonNegInt"
+        }
+      }
+    },
+    "StopRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sessionId",
+        "lastSeq"
+      ],
+      "properties": {
+        "sessionId": {
+          "$ref": "#/$defs/Id"
+        },
+        "lastSeq": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        }
+      }
+    },
+    "StatusRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sessionId"
+      ],
+      "properties": {
+        "sessionId": {
+          "$ref": "#/$defs/Id"
+        }
+      }
+    },
+    "StatusResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sessionId",
+        "state",
+        "acceptedSamples",
+        "durableSamples",
+        "inputSampleRateHz"
+      ],
+      "properties": {
+        "sessionId": {
+          "$ref": "#/$defs/Id"
+        },
+        "state": {
+          "$ref": "#/$defs/SessionState"
+        },
+        "acceptedSamples": {
+          "$ref": "#/$defs/NonNegInt"
+        },
+        "durableSamples": {
+          "$ref": "#/$defs/NonNegInt"
+        },
+        "inputSampleRateHz": {
+          "type": "integer"
+        },
+        "encodeProgressSec": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "durationSec": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "versionId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "mediaRel": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "error": {
+          "$ref": "#/$defs/CommandError"
+        }
+      }
+    },
+    "RecoverRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sessionId"
+      ],
+      "properties": {
+        "sessionId": {
+          "$ref": "#/$defs/Id"
+        }
+      }
+    },
+    "DiscardRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sessionId"
+      ],
+      "properties": {
+        "sessionId": {
+          "$ref": "#/$defs/Id"
+        }
+      }
+    },
+    "ListInterruptedRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "workspaceKind",
+        "workspaceId",
+        "nodeId"
+      ],
+      "properties": {
+        "workspaceKind": {
+          "$ref": "#/$defs/WorkspaceKind"
+        },
+        "workspaceId": {
+          "$ref": "#/$defs/Id"
+        },
+        "nodeId": {
+          "$ref": "#/$defs/Id"
+        }
+      }
+    },
+    "InterruptedSession": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sessionId",
+        "state",
+        "durableSamples",
+        "inputSampleRateHz",
+        "settings",
+        "target"
+      ],
+      "properties": {
+        "sessionId": {
+          "$ref": "#/$defs/Id"
+        },
+        "state": {
+          "$ref": "#/$defs/SessionState"
+        },
+        "durableSamples": {
+          "$ref": "#/$defs/NonNegInt"
+        },
+        "inputSampleRateHz": {
+          "type": "integer"
+        },
+        "settings": {
+          "$ref": "#/$defs/OutputSettings"
+        },
+        "target": {
+          "$ref": "#/$defs/TargetSnapshot"
+        },
+        "error": {
+          "$ref": "#/$defs/CommandError"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,373 @@
+{
+  "$schema": "creator-capability-registry.schema.json",
+  "schemaVersion": 1,
+  "note": "S15 SSOT for F1/MCP creative capabilities. Published entries reference creator-tool-catalog.json (effect/billing/undo/revision resolved from the catalog, never copied). Planned entries are never published; they become published only when their plannedIn step lands a real handler AND the catalog gains the tool. recipe.run billing is the max over its steps (remoteMetered when any step is). Billing audit of all 66 catalog tools is S90.",
+  "ownerPorts": [
+    "contextPort",
+    "queryPort",
+    "surfacePort",
+    "changePlanPort",
+    "generationPort",
+    "taskPort",
+    "mediaDescribePort",
+    "creativeRevisionPort",
+    "shotRestructurePort",
+    "workbenchPort",
+    "recipePort",
+    "textOrganizePort",
+    "storyCreationPort"
+  ],
+  "capabilities": [
+    {
+      "capabilityId": "context.get",
+      "availability": "published",
+      "catalogToolId": "context.get",
+      "ownerPort": "contextPort",
+      "targetKinds": [],
+      "nestedRemoteModel": false
+    },
+    {
+      "capabilityId": "resource.get",
+      "availability": "published",
+      "catalogToolId": "resource.get",
+      "ownerPort": "queryPort",
+      "targetKinds": [
+        "story",
+        "chapter",
+        "role",
+        "visualAsset",
+        "canvasProject",
+        "canvasNode",
+        "canvasEdge",
+        "mediaVersion",
+        "memory",
+        "task"
+      ],
+      "nestedRemoteModel": false
+    },
+    {
+      "capabilityId": "surface.read",
+      "availability": "published",
+      "catalogToolId": "surface.read",
+      "ownerPort": "surfacePort",
+      "targetKinds": [
+        "canvasNode"
+      ],
+      "nestedRemoteModel": false
+    },
+    {
+      "capabilityId": "surface.patch",
+      "availability": "published",
+      "catalogToolId": "surface.patch",
+      "ownerPort": "surfacePort",
+      "targetKinds": [
+        "canvasNode"
+      ],
+      "nestedRemoteModel": false
+    },
+    {
+      "capabilityId": "canvas.change.prepare",
+      "availability": "published",
+      "catalogToolId": "canvas.change.prepare",
+      "ownerPort": "changePlanPort",
+      "targetKinds": [
+        "canvasProject",
+        "canvasNode",
+        "canvasEdge"
+      ],
+      "nestedRemoteModel": false
+    },
+    {
+      "capabilityId": "change.apply",
+      "availability": "published",
+      "catalogToolId": "change.apply",
+      "ownerPort": "changePlanPort",
+      "targetKinds": [],
+      "nestedRemoteModel": false
+    },
+    {
+      "capabilityId": "change.undo",
+      "availability": "published",
+      "catalogToolId": "change.undo",
+      "ownerPort": "changePlanPort",
+      "targetKinds": [],
+      "nestedRemoteModel": false
+    },
+    {
+      "capabilityId": "generation.quote",
+      "availability": "published",
+      "catalogToolId": "generation.quote",
+      "ownerPort": "generationPort",
+      "targetKinds": [
+        "canvasNode"
+      ],
+      "nestedRemoteModel": false
+    },
+    {
+      "capabilityId": "generation.submit",
+      "availability": "published",
+      "catalogToolId": "generation.submit",
+      "ownerPort": "generationPort",
+      "targetKinds": [
+        "canvasNode",
+        "story",
+        "role"
+      ],
+      "nestedRemoteModel": true
+    },
+    {
+      "capabilityId": "task.get",
+      "availability": "published",
+      "catalogToolId": "task.get",
+      "ownerPort": "taskPort",
+      "targetKinds": [
+        "task"
+      ],
+      "nestedRemoteModel": false
+    },
+    {
+      "capabilityId": "task.wait",
+      "availability": "published",
+      "catalogToolId": "task.wait",
+      "ownerPort": "taskPort",
+      "targetKinds": [
+        "task"
+      ],
+      "nestedRemoteModel": false
+    },
+    {
+      "capabilityId": "task.cancel",
+      "availability": "published",
+      "catalogToolId": "task.cancel",
+      "ownerPort": "taskPort",
+      "targetKinds": [
+        "task"
+      ],
+      "nestedRemoteModel": false
+    },
+    {
+      "capabilityId": "media.describe",
+      "availability": "published",
+      "catalogToolId": "media.describe",
+      "ownerPort": "mediaDescribePort",
+      "targetKinds": [
+        "mediaVersion",
+        "visualAsset",
+        "chatAttachment"
+      ],
+      "nestedRemoteModel": true
+    },
+    {
+      "capabilityId": "text.organize",
+      "availability": "published",
+      "catalogToolId": "text.organize",
+      "ownerPort": "textOrganizePort",
+      "targetKinds": [],
+      "nestedRemoteModel": true
+    },
+    {
+      "capabilityId": "text.organize.candidate.read",
+      "availability": "published",
+      "catalogToolId": "text.organize.candidate.read",
+      "ownerPort": "textOrganizePort",
+      "targetKinds": [],
+      "nestedRemoteModel": false
+    },
+    {
+      "capabilityId": "workbench.read",
+      "availability": "published",
+      "catalogToolId": "workbench.read",
+      "ownerPort": "workbenchPort",
+      "targetKinds": [
+        "canvasNode"
+      ],
+      "nestedRemoteModel": false
+    },
+    {
+      "capabilityId": "workbench.patch",
+      "availability": "published",
+      "catalogToolId": "workbench.patch",
+      "ownerPort": "workbenchPort",
+      "targetKinds": [
+        "canvasNode"
+      ],
+      "nestedRemoteModel": false
+    },
+    {
+      "capabilityId": "creative.optimize",
+      "availability": "planned",
+      "plannedIn": "S66",
+      "ownerPort": "creativeRevisionPort",
+      "targetKinds": [
+        "canvasNode"
+      ],
+      "effects": [
+        "prepare"
+      ],
+      "billing": {
+        "class": "remoteMetered",
+        "nestedRemoteModel": true
+      },
+      "revisionPolicy": "draftCas",
+      "undo": "none",
+      "contractRef": "creative-intent-v1.schema.json"
+    },
+    {
+      "capabilityId": "creative.review",
+      "availability": "planned",
+      "plannedIn": "S67",
+      "ownerPort": "creativeRevisionPort",
+      "targetKinds": [
+        "canvasNode"
+      ],
+      "effects": [
+        "read"
+      ],
+      "billing": {
+        "class": "remoteMetered",
+        "nestedRemoteModel": true
+      },
+      "revisionPolicy": "none",
+      "undo": "none",
+      "contractRef": "creative-review-v1.schema.json"
+    },
+    {
+      "capabilityId": "shot.restructure",
+      "availability": "planned",
+      "plannedIn": "S60",
+      "ownerPort": "shotRestructurePort",
+      "targetKinds": [],
+      "effects": [
+        "prepare",
+        "apply",
+        "undo"
+      ],
+      "billing": {
+        "class": "localFree",
+        "nestedRemoteModel": false
+      },
+      "revisionPolicy": "changeSetCas",
+      "undo": "token",
+      "contractRef": "creator-shot-restructure-v1.schema.json"
+    },
+    {
+      "capabilityId": "recipe.run",
+      "availability": "planned",
+      "plannedIn": "S68",
+      "ownerPort": "recipePort",
+      "targetKinds": [],
+      "effects": [
+        "task"
+      ],
+      "billing": {
+        "class": "remoteMetered",
+        "nestedRemoteModel": true
+      },
+      "revisionPolicy": "changeSetCas",
+      "undo": "none",
+      "contractRef": "creative-run-v1.schema.json"
+    },
+    {
+      "capabilityId": "story.role.portraitPrompt.batch.preview",
+      "availability": "published",
+      "catalogToolId": "story.role.portraitPrompt.batch.preview",
+      "ownerPort": "generationPort",
+      "targetKinds": [
+        "story",
+        "role"
+      ],
+      "nestedRemoteModel": false
+    },
+    {
+      "capabilityId": "story.prop.visualPrompt.batch.preview",
+      "availability": "published",
+      "catalogToolId": "story.prop.visualPrompt.batch.preview",
+      "ownerPort": "generationPort",
+      "targetKinds": [
+        "story",
+        "storyProp"
+      ],
+      "nestedRemoteModel": false
+    },
+    {
+      "capabilityId": "story.creation.clips.generate",
+      "availability": "published",
+      "catalogToolId": "story.creation.clips.generate",
+      "ownerPort": "storyCreationPort",
+      "targetKinds": [
+        "chapter"
+      ],
+      "nestedRemoteModel": true
+    },
+    {
+      "capabilityId": "clip.workflow.read",
+      "availability": "published",
+      "catalogToolId": "clip.workflow.read",
+      "ownerPort": "queryPort",
+      "targetKinds": [
+        "story"
+      ],
+      "nestedRemoteModel": false
+    },
+    {
+      "capabilityId": "clip.workflow.history",
+      "availability": "published",
+      "catalogToolId": "clip.workflow.history",
+      "ownerPort": "queryPort",
+      "targetKinds": [
+        "story"
+      ],
+      "nestedRemoteModel": false
+    },
+    {
+      "capabilityId": "clip.workflow.artifacts",
+      "availability": "published",
+      "catalogToolId": "clip.workflow.artifacts",
+      "ownerPort": "queryPort",
+      "targetKinds": [
+        "story"
+      ],
+      "nestedRemoteModel": false
+    },
+    {
+      "capabilityId": "clip.workflow.change.prepare",
+      "availability": "published",
+      "catalogToolId": "clip.workflow.change.prepare",
+      "ownerPort": "changePlanPort",
+      "targetKinds": [
+        "story"
+      ],
+      "nestedRemoteModel": false
+    },
+    {
+      "capabilityId": "clip.workflow.frames.read",
+      "availability": "published",
+      "catalogToolId": "clip.workflow.frames.read",
+      "ownerPort": "queryPort",
+      "targetKinds": [
+        "story"
+      ],
+      "nestedRemoteModel": false
+    },
+    {
+      "capabilityId": "clip.workflow.batch.read",
+      "availability": "published",
+      "catalogToolId": "clip.workflow.batch.read",
+      "ownerPort": "queryPort",
+      "targetKinds": [
+        "story"
+      ],
+      "nestedRemoteModel": false
+    },
+    {
+      "capabilityId": "clip.workflow.batch.inspect",
+      "availability": "published",
+      "catalogToolId": "clip.workflow.batch.inspect",
+      "ownerPort": "queryPort",
+      "targetKinds": [
+        "story"
+      ],
+      "nestedRemoteModel": false
+    }
+  ]
+}

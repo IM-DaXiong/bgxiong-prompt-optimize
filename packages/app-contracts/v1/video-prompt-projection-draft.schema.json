@@ -1,0 +1,294 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "video-prompt-projection-draft.schema.json",
+  "title": "VideoPromptProjectionDraftV1",
+  "description": "Per-fact expression output of a projection method and its model review. Every id must belong to the frozen reviewed mother document or frozen reference inventory; Rust validates JSON shape, enums, counts and id membership only. Quote text is never part of model output: quotes are referenced by quoteId and inserted verbatim by the target adapter. Semantic fidelity is judged by the review model (findings), never by searching the text.",
+  "schemaVersion": 1,
+  "definitions": {
+    "localId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "description": "Opaque id issued by Rust inside the frozen mother/inventory closed set; membership is checked by the service, never by text search."
+    },
+    "expressionLine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "shotId",
+        "factIds",
+        "text"
+      ],
+      "properties": {
+        "shotId": {
+          "$ref": "#/definitions/localId"
+        },
+        "factIds": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/definitions/localId"
+          }
+        },
+        "quoteIds": {
+          "type": "array",
+          "default": [],
+          "maxItems": 32,
+          "items": {
+            "$ref": "#/definitions/localId"
+          },
+          "description": "Quotes rendered verbatim by the adapter after this line, in this order."
+        },
+        "referenceUseIds": {
+          "type": "array",
+          "default": [],
+          "maxItems": 32,
+          "items": {
+            "$ref": "#/definitions/localId"
+          }
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Expression of the listed facts in the target expression language; excludes quote text, reference tags and target section syntax (adapter-owned)."
+        }
+      }
+    },
+    "conflictCode": {
+      "type": "string",
+      "enum": [
+        "capability_unsupported",
+        "mode_mismatch",
+        "reference_use_unsupported",
+        "mother_insufficient"
+      ]
+    },
+    "projectionConflict": {
+      "description": "Explicit statement that frozen facts cannot be expressed for the target; facts are never dropped or changed silently.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "factIds",
+        "referenceUseIds"
+      ],
+      "properties": {
+        "code": {
+          "$ref": "#/definitions/conflictCode"
+        },
+        "factIds": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/definitions/localId"
+          }
+        },
+        "referenceUseIds": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "$ref": "#/definitions/localId"
+          }
+        }
+      }
+    },
+    "speakerVoiceBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "speakerId",
+        "voiceReferenceUseId"
+      ],
+      "description": "Structured self-report of which frozen speaker uses which voice-timbre reference. Use only ids offered by this request; one reference per speaker and one speaker per reference. Leave a reference unbound when the mother document, reference labels or declared identities do not state the relationship.",
+      "properties": {
+        "speakerId": {
+          "$ref": "#/definitions/localId"
+        },
+        "voiceReferenceUseId": {
+          "$ref": "#/definitions/localId"
+        },
+        "subjectId": {
+          "$ref": "#/definitions/localId"
+        }
+      }
+    },
+    "projectionDraft": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lines",
+        "conflicts"
+      ],
+      "properties": {
+        "lines": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 256,
+          "items": {
+            "$ref": "#/definitions/expressionLine"
+          }
+        },
+        "conflicts": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/definitions/projectionConflict"
+          }
+        },
+        "proposedFacts": {
+          "type": "array",
+          "items": {
+            "$ref": "video-prompt-channels.schema.json#/definitions/proposedFact"
+          }
+        },
+        "negative": {
+          "$ref": "video-prompt-channels.schema.json#/definitions/negativeResult"
+        },
+        "speakerVoiceBindings": {
+          "type": "array",
+          "default": [],
+          "maxItems": 32,
+          "items": {
+            "$ref": "#/definitions/speakerVoiceBinding"
+          }
+        }
+      }
+    },
+    "reviewIssue": {
+      "type": "string",
+      "enum": [
+        "fact_omitted",
+        "fact_added",
+        "fact_altered",
+        "quote_altered",
+        "reference_misused",
+        "order_changed",
+        "language_mismatch",
+        "method_rule_violated",
+        "target_syntax_violated",
+        "expansion_out_of_scope"
+      ]
+    },
+    "reviewSeverity": {
+      "type": "string",
+      "enum": [
+        "blocking",
+        "minor"
+      ],
+      "description": "Severity describes advisory importance only. Neither value rejects, deletes or automatically rewrites the candidate."
+    },
+    "reviewFinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "issue",
+        "severity",
+        "lineIndex",
+        "shotId",
+        "factIds",
+        "quoteIds",
+        "referenceUseIds",
+        "detail"
+      ],
+      "properties": {
+        "issue": {
+          "$ref": "#/definitions/reviewIssue"
+        },
+        "severity": {
+          "$ref": "#/definitions/reviewSeverity"
+        },
+        "lineIndex": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "shotId": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/localId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "factIds": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/definitions/localId"
+          }
+        },
+        "quoteIds": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "$ref": "#/definitions/localId"
+          }
+        },
+        "referenceUseIds": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "$ref": "#/definitions/localId"
+          }
+        },
+        "detail": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Explain the concrete mother fact / spoken quote to expression difference using the cited IDs. Do not invent a difference merely because adapter-owned quote text is absent from line text."
+        },
+        "channel": {
+          "type": "string",
+          "enum": [
+            "positive",
+            "negative"
+          ]
+        },
+        "sourceRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "projectionReviewResult": {
+      "description": "Advisory review findings only; severity is not an acceptance gate and there is no pass/fail verdict.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "findings"
+      ],
+      "properties": {
+        "findings": {
+          "type": "array",
+          "maxItems": 128,
+          "items": {
+            "$ref": "#/definitions/reviewFinding"
+          }
+        }
+      }
+    }
+  },
+  "reviewIssueSeverities": {
+    "fact_omitted": "blocking",
+    "fact_added": "blocking",
+    "fact_altered": "blocking",
+    "quote_altered": "blocking",
+    "reference_misused": "blocking",
+    "order_changed": "blocking",
+    "language_mismatch": "blocking",
+    "method_rule_violated": "minor",
+    "target_syntax_violated": "blocking",
+    "expansion_out_of_scope": "blocking"
+  }
+}

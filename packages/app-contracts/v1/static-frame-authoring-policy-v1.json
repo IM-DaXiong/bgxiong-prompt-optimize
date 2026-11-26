@@ -1,0 +1,59 @@
+{
+  "$id": "static-frame-authoring-policy-v1.json",
+  "schemaVersion": 1,
+  "title": "Static-frame authoring policy (single source for stage names, temperatures, schema versions, checkpoint key, closed sets)",
+  "definitions": {
+    "aiTaskStage": {
+      "type": "string",
+      "enum": ["storyboard_structure", "storyboard_authoring", "storyboard_review_edit"]
+    },
+    "reviewScope": {
+      "type": "string",
+      "enum": ["upstream_only", "full_candidate"]
+    },
+    "sourceKind": {
+      "type": "string",
+      "enum": ["scene_generation", "existing_shot"]
+    }
+  },
+  "stages": {
+    "structure": { "aiTaskStage": "storyboard_structure", "temperature": 0.35, "schema": "storyboard-render-structure-v1.schema.json" },
+    "authoring": { "aiTaskStage": "storyboard_authoring", "temperature": 0.7, "schema": "static-frame-authoring-v1.schema.json" },
+    "reviewEdit": { "aiTaskStage": "storyboard_review_edit", "temperature": 0.2, "schema": "static-frame-review-edit-v1.schema.json" }
+  },
+  "schemaVersions": {
+    "storyboardRenderStructure": 1,
+    "staticFrameAuthoring": 1,
+    "staticFrameReviewEdit": 1,
+    "staticFrameReviewRules": 1,
+    "staticFrameCheckpoint": 1,
+    "staticFrameCandidateReview": 1
+  },
+  "checkpointPayloadKey": "storyboardStaticFrameCheckpoint",
+  "candidateMetadataKind": "static_frame_review_v1",
+  "formatRepairAttempts": 0,
+  "authoringErrorKinds": [
+    "context_invalid",
+    "schema_invalid",
+    "truncated",
+    "transport_failed",
+    "cancelled",
+    "outcome_unknown",
+    "checkpoint_failed",
+    "stale_input",
+    "cas_conflict"
+  ],
+  "reviewScopes": {
+    "upstream_only": {
+      "description": "Scene generation / local re-review followed by D: Q does not receive still prompt text; P may only patch video shots and transitions.",
+      "qMaterials": ["source", "stageA", "structure", "videoMaster", "transitions"],
+      "patchOps": ["videoShot", "transition"]
+    },
+    "full_candidate": {
+      "description": "Free canvas (no D this round): Q reviews the full candidate as today, including still prompts.",
+      "qMaterials": ["source", "stageA", "structure", "videoMaster", "transitions", "stillPrompts"],
+      "patchOps": ["videoShot", "transition", "stillPrompt"]
+    }
+  },
+  "notes": "No MAX_REWRITE_ATTEMPTS, no business shot-count cap, no fixed concurrency: concurrency reuses ai_execution_lane. The text model is the user's frozen selection for C and D."
+}

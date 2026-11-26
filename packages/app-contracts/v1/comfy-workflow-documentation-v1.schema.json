@@ -1,0 +1,160 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "comfy-workflow-documentation-v1.schema.json",
+  "schemaVersion": 1,
+  "title": "ComfyWorkflowDocumentationV1",
+  "description": "Versioned reading notes for one workflow revision. The model returns only optional text sections defined by $defs/noteSections. The host assigns binding, record IDs, input-shard provenance and delivery coverage, then publishes through the existing revision CAS. Generic note content is display-only; typed existing records remain readable. Reading notes never change graph capabilities, parameters or mappings.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["binding", "claims", "summary", "modelRequirements", "promptGuidance", "assetGuidance", "modeGuidance", "parameterAdvice", "mappingSuggestions", "coverage", "conflicts"],
+  "properties": {
+    "binding": { "$ref": "#/$defs/binding" },
+    "claims": { "type": "array", "maxItems": 4096, "items": { "$ref": "#/$defs/claim" } },
+    "summary": { "$ref": "#/$defs/claimIdList", "description": "UI need: workflow purpose and usage overview explicitly described in the author notes. No matching information: leave this section empty." },
+    "modelRequirements": { "$ref": "#/$defs/claimIdList", "description": "UI need: model names, requirements and author-provided links stated in the notes. No matching information: leave this section empty." },
+    "promptGuidance": { "$ref": "#/$defs/claimIdList", "description": "UI need: prompt writing instructions, techniques or examples supplied in the notes. No matching information: leave this section empty." },
+    "assetGuidance": { "$ref": "#/$defs/claimIdList", "description": "UI need: input/output image, video, audio or mask requirements stated in the notes, including maximum resolution, supported width/height pairs, aspect ratios and size multiples. Preserve exact values and distinguish required limits from recommendations and defaults. No matching information: leave this section empty." },
+    "modeGuidance": { "$ref": "#/$defs/claimIdList", "description": "UI need: supported usage modes and switching instructions described in the notes. No matching information: leave this section empty." },
+    "parameterAdvice": { "$ref": "#/$defs/claimIdList", "description": "UI need: author recommendations for parameter values and when to use them, including width, height, resolution and aspect ratio presets. Bind each concrete suggested value to an existing fieldRef with its real type. A stated maximum is a limit to describe in assetGuidance, never a suggested default. No matching information: leave this section empty." },
+    "mappingSuggestions": { "$ref": "#/$defs/claimIdList", "description": "UI need: explicit author guidance on which workflow fields correspond to controls. Only reference provided mapping candidates; never apply changes. No matching information: leave this section empty." },
+    "coverage": { "$ref": "#/$defs/coverage" },
+    "conflicts": { "type": "array", "items": { "$ref": "#/$defs/conflict" } }
+  },
+  "$defs": {
+    "noteSections": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "summary": {"type": "string", "description": "Workflow purpose and usage overview. Omit when absent; empty text is valid.", "x-claimKind": "overview"},
+        "modelRequirements": {"type": "string", "description": "Model names, requirements and author-provided links; record as reading notes only. Omit when absent; empty text is valid.", "x-claimKind": "modelRequirement"},
+        "promptGuidance": {"type": "string", "description": "Author prompt writing instructions, techniques and examples. Omit when absent; empty text is valid.", "x-claimKind": "promptGuidance"},
+        "assetGuidance": {"type": "string", "description": "Image/video/audio/mask requirements, resolution, aspect ratios, fps and duration. Distinguish stated limits, recommendations and baked defaults. Omit when absent; empty text is valid.", "x-claimKind": "assetGuidance"},
+        "modeGuidance": {"type": "string", "description": "Usage modes and switching instructions described by the author. Omit when absent; empty text is valid.", "x-claimKind": "modeGuidance"},
+        "parameterAdvice": {"type": "string", "description": "Author parameter recommendations as reading notes, never an executable parameter write. Omit when absent; empty text is valid.", "x-claimKind": "parameterAdvice"},
+        "mappingSuggestions": {"type": "string", "description": "Author explanations of workflow controls as reading notes, never executable mapping changes. Omit when absent; empty text is valid.", "x-claimKind": "mappingSuggestion"}
+      },
+      "examples": [{}, {"assetGuidance": "The author recommends 1280×720 at 24 fps."}]
+    },
+    "id": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "text": { "type": "string", "minLength": 1, "maxLength": 8000 },
+    "claimIdList": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+    "refList": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+    "binding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["workflowIdentity", "sourceDigest", "notesDigest", "definitionDigest", "extractionSchemaVersion", "promptVersion", "selectedTextModelSnapshot"],
+      "properties": {
+        "workflowIdentity": { "$ref": "#/$defs/id" },
+        "sourceDigest": { "type": "string", "minLength": 1 },
+        "notesDigest": { "type": "string", "minLength": 1 },
+        "definitionDigest": { "type": "string", "minLength": 1 },
+        "extractionSchemaVersion": { "const": "comfy-workflow-documentation-v1.schema.json", "description": "The $id of this schema." },
+        "promptVersion": { "type": "integer", "minimum": 1 },
+        "selectedTextModelSnapshot": { "type": "string", "minLength": 1 }
+      }
+    },
+    "claimKind": { "type": "string", "enum": ["overview", "modelRequirement", "promptGuidance", "assetGuidance", "modeGuidance", "parameterAdvice", "mappingSuggestion"] },
+    "assertionStatus": { "type": "string", "enum": ["authorDeclared", "structurallyVerified", "userConfirmed", "conflicting", "unknown"] },
+    "modelAssertionStatus": { "type": "string", "enum": ["authorDeclared", "unknown"] },
+    "mappingTarget": { "type": "string", "enum": ["positivePrompt", "negativePrompt", "seed", "steps", "cfg", "denoise", "width", "height", "aspectRatio", "resolution", "durationSeconds", "fps", "firstFrame", "lastFrame", "referenceImage", "referenceVideo", "referenceAudio", "mask", "outputImage", "outputVideo", "outputAudio", "advanced"] },
+    "content": {
+      "oneOf": [
+        {"type": "object", "additionalProperties": false, "required": ["kind", "text"], "properties": {"kind": {"const": "note"}, "text": {"type": "string"}}, "description": "Plain reading note for the section selected by the enclosing claim.kind; host assigns metadata. It carries no executable parameter or mapping proposal."},
+        { "type": "object", "additionalProperties": false, "required": ["kind", "text"],
+          "properties": { "kind": { "const": "overview" }, "text": { "$ref": "#/$defs/text" } } },
+        { "type": "object", "additionalProperties": false, "required": ["kind", "resourceName", "urlRefs", "loaderCandidates", "relation"],
+          "properties": { "kind": { "const": "modelRequirement" }, "resourceName": { "$ref": "#/$defs/text" },
+            "urlRefs": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 2048 }, "description": "Author-provided links, view only; never fetched or downloaded." },
+            "loaderCandidates": { "$ref": "#/$defs/refList", "description": "Compiled exec ids from the node closure." },
+            "relation": { "enum": ["required", "recommended", "unknown"] } } },
+        { "type": "object", "additionalProperties": false, "required": ["kind", "usage", "technique", "examples", "targetCandidates"],
+          "properties": { "kind": { "const": "promptGuidance" }, "usage": { "enum": ["positive", "negative", "other"] },
+            "technique": { "$ref": "#/$defs/text" },
+            "examples": { "type": "array", "items": { "$ref": "#/$defs/text" } },
+            "targetCandidates": { "$ref": "#/$defs/refList", "description": "Mapping candidate ids from the closed candidate set." } } },
+        { "type": "object", "additionalProperties": false, "required": ["kind", "role", "advice"],
+          "properties": { "kind": { "const": "assetGuidance" }, "role": { "$ref": "#/$defs/mappingTarget" }, "advice": { "$ref": "#/$defs/text" } } },
+        { "type": "object", "additionalProperties": false, "required": ["kind", "modeName", "condition", "variantCandidates"],
+          "properties": { "kind": { "const": "modeGuidance" }, "modeName": { "$ref": "#/$defs/text" }, "condition": { "$ref": "#/$defs/text" },
+            "variantCandidates": { "$ref": "#/$defs/refList", "description": "Existing structural variant proposal ids; never an executable patch." } } },
+        { "type": "object", "additionalProperties": false, "required": ["kind", "fieldRef", "suggestedValue", "rationale"],
+          "properties": { "kind": { "const": "parameterAdvice" }, "fieldRef": { "$ref": "#/$defs/id" },
+            "suggestedValue": { "type": ["string", "number", "boolean"], "description": "Typed suggestion; applied only after explicit user acceptance through the standard write set." },
+            "rationale": { "$ref": "#/$defs/text" } } },
+        { "type": "object", "additionalProperties": false, "required": ["kind", "candidateId", "semanticRole", "rationale"],
+          "properties": { "kind": { "const": "mappingSuggestion" }, "candidateId": { "$ref": "#/$defs/id" }, "semanticRole": { "$ref": "#/$defs/mappingTarget" }, "rationale": { "$ref": "#/$defs/text" } } }
+      ]
+    },
+    "claim": {
+      "type": "object", "additionalProperties": false,
+      "required": ["claimId", "kind", "content", "noteRefs", "nodeRefs", "fieldRefs", "assertionStatus"],
+      "description": "Typed content matches claim.kind; generic note content is text for that section. Source refs of a generic note identify the input shard, not exact sentence citations.",
+      "properties": {
+        "claimId": { "$ref": "#/$defs/id" },
+        "kind": { "$ref": "#/$defs/claimKind" },
+        "content": { "$ref": "#/$defs/content" },
+        "noteRefs": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+        "nodeRefs": { "$ref": "#/$defs/refList" },
+        "fieldRefs": { "$ref": "#/$defs/refList" },
+        "assertionStatus": { "$ref": "#/$defs/assertionStatus" }
+      }
+    },
+    "coverage": {
+      "type": "object", "additionalProperties": false,
+      "required": ["inputNoteIds", "processedNoteIds", "shards", "complete"],
+      "description": "inputNoteIds = every input note unit (equals the closure); processedNoteIds is a subset; complete is true exactly when every input note was processed.",
+      "properties": {
+        "inputNoteIds": { "$ref": "#/$defs/refList" },
+        "processedNoteIds": { "$ref": "#/$defs/refList" },
+        "shards": { "$ref": "#/$defs/refList" },
+        "complete": { "type": "boolean" }
+      }
+    },
+    "conflict": {
+      "type": "object", "additionalProperties": false,
+      "required": ["conflictId", "claimIds", "sourceRefs", "findingIds"],
+      "properties": {
+        "conflictId": { "$ref": "#/$defs/id" },
+        "claimIds": { "type": "array", "minItems": 2, "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+        "sourceRefs": { "$ref": "#/$defs/refList" },
+        "findingIds": { "$ref": "#/$defs/refList" }
+      }
+    }
+  },
+  "examples": [
+    {
+      "binding": {
+        "workflowIdentity": "entry-wan-animate",
+        "sourceDigest": "sha256:2222",
+        "notesDigest": "sha256:aaaa",
+        "definitionDigest": "sha256:bbbb",
+        "extractionSchemaVersion": "comfy-workflow-documentation-v1.schema.json",
+        "promptVersion": 1,
+        "selectedTextModelSnapshot": "text-model-snapshot"
+      },
+      "claims": [
+        { "claimId": "c-1", "kind": "overview", "content": { "kind": "overview", "text": "Image-to-video workflow with Mix and Move modes." },
+          "noteRefs": ["note-1"], "nodeRefs": [], "fieldRefs": [], "assertionStatus": "authorDeclared" },
+        { "claimId": "c-2", "kind": "modelRequirement", "content": { "kind": "modelRequirement", "resourceName": "wan2.2_animate_14B.safetensors", "urlRefs": ["https://example.invalid/model"], "loaderCandidates": ["4"], "relation": "required" },
+          "noteRefs": ["note-2"], "nodeRefs": ["4"], "fieldRefs": [], "assertionStatus": "authorDeclared" },
+        { "claimId": "c-3", "kind": "promptGuidance", "content": { "kind": "promptGuidance", "usage": "positive", "technique": "Describe the subject motion first.", "examples": ["a dancer spins slowly"], "targetCandidates": ["PositivePrompt|6|text"] },
+          "noteRefs": ["note-1"], "nodeRefs": ["6"], "fieldRefs": [], "assertionStatus": "authorDeclared" },
+        { "claimId": "c-4", "kind": "assetGuidance", "content": { "kind": "assetGuidance", "role": "referenceVideo", "advice": "Use a clip with a clearly visible full body." },
+          "noteRefs": ["note-2"], "nodeRefs": [], "fieldRefs": [], "assertionStatus": "unknown" },
+        { "claimId": "c-5", "kind": "modeGuidance", "content": { "kind": "modeGuidance", "modeName": "Move", "condition": "Disconnect the background video link.", "variantCandidates": ["variant-move"] },
+          "noteRefs": ["note-1"], "nodeRefs": [], "fieldRefs": [], "assertionStatus": "authorDeclared" },
+        { "claimId": "c-6", "kind": "parameterAdvice", "content": { "kind": "parameterAdvice", "fieldRef": "field:3:steps", "suggestedValue": 6, "rationale": "The author recommends 6 steps for the distilled model." },
+          "noteRefs": ["note-2"], "nodeRefs": ["3"], "fieldRefs": ["field:3:steps"], "assertionStatus": "authorDeclared" },
+        { "claimId": "c-7", "kind": "mappingSuggestion", "content": { "kind": "mappingSuggestion", "candidateId": "PositivePrompt|6|text", "semanticRole": "positivePrompt", "rationale": "The note labels this text box as the prompt." },
+          "noteRefs": ["note-1"], "nodeRefs": ["6"], "fieldRefs": [], "assertionStatus": "authorDeclared" }
+      ],
+      "summary": ["c-1"],
+      "modelRequirements": ["c-2"],
+      "promptGuidance": ["c-3"],
+      "assetGuidance": ["c-4"],
+      "modeGuidance": ["c-5"],
+      "parameterAdvice": ["c-6"],
+      "mappingSuggestions": ["c-7"],
+      "coverage": { "inputNoteIds": ["note-1", "note-2"], "processedNoteIds": ["note-1", "note-2"], "shards": ["shard-0"], "complete": true },
+      "conflicts": []
+    }
+  ]
+}

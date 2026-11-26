@@ -1,0 +1,61 @@
+{
+  "$schema": "./voice-dictation.schema.json",
+  "contractId": "voice-dictation",
+  "enabled": true,
+  "language": "zh",
+  "pcm": { "sampleRate": 16000, "channels": 1, "bitsPerSample": 16, "segmentMaxSamples": 400000, "wavHeaderBytes": 44, "segmentMaxWavBytes": 800044 },
+  "vad": {
+    "frameMs": 20, "preRollMs": 200, "silenceReleaseMs": 600, "minSegmentMs": 1500, "forceCutMs": 25000,
+    "forceCutSearchWindowMs": 300, "rmsFloor": 0.008, "noiseFloorMultiplier": 3, "noiseFloorInitial": 0.0026666667,
+    "noiseFloorDecay": 0.98, "noiseFloorAlpha": 0.02, "attackFrames": 3, "releaseFrames": 30
+  },
+  "clientBudget": { "maxBufferedBytes": 8388608, "maxInFlightUploads": 1, "maxCutPendingSegments": 1 },
+  "serverBudget": {
+    "sessionDiskBytes": 536870912, "maxQueuedSegments": 2000, "softWarnQueuedAudioMs": 120000,
+    "hardStopReserveSegments": 2, "minFreeDiskBytes": 1073741824, "inferenceTimeoutMs": 120000,
+    "readResultsMaxPageBytes": 262144
+  },
+  "event": { "changed": "voice-dictation://changed" },
+  "commands": [
+    "voice_dictation_probe", "voice_dictation_start", "voice_dictation_reserve_segment", "voice_dictation_push_segment",
+    "voice_dictation_stop", "voice_dictation_cancel", "voice_dictation_read_results", "voice_dictation_ack_results",
+    "voice_dictation_finish"
+  ],
+  "sessionStates": ["preparing", "recording", "stopping", "draining", "committing", "cancelling", "saveFailed", "failed", "finished", "cancelled"],
+  "segmentOutcomeKinds": ["text", "empty", "failed", "cancelled"],
+  "errors": [
+    "featureDisabled", "runtimeMissing", "modelMissing", "modelEnglishOnly", "modelChanged", "cleanupPending", "modelBusy",
+    "micPermissionDenied", "micNotFound", "micLost",
+    "sessionBusy", "sessionNotFound", "ownerMismatch", "tokenInvalid",
+    "invalidTicket", "invalidFormat", "invalidSequence", "duplicateMismatch", "sessionStopped", "finalSeqMismatch",
+    "queueFull", "diskFull", "ioError",
+    "engineWaitCancelled", "inferenceCancelled", "inferenceTimeout", "inferenceFailed",
+    "prepareTimeout", "modelLoadFailed", "modelStopFailed",
+    "cursorExpired", "ackOutOfRange",
+    "surfaceBusy", "surfaceConflict", "commitReceiptMissing", "commitResultUnknown"
+  ],
+  "errorLocaleKeys": {
+    "featureDisabled": "voiceDictation.err.featureDisabled", "runtimeMissing": "voiceDictation.err.runtimeMissing",
+    "modelMissing": "voiceDictation.err.modelMissing", "modelEnglishOnly": "voiceDictation.err.modelEnglishOnly",
+    "modelChanged": "voiceDictation.err.modelChanged", "cleanupPending": "voiceDictation.err.cleanupPending",
+    "modelBusy": "voiceDictation.err.modelBusy",
+    "micPermissionDenied": "voiceDictation.err.micPermissionDenied", "micNotFound": "voiceDictation.err.micNotFound",
+    "micLost": "voiceDictation.err.micLost", "sessionBusy": "voiceDictation.err.sessionBusy",
+    "sessionNotFound": "voiceDictation.err.sessionNotFound", "ownerMismatch": "voiceDictation.err.ownerMismatch",
+    "tokenInvalid": "voiceDictation.err.tokenInvalid", "invalidTicket": "voiceDictation.err.invalidTicket",
+    "invalidFormat": "voiceDictation.err.invalidFormat", "invalidSequence": "voiceDictation.err.invalidSequence",
+    "duplicateMismatch": "voiceDictation.err.duplicateMismatch", "sessionStopped": "voiceDictation.err.sessionStopped",
+    "finalSeqMismatch": "voiceDictation.err.finalSeqMismatch", "queueFull": "voiceDictation.err.queueFull",
+    "diskFull": "voiceDictation.err.diskFull", "ioError": "voiceDictation.err.ioError",
+    "engineWaitCancelled": "voiceDictation.err.engineWaitCancelled", "inferenceCancelled": "voiceDictation.err.inferenceCancelled",
+    "inferenceTimeout": "voiceDictation.err.inferenceTimeout", "inferenceFailed": "voiceDictation.err.inferenceFailed",
+    "prepareTimeout": "voiceDictation.err.prepareTimeout", "modelLoadFailed": "voiceDictation.err.modelLoadFailed",
+    "modelStopFailed": "voiceDictation.err.modelStopFailed",
+    "cursorExpired": "voiceDictation.err.cursorExpired", "ackOutOfRange": "voiceDictation.err.ackOutOfRange",
+    "surfaceBusy": "voiceDictation.err.surfaceBusy", "surfaceConflict": "voiceDictation.err.surfaceConflict",
+    "commitReceiptMissing": "voiceDictation.err.commitReceiptMissing", "commitResultUnknown": "voiceDictation.err.commitResultUnknown"
+  },
+  "writeModeSeparator": "\n",
+  "resultVersionTitleKeys": { "append": "voiceDictation.versionTitle.append", "replace": "voiceDictation.versionTitle.replace" },
+  "devicePreferenceKey": "bgxiong.micCapture.devicePreference"
+}

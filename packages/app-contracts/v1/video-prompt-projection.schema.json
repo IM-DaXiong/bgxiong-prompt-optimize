@@ -1,0 +1,1174 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "video-prompt-projection.schema.json",
+  "title": "VideoPromptProjectionV1",
+  "description": "Video prompt projection request additions and service-frozen receipt. Extends the existing run_video_prompt_pipeline request: the only mode field is `mode` (adds project_existing) and the only method selection field is `projectionMethodSelection`. No operation alias, no input.request wrapper, no vendor/model/platform fields. Generated types (VS07): pipelineMode, projectionMethodSelection, canonicalDocumentRef, frozenMethod, targetSnapshot, projectionReview, projectionReceipt. `projectionRequestFields` is validation-only for fixtures and is not generated.",
+  "schemaVersion": 1,
+  "definitions": {
+    "pipelineMode": {
+      "type": "string",
+      "enum": [
+        "optimize",
+        "compress_only",
+        "generate",
+        "project_existing",
+        "adapt_expand"
+      ],
+      "description": "Single closed set of pipeline modes; Rust PipelineMode and TS mode use the generated type."
+    },
+    "projectionMethodSelection": {
+      "description": "Client choice only. target_default follows the current target's declared default method; custom names a standard skill package. The service freezes activation, body/resource hashes and target caps; a client cannot submit those.",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "const": "target_default"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "stableId",
+            "packageDigest"
+          ],
+          "properties": {
+            "kind": {
+              "const": "custom"
+            },
+            "stableId": {
+              "$ref": "agent-skills.json#/definitions/stableId"
+            },
+            "packageDigest": {
+              "$ref": "agent-skills.json#/definitions/packageDigest"
+            }
+          }
+        }
+      ]
+    },
+    "canonicalDocumentScope": {
+      "type": "string",
+      "enum": [
+        "segment_node"
+      ],
+      "description": "Where Rust persists a reviewed canonical document. clip_draft_only hosts (free canvas, clips) persist none, so project_existing is rejected for them (VS00 CF-01)."
+    },
+    "canonicalDocumentRef": {
+      "description": "Identity of a reviewed canonical document as issued by Rust in a previous receipt. The service re-reads the node and compares both fingerprints before projecting.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scope",
+        "segmentNodeId",
+        "canonicalFingerprint",
+        "contentFingerprint"
+      ],
+      "properties": {
+        "scope": {
+          "$ref": "#/definitions/canonicalDocumentScope"
+        },
+        "segmentNodeId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "canonicalFingerprint": {
+          "$ref": "agent-skills.json#/definitions/sha256Hex"
+        },
+        "contentFingerprint": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "description": "Node content CAS fingerprint exactly as issued by Rust; TS-computed fingerprints are not accepted."
+        }
+      }
+    },
+    "spanSourceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "storyId",
+        "sceneId",
+        "spanId",
+        "spanRevision",
+        "snapshotRef"
+      ],
+      "properties": {
+        "storyId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        },
+        "sceneId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        },
+        "spanId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        },
+        "spanRevision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "snapshotRef": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        }
+      },
+      "description": "SP029: Rust-issued video span source reference, copied verbatim from video.span.read (spanId, revision, snapshotRef). The request's segmentNodeId is that span's physical target; the source closure is the span's ordered shots (never mergeSourceSegmentIds). Clients never compute it."
+    },
+    "expressionLanguage": {
+      "type": "string",
+      "enum": [
+        "zh",
+        "en"
+      ]
+    },
+    "frozenResource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "resourceRef",
+        "sha256"
+      ],
+      "properties": {
+        "resourceRef": {
+          "$ref": "agent-skills.json#/definitions/resourceRef"
+        },
+        "sha256": {
+          "$ref": "agent-skills.json#/definitions/sha256Hex"
+        }
+      }
+    },
+    "selectionKind": {
+      "type": "string",
+      "enum": [
+        "target_default",
+        "custom"
+      ]
+    },
+    "frozenMethod": {
+      "description": "Service-frozen method identity; part of the receipt and the projection fingerprint.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "selectionKind",
+        "activationId",
+        "stableId",
+        "packageDigest",
+        "name",
+        "bodySha256",
+        "resources",
+        "bindingProfileId",
+        "bindingProfileVersion"
+      ],
+      "properties": {
+        "selectionKind": {
+          "$ref": "#/definitions/selectionKind"
+        },
+        "activationId": {
+          "$ref": "agent-skills.json#/definitions/activationId"
+        },
+        "stableId": {
+          "$ref": "agent-skills.json#/definitions/stableId"
+        },
+        "packageDigest": {
+          "$ref": "agent-skills.json#/definitions/packageDigest"
+        },
+        "name": {
+          "$ref": "agent-skills.json#/definitions/skillName"
+        },
+        "bodySha256": {
+          "$ref": "agent-skills.json#/definitions/sha256Hex"
+        },
+        "resources": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/definitions/frozenResource"
+          },
+          "description": "Resources actually read for this run from the activation snapshot (not latest)."
+        },
+        "bindingProfileId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "bindingProfileVersion": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "targetSnapshot": {
+      "description": "Service-frozen target capability snapshot used by the projection.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profileId",
+        "profileVersion",
+        "inputMode",
+        "durationSeconds",
+        "capsDigest",
+        "expressionLanguage",
+        "referenceUseIds"
+      ],
+      "properties": {
+        "profileId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "description": "Projection profile id declared by the target adapter capability; opaque to the host."
+        },
+        "profileVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "inputMode": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "description": "One of the vendor-adapter runtime-caps implementedModeIds of the target; validated by the service against target caps (VS00 CF-03)."
+        },
+        "durationSeconds": {
+          "anyOf": [
+            {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "capsDigest": {
+          "$ref": "agent-skills.json#/definitions/sha256Hex"
+        },
+        "expressionLanguage": {
+          "$ref": "#/definitions/expressionLanguage"
+        },
+        "referenceUseIds": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "description": "Opaque id issued by Rust inside the frozen mother/inventory closed set; membership is checked by the service, never by text search."
+          }
+        }
+      }
+    },
+    "motherDocumentOrigin": {
+      "type": "string",
+      "enum": [
+        "authored",
+        "reused_cache",
+        "existing_canonical",
+        "adapted_expansion"
+      ]
+    },
+    "projectionReview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "invoked",
+        "blockingCount",
+        "minorCount",
+        "repairRounds"
+      ],
+      "properties": {
+        "invoked": {
+          "type": "boolean"
+        },
+        "blockingCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "minorCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "repairRounds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "not_run",
+            "completed",
+            "incomplete"
+          ],
+          "description": "Actual review completion, independent of whether the usable draft is saved. Missing on older receipts means unrecorded, never passed."
+        },
+        "canonicalFingerprint": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Canonical document actually reviewed. No inheritance across a different document."
+        }
+      }
+    },
+    "projectionReceipt": {
+      "description": "Returned for optimize/generate/project_existing; GUI, F1 and MCP read the same receipt.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "motherDocumentOrigin",
+        "canonicalDocumentRef",
+        "frozenMethod",
+        "targetSnapshot",
+        "projectionFingerprint",
+        "expressionModelInvoked",
+        "review"
+      ],
+      "properties": {
+        "mode": {
+          "$ref": "#/definitions/pipelineMode"
+        },
+        "motherDocumentOrigin": {
+          "$ref": "#/definitions/motherDocumentOrigin"
+        },
+        "canonicalDocumentRef": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/canonicalDocumentRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Null for clip_draft_only hosts, which persist no canonical."
+        },
+        "frozenMethod": {
+          "$ref": "#/definitions/frozenMethod"
+        },
+        "targetSnapshot": {
+          "$ref": "#/definitions/targetSnapshot"
+        },
+        "projectionFingerprint": {
+          "$ref": "agent-skills.json#/definitions/sha256Hex"
+        },
+        "expressionModelInvoked": {
+          "type": "boolean"
+        },
+        "review": {
+          "$ref": "#/definitions/projectionReview"
+        },
+        "expansionPolicy": {
+          "$ref": "video-prompt-channels.schema.json#/definitions/expansionPolicy"
+        },
+        "promptChannels": {
+          "$ref": "video-prompt-channels.schema.json#/definitions/promptChannels"
+        },
+        "actualExpanded": {
+          "type": "boolean"
+        },
+        "motherReview": {
+          "$ref": "#/definitions/projectionReview"
+        },
+        "reviewInvokedThisRun": {
+          "type": "boolean",
+          "description": "This operation invoked projection review; review stores the artifact evidence, including cached incomplete evidence."
+        }
+      }
+    },
+    "projectionRequestFields": {
+      "description": "Validation-only view of the additive request fields on the existing open VideoPromptPipelineRequest. Not generated.",
+      "type": "object",
+      "required": [
+        "mode"
+      ],
+      "properties": {
+        "mode": {
+          "$ref": "#/definitions/pipelineMode"
+        },
+        "projectionMethodSelection": {
+          "$ref": "#/definitions/projectionMethodSelection"
+        },
+        "canonicalDocumentRef": {
+          "$ref": "#/definitions/canonicalDocumentRef"
+        },
+        "collectScope": {
+          "type": "string",
+          "enum": [
+            "segment",
+            "clip_draft_only"
+          ]
+        },
+        "expansionOverride": {
+          "$ref": "#/definitions/expansionMode"
+        },
+        "userInstructions": {
+          "type": "string"
+        },
+        "negativePromptInput": {
+          "$ref": "#/definitions/negativeInput"
+        },
+        "negativePromptOperation": {
+          "$ref": "#/definitions/negativeOperation"
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "#/definitions/projectionOperationConstraints"
+        }
+      ]
+    },
+    "referenceMediaInventoryItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "token",
+        "mediaKind",
+        "label"
+      ],
+      "properties": {
+        "token": {
+          "type": "string"
+        },
+        "mediaKind": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "bindingId": {
+          "type": "string"
+        },
+        "sourceKind": {
+          "type": "string"
+        },
+        "mediaRelativePath": {
+          "type": "string"
+        },
+        "audioUsage": {
+          "type": "string"
+        },
+        "itemId": {
+          "type": "string"
+        },
+        "ordinalWithinKind": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "declaredEntityKind": {
+          "type": "string"
+        },
+        "declaredIdentity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "entityKind",
+            "entityId"
+          ],
+          "properties": {
+            "entityKind": {
+              "type": "string"
+            },
+            "entityId": {
+              "type": "string"
+            }
+          }
+        },
+        "transportRole": {
+          "type": "string",
+          "enum": [
+            "first_frame",
+            "last_frame",
+            "reference_image"
+          ]
+        }
+      }
+    },
+    "projectionQueryInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "videoProviderKind",
+        "intentInputMode",
+        "projectionMethodSelection",
+        "referenceMediaInventory"
+      ],
+      "properties": {
+        "videoProviderKind": {
+          "type": "string"
+        },
+        "videoModelId": {
+          "type": "string"
+        },
+        "intentInputMode": {
+          "type": "string"
+        },
+        "durationSeconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "projectionMethodSelection": {
+          "$ref": "#/definitions/projectionMethodSelection"
+        },
+        "referenceMediaInventory": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/referenceMediaInventoryItem"
+          }
+        },
+        "candidateCursor": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Opaque candidate continuation issued by this query; omit on the first page."
+        }
+      }
+    },
+    "projectionQueryMethod": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stableId",
+        "packageDigest",
+        "name",
+        "displayName",
+        "compatibility",
+        "missingResourceRefs",
+        "resourceRefs",
+        "expansionDeclaration"
+      ],
+      "properties": {
+        "stableId": {
+          "$ref": "agent-skills.json#/definitions/stableId"
+        },
+        "packageDigest": {
+          "$ref": "agent-skills.json#/definitions/packageDigest"
+        },
+        "name": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "compatibility": {
+          "$ref": "agent-skill-library.schema.json#/definitions/projectionBindingState"
+        },
+        "missingResourceRefs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "resourceRefs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "expansionDeclaration": {
+          "$ref": "agent-skills.json#/definitions/expansionDeclarationView"
+        }
+      }
+    },
+    "projectionQueryIssue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "detail"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "VIDEO_PROMPT_TARGET_MISSING",
+            "PROMPT_PROJECTION_INVALID",
+            "PROMPT_PROJECTION_UNKNOWN_PROFILE",
+            "PROMPT_PROJECTION_NOT_APPLICABLE",
+            "VIDEO_PROMPT_INPUT_MODE_UNSUPPORTED",
+            "VIDEO_PROMPT_CAPS_DIGEST_MISSING",
+            "VIDEO_PROMPT_REFERENCE_ID_MISSING",
+            "VIDEO_PROMPT_PROJECTOR_MISSING",
+            "VIDEO_PROMPT_TARGET_SNAPSHOT_INVALID",
+            "PROJECTION_TARGET_PROJECTOR_NOT_REGISTERED",
+            "PROJECTION_DEFAULT_METHOD_NOT_INSTALLED",
+            "PROJECTION_CUSTOM_METHOD_NOT_INSTALLED",
+            "PROJECTION_CUSTOM_DIGEST_MISMATCH",
+            "PROJECTION_METHOD_RECORD_UNREADABLE",
+            "PROJECTION_METHOD_LIBRARY_UNAVAILABLE",
+            "PROJECTION_METHOD_LIBRARY_CHANGED",
+            "PROJECTION_METHOD_NOT_BOUND",
+            "PROJECTION_BINDING_OUT_OF_RANGE",
+            "PROJECTION_BINDING_DUPLICATE_PROFILE_VERSION",
+            "PROJECTION_BINDING_DUPLICATE_ITEM",
+            "PROJECTION_BINDING_UNKNOWN_PROFILE",
+            "PROJECTION_BINDING_INPUT_MODE_UNSUPPORTED",
+            "PROJECTION_BINDING_INVALID_RESOURCE_REF",
+            "PROJECTION_BINDING_RESOURCE_MISSING",
+            "PROJECTION_BINDING_MANIFEST_MISMATCH",
+            "PROJECTION_CANDIDATE_CURSOR_INVALID",
+            "PROJECTION_EXPANSION_DECLARATION_INVALID",
+            "PROJECTION_METHOD_DISABLED",
+            "PROJECTION_METHOD_HOST_NOT_ENABLED"
+          ]
+        },
+        "detail": {
+          "type": "string"
+        }
+      }
+    },
+    "projectionInventoryLabel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "itemId",
+        "token"
+      ],
+      "properties": {
+        "itemId": {
+          "type": "string"
+        },
+        "token": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "projectionQueryResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "targetSnapshot",
+        "capsRevision",
+        "syntaxProfileId",
+        "defaultMethodName",
+        "selectedMethod",
+        "inventoryLabels",
+        "selectableMethods",
+        "issue",
+        "methodCandidates",
+        "recommendedExistingMode",
+        "nextCandidateCursor"
+      ],
+      "properties": {
+        "targetSnapshot": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/targetSnapshot"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "capsRevision": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "syntaxProfileId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "defaultMethodName": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "selectedMethod": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/projectionQueryMethod"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "inventoryLabels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/projectionInventoryLabel"
+          }
+        },
+        "selectableMethods": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/projectionQueryMethod"
+          }
+        },
+        "issue": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/projectionQueryIssue"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "methodCandidates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/projectionMethodCandidate"
+          }
+        },
+        "recommendedExistingMode": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/existingProjectionMode"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "nextCandidateCursor": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "pipelineBusinessRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "$ref": "#/definitions/pipelineMode"
+        },
+        "segmentNodeId": {
+          "type": "string"
+        },
+        "storyId": {
+          "type": "string"
+        },
+        "actionDescriptionDraft": {
+          "type": "string"
+        },
+        "videoProviderKind": {
+          "type": "string"
+        },
+        "videoModelId": {
+          "type": "string"
+        },
+        "workflowClassTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "displayLabels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "intentInputMode": {
+          "type": "string"
+        },
+        "referenceMediaInventory": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/referenceMediaInventoryItem"
+          }
+        },
+        "includeCameraInSources": {
+          "type": "boolean"
+        },
+        "targetMaxChars": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "collectScope": {
+          "enum": [
+            "segment",
+            "clip_draft_only"
+          ]
+        },
+        "clipPromptFields": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "title": {
+              "type": "string"
+            },
+            "visualPrompt": {
+              "type": "string"
+            },
+            "cameraPrompt": {
+              "type": "string"
+            },
+            "performancePrompt": {
+              "type": "string"
+            },
+            "dialogue": {
+              "type": "string"
+            },
+            "stylePrompt": {
+              "type": "string"
+            }
+          },
+          "required": []
+        },
+        "styleDomain": {
+          "type": "string"
+        },
+        "hostSurface": {
+          "type": "string",
+          "enum": [
+            "free_canvas",
+            "clip_canvas"
+          ]
+        },
+        "workspaceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "durationSeconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "optimizeSkillId": {
+          "type": "string"
+        },
+        "optimizeSkillDigest": {
+          "type": "string"
+        },
+        "identityPrimaryChoices": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "entityKind": {
+                "type": "string"
+              },
+              "entityId": {
+                "type": "string"
+              },
+              "itemId": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "entityKind",
+              "entityId",
+              "itemId"
+            ]
+          }
+        },
+        "projectionMethodSelection": {
+          "$ref": "#/definitions/projectionMethodSelection"
+        },
+        "canonicalDocumentRef": {
+          "$ref": "#/definitions/canonicalDocumentRef"
+        },
+        "expansionOverride": {
+          "$ref": "#/definitions/expansionMode"
+        },
+        "userInstructions": {
+          "type": "string"
+        },
+        "negativePromptInput": {
+          "$ref": "#/definitions/negativeInput"
+        },
+        "negativePromptOperation": {
+          "$ref": "#/definitions/negativeOperation"
+        }
+      },
+      "required": [
+        "mode",
+        "segmentNodeId",
+        "storyId",
+        "actionDescriptionDraft",
+        "hostSurface"
+      ],
+      "description": "Existing video prompt business request shared by IPC/Creator; textServiceOverride is host-injected transport credential material and is never published to model tools.",
+      "allOf": [
+        {
+          "$ref": "#/definitions/projectionOperationConstraints"
+        },
+        {
+          "if": {
+            "properties": {
+              "hostSurface": {
+                "const": "clip_canvas"
+              }
+            },
+            "required": [
+              "hostSurface"
+            ]
+          },
+          "then": {
+            "required": [
+              "workspaceId",
+              "collectScope"
+            ],
+            "properties": {
+              "collectScope": {
+                "const": "clip_draft_only"
+              }
+            }
+          },
+          "else": {
+            "not": {
+              "required": [
+                "workspaceId"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "projectionOperationConstraints": {
+      "description": "Single source of operation-specific projection selection/canonical fields; validation-only, not generated.",
+      "allOf": [
+        {
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "operation"
+                ]
+              },
+              {
+                "required": [
+                  "input"
+                ]
+              },
+              {
+                "required": [
+                  "frozenMethod"
+                ]
+              },
+              {
+                "required": [
+                  "targetSnapshot"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "compress_only"
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "projectionMethodSelection"
+                  ]
+                },
+                {
+                  "required": [
+                    "canonicalDocumentRef"
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "enum": [
+                  "optimize",
+                  "generate"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "projectionMethodSelection"
+            ],
+            "not": {
+              "required": [
+                "canonicalDocumentRef"
+              ]
+            },
+            "properties": {
+              "projectionMethodSelection": {
+                "$ref": "#/definitions/projectionMethodSelection"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "enum": [
+                  "project_existing",
+                  "adapt_expand"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "projectionMethodSelection",
+              "canonicalDocumentRef"
+            ],
+            "properties": {
+              "collectScope": {
+                "const": "segment"
+              },
+              "projectionMethodSelection": {
+                "$ref": "#/definitions/projectionMethodSelection"
+              },
+              "canonicalDocumentRef": {
+                "$ref": "#/definitions/canonicalDocumentRef"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "projectionMethodCandidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stableId",
+        "packageDigest",
+        "name",
+        "displayName",
+        "compatibility",
+        "missingResourceRefs",
+        "resourceRefs",
+        "compatible",
+        "issue",
+        "expansionDeclaration"
+      ],
+      "properties": {
+        "stableId": {
+          "$ref": "agent-skills.json#/definitions/stableId"
+        },
+        "packageDigest": {
+          "$ref": "agent-skills.json#/definitions/packageDigest"
+        },
+        "name": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "compatibility": {
+          "$ref": "agent-skill-library.schema.json#/definitions/projectionBindingState"
+        },
+        "missingResourceRefs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "resourceRefs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "expansionDeclaration": {
+          "$ref": "agent-skills.json#/definitions/expansionDeclarationView"
+        },
+        "compatible": {
+          "type": "boolean"
+        },
+        "issue": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "code",
+                "detail"
+              ],
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "detail": {
+                  "type": "string"
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "negativeInput": {
+      "$ref": "video-prompt-channels.schema.json#/definitions/negativeInput"
+    },
+    "negativeOperation": {
+      "$ref": "video-prompt-channels.schema.json#/definitions/negativeOperation"
+    },
+    "expansionMode": {
+      "$ref": "video-prompt-channels.schema.json#/definitions/expansionMode"
+    },
+    "projectionDraft": {
+      "$ref": "video-prompt-projection-draft.schema.json#/definitions/projectionDraft"
+    },
+    "projectionReviewResult": {
+      "$ref": "video-prompt-projection-draft.schema.json#/definitions/projectionReviewResult"
+    },
+    "existingProjectionMode": {
+      "type": "string",
+      "enum": [
+        "project_existing",
+        "adapt_expand"
+      ]
+    }
+  }
+}

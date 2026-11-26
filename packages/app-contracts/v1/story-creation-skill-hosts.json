@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "stages": {
+    "chapters": "story-chapters",
+    "scenes": "chapter-scenes",
+    "storyboard": "scene-storyboard",
+    "roles": "chapter-roles",
+    "props": "chapter-props",
+    "integration": "story-entity-integration",
+    "clipPlan": "episode-clip-plan",
+    "environmentPrompt": "clip-environment-prompt",
+    "clipDraft": "clip-video-draft",
+    "framePlan": "clip-frame-plan",
+    "framePrompt": "clip-frame-prompt"
+  }
+}

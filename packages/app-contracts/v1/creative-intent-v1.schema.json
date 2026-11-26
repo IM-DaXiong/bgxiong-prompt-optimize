@@ -1,0 +1,73 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creative-intent-v1.schema.json",
+  "title": "CreativeIntentV1",
+  "description": "S12: user creative intent for F1/MCP prompt optimize / revise. Semantics are carried by closed enums and structured proposedChanges — hosts must not grep free-text goal/notes for policy. applyPolicy is the only switch that decides auto-apply vs preview.",
+  "definitions": {
+    "nonBlank": { "type": "string", "minLength": 1, "maxLength": 512, "pattern": "\\S" },
+    "goalKind": {
+      "enum": [
+        "optimizeStaticFramePrompt",
+        "optimizeActionDescription",
+        "optimizeVideoPrompt",
+        "reviseSelectedFields",
+        "clarifyThenPropose",
+        "otherStructured"
+      ]
+    },
+    "applyPolicy": {
+      "enum": ["previewOnly", "applyWhenNoBlocking", "applyDirect"],
+      "description": "previewOnly = never write; applyWhenNoBlocking = write only when review has zero blocking findings; applyDirect = write without waiting for a review round (still subject to revision CAS)."
+    },
+    "changeOp": {
+      "enum": ["set", "clear", "append"],
+      "description": "Structural edit op. Hosts apply by fieldId, never by searching goal text."
+    },
+    "proposedChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["changeId", "targetRef", "fieldId", "op", "expectedResourceRevision"],
+      "properties": {
+        "changeId": { "$ref": "#/definitions/nonBlank" },
+        "targetRef": { "$ref": "creator-resource-ref.schema.json" },
+        "fieldId": { "$ref": "#/definitions/nonBlank" },
+        "op": { "$ref": "#/definitions/changeOp" },
+        "value": { "type": "string", "description": "Required for set/append; forbidden for clear. Full text, never truncated." },
+        "expectedResourceRevision": { "$ref": "#/definitions/nonBlank" },
+        "expectedDraftRevision": { "oneOf": [{ "type": "null" }, { "$ref": "#/definitions/nonBlank" }] }
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "intentId", "goalKind", "goal", "target", "applyPolicy", "sourceRefs", "proposedChanges"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "intentId": { "$ref": "#/definitions/nonBlank" },
+    "goalKind": { "$ref": "#/definitions/goalKind" },
+    "goal": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human goal text for the model. Hosts must not parse it for apply/rewrite policy."
+    },
+    "target": { "$ref": "creator-resource-ref.schema.json" },
+    "applyPolicy": { "$ref": "#/definitions/applyPolicy" },
+    "sourceRefs": {
+      "type": "array",
+      "maxItems": 64,
+      "items": { "$ref": "creator-resource-ref.schema.json" },
+      "description": "Closed set of sources the model may cite. Empty = none; hosts never invent sources from navigation."
+    },
+    "proposedChanges": {
+      "type": "array",
+      "maxItems": 64,
+      "items": { "$ref": "#/definitions/proposedChange" },
+      "description": "May be empty on clarifyThenPropose. Each change targets one field on one resource."
+    },
+    "contextPackRef": {
+      "oneOf": [{ "type": "null" }, { "$ref": "#/definitions/nonBlank" }],
+      "description": "Opaque id of a CreativeContextPack page/summary the intent was built from."
+    },
+    "notes": { "type": "string" }
+  }
+}

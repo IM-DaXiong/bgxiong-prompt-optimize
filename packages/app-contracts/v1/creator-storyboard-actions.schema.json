@@ -1,0 +1,717 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-storyboard-actions.schema.json",
+  "title": "CreatorStoryboardActions",
+  "description": "W5 Batch4: storyboard.change.prepare payload (A504 data rows incl. W5-remainder shot.prompt.patch / shot.reorder / storyboard.delete). Applied by change.apply (plan kind storyboard.change) via StoryboardPlanApplier; undoClass: graph-only plans (graph.save / node.move / edge.disconnect) get a change.undo token (S54, UNDO_CONFLICT after later edits), all other plans none; scene write-guard busy -> GRAPH_TARGET_BUSY (S55). No entitlement gate (IPC twins have none). S60: story.shot.restructure (semantic merge/split of storyboard shots; reviewed S57 proposal + proposalHash + expectedRevisions; apply = S58 plan + S59 single transaction, no model call; must be alone; change.undo token = CAS'd inverse, any later edit -> UNDO_CONFLICT with zero writes).",
+  "type": "object",
+  "required": [
+    "actions"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "description": "IPC save_storyboard_graph core (scene guard + validate_graph_shape + compact inbound ports + save_graph). CAS on graph revision; compensation writes the pre-image graph back.",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "chapterNodeId",
+              "sceneNodeId",
+              "graph",
+              "expectedRevision"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "story.storyboard.graph.save"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "chapterNodeId": {
+                "type": "string"
+              },
+              "sceneNodeId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "graph": {
+                "type": "object",
+                "required": [
+                  "nodes",
+                  "edges",
+                  "viewport"
+                ]
+              },
+              "expectedRevision": {
+                "type": "string",
+                "minLength": 1,
+                "description": "本计划开始前读取的图版本；同一计划同一图的动作填写同一个值，Host 接力本计划产生的版本，事务内仍校验实际图。"
+              },
+              "persistIntent": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "IPC save_segment_storyboard_workbench_draft (input = SaveSegmentStoryboardWorkbenchDraftInput; fingerprint CAS). Must be alone.",
+            "required": [
+              "type",
+              "actionId",
+              "input"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "story.storyboard.pad.save"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "input": {
+                "type": "object",
+                "required": [
+                  "storyId",
+                  "chapterNodeId",
+                  "sceneNodeId",
+                  "segmentNodeId",
+                  "staticFramePrompt",
+                  "expectedStaticFramePromptFingerprint",
+                  "reason"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "storyId": {
+                    "type": "string"
+                  },
+                  "chapterNodeId": {
+                    "type": "string"
+                  },
+                  "sceneNodeId": {
+                    "type": "string"
+                  },
+                  "segmentNodeId": {
+                    "type": "string"
+                  },
+                  "staticFramePrompt": {
+                    "type": "string"
+                  },
+                  "expectedStaticFramePromptFingerprint": {
+                    "type": "string"
+                  },
+                  "characterLock": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "expectedCharacterLockFingerprint": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "aspectRatio": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "expectedVisualParamsFingerprint": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "reason": {
+                    "enum": [
+                      "manual",
+                      "ai_optimize",
+                      "generation_preflight",
+                      "live"
+                    ]
+                  }
+                },
+                "allOf": [
+                  {
+                    "if": {
+                      "required": [
+                        "aspectRatio"
+                      ]
+                    },
+                    "then": {
+                      "required": [
+                        "expectedVisualParamsFingerprint"
+                      ]
+                    }
+                  },
+                  {
+                    "if": {
+                      "required": [
+                        "expectedVisualParamsFingerprint"
+                      ]
+                    },
+                    "then": {
+                      "required": [
+                        "aspectRatio"
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "IPC patch_segment_storyboard_visual_params (input = PatchSegmentStoryboardVisualParamsInput; fingerprint CAS). Must be alone.",
+            "required": [
+              "type",
+              "actionId",
+              "input"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "story.shot.visualParams.patch"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "input": {
+                "type": "object",
+                "required": [
+                  "storyId",
+                  "chapterNodeId",
+                  "sceneNodeId",
+                  "segmentNodeId",
+                  "expectedVisualParamsFingerprint",
+                  "changes"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "IPC change_shot_number (cascading renumber). Must be alone.",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "chapterNodeId",
+              "sceneNodeId",
+              "oldShotNumber",
+              "newShotNumber"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "story.shot.number.change"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "chapterNodeId": {
+                "type": "string"
+              },
+              "sceneNodeId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "oldShotNumber": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "newShotNumber": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "IPC add_shots_at_position (StoryboardService). Must be alone.",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "chapterNodeId",
+              "sceneNodeId",
+              "insertAt",
+              "count"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "story.shot.create"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "chapterNodeId": {
+                "type": "string"
+              },
+              "sceneNodeId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "insertAt": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "count": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "layout": {
+                "type": "object",
+                "required": [
+                  "anchorX",
+                  "anchorY"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "anchorX": {
+                    "type": "number"
+                  },
+                  "anchorY": {
+                    "type": "number"
+                  },
+                  "fromSegmentNodeId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "chapterNodeId",
+              "sceneNodeId",
+              "segmentNodeId",
+              "promptText",
+              "expectedRevision"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "story.shot.prompt.patch"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "chapterNodeId": {
+                "type": "string"
+              },
+              "sceneNodeId": {
+                "type": "string"
+              },
+              "segmentNodeId": {
+                "type": "string"
+              },
+              "promptText": {
+                "type": "string"
+              },
+              "expectedRevision": {
+                "type": "string"
+              }
+            },
+            "description": "W5 remainder: narrow static-frame prompt patch (UI StoryboardWorkbench manual save of the prompt only). `expectedRevision` = `staticFramePromptFingerprint` (CAS). Compensation: pre-image prompt, CAS on new fp."
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "chapterNodeId",
+              "sceneNodeId",
+              "segmentNodeId",
+              "newShotNumber"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "story.shot.reorder"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "chapterNodeId": {
+                "type": "string"
+              },
+              "sceneNodeId": {
+                "type": "string"
+              },
+              "segmentNodeId": {
+                "type": "string"
+              },
+              "newShotNumber": {
+                "type": "integer"
+              }
+            },
+            "description": "W5 remainder: drag-reorder a shot to a new shot number (IPC `assign_shot_number_for_segment`)."
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "chapterNodeId",
+              "sceneNodeId",
+              "targets"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "story.storyboard.delete"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "chapterNodeId": {
+                "type": "string"
+              },
+              "sceneNodeId": {
+                "type": "string"
+              },
+              "targets": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "nodeId",
+                    "kind"
+                  ],
+                  "properties": {
+                    "nodeId": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "kind": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "userConfirmedPhysicalDelete": {
+                "type": "boolean"
+              },
+              "shotGraphDetach": {
+                "type": "boolean"
+              },
+              "confirm": {
+                "type": "boolean"
+              }
+            },
+            "description": "W5 remainder: storyboard canvas delete (IPC `execute_storyboard_canvas_delete`). Physical delete requires `userConfirmedPhysicalDelete=true` + `confirm=true` and must be alone (irreversible)."
+          },
+          {
+            "type": "object",
+            "description": "S75: storyboard canvas reset layout (UI button). Same owner as the UI (storyboard_graph::apply_reset_layout) through the save_storyboard_graph core: every shot node re-placed masonry-style in shot-number order, custom tile sizes cleared, viewport replaced (default panX 0, panY 0, scale 1). Never changes membership, edges or shot numbers. CAS on graph revision; compensation writes the pre-image graph back.",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "chapterNodeId",
+              "sceneNodeId",
+              "containerWidth",
+              "expectedRevision"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "story.storyboard.layout.reset"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "chapterNodeId": {
+                "type": "string"
+              },
+              "sceneNodeId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "expectedRevision": {
+                "type": "string",
+                "minLength": 1,
+                "description": "本计划开始前读取的图版本；同一计划同一图的动作填写同一个值，Host 接力本计划产生的版本，事务内仍校验实际图。"
+              },
+              "containerWidth": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "description": "画布容器可用宽度（像素），决定瀑布流列数。"
+              },
+              "viewport": {
+                "type": "object",
+                "required": [
+                  "panX",
+                  "panY",
+                  "scale"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "panX": {
+                    "type": "number"
+                  },
+                  "panY": {
+                    "type": "number"
+                  },
+                  "scale": {
+                    "type": "number",
+                    "minimum": 0.01,
+                    "maximum": 20
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "S53: storyboard canvas drag. Read-modify-write of the save_storyboard_graph core (UserEdit intent, scene guard, inbound-port compaction); only x/y of the listed nodes change. CAS on graph revision; compensation writes the pre-image graph back.",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "chapterNodeId",
+              "sceneNodeId",
+              "moves",
+              "expectedRevision"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "story.storyboard.node.move"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "chapterNodeId": {
+                "type": "string"
+              },
+              "sceneNodeId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "expectedRevision": {
+                "type": "string",
+                "minLength": 1,
+                "description": "本计划开始前读取的图版本；同一计划同一图的动作填写同一个值，Host 接力本计划产生的版本，事务内仍校验实际图。"
+              },
+              "moves": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "nodeId",
+                    "x",
+                    "y"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "nodeId": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "x": {
+                      "type": "number"
+                    },
+                    "y": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "S53: delete storyboard connection lines (same core as UI edge delete → graph save; inbound ports compacted). Never removes nodes. CAS on graph revision; compensation writes the pre-image graph back.",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "chapterNodeId",
+              "sceneNodeId",
+              "edgeIds",
+              "expectedRevision"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "story.storyboard.edge.disconnect"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "chapterNodeId": {
+                "type": "string"
+              },
+              "sceneNodeId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "expectedRevision": {
+                "type": "string",
+                "minLength": 1,
+                "description": "本计划开始前读取的图版本；同一计划同一图的动作填写同一个值，Host 接力本计划产生的版本，事务内仍校验实际图。"
+              },
+              "edgeIds": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "S60: semantic merge (2+ shots -> 1, no upper cap, anchor id kept, other sources become restorable tombstones) or split (1 -> 2+ parts, anchor part keeps the source id) inside ONE scene graph. proposal = ShotRestructureProposalV1 exactly as reviewed (creator-shot-restructure-v1.schema.json); proposalHash must equal sha256 over proposal + expectedRevisions and must come from a passing structured review in this session (else SHOT_RESTRUCTURE_PROPOSAL_HASH_MISMATCH / SHOT_RESTRUCTURE_PROPOSAL_NOT_REVIEWED). Prepare diff carries the S58 plan preview (resultMapping, archivedSources, regenerate, facts, warnings). Stale sources/graph -> SHOT_RESTRUCTURE_SOURCE_STALE, running writer -> SHOT_RESTRUCTURE_TARGET_BUSY, all with zero writes. Must be alone.",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "chapterNodeId",
+              "sceneNodeId",
+              "proposal",
+              "proposalHash",
+              "expectedRevisions"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "story.shot.restructure"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "chapterNodeId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sceneNodeId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "proposal": {
+                "type": "object",
+                "required": [
+                  "op",
+                  "schemaVersion"
+                ],
+                "description": "ShotRestructureProposalV1 (op merge|split, schemaVersion 1); unknown fields rejected."
+              },
+              "proposalHash": {
+                "type": "string",
+                "minLength": 1
+              },
+              "expectedRevisions": {
+                "type": "object",
+                "required": [
+                  "graphRevision",
+                  "shots"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "graphRevision": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "shots": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "shotNodeId",
+                        "revision"
+                      ],
+                      "additionalProperties": false,
+                      "properties": {
+                        "shotNodeId": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "revision": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

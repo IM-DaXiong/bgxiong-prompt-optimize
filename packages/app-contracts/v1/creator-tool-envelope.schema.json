@@ -1,0 +1,424 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-tool-envelope.schema.json",
+  "title": "CreatorToolResult (one result envelope for F1 in-process Kernel calls, IPC and MCP structuredContent)",
+  "description": "MCP structuredContent and the F1 Kernel result are this same object; MCP content text is its JSON text and optional image parts come from callContext.includeImageContent. data carries the typed tool payload and verifiable receipt fields; request is the shared CreatorRequests projection reference after the call. Video prompt process results distinguish a completed text task from result.commit (committed/candidate/conflict/not_applicable); only committed with a canonical effect proves a saved body. Describe is a read-only observation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "ok"
+  ],
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "toolId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "data": {
+      "description": "Typed tool payload. When the call recorded a canonical effect, data.effect names it (full shape: creator-effect-receipt.schema.json); clients refresh/locate by effectId, never by parsing the payload.",
+      "properties": {
+        "effect": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/effectRef"
+            }
+          ]
+        }
+      }
+    },
+    "error": {
+      "$ref": "#/definitions/errorBody"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "request": {
+      "$ref": "#/definitions/requestRef"
+    },
+    "replayed": {
+      "type": "boolean",
+      "description": "true when an identical canonical call (same requestRef + hostIdempotencyKey + arguments) returned the stored original result instead of running again"
+    }
+  },
+  "definitions": {
+    "errorBody": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "userSpeech"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "userSpeech": {
+          "type": "string"
+        },
+        "logCode": {
+          "type": "string"
+        },
+        "detail": {
+          "properties": {
+            "writeOutcome": { "type": "string", "enum": ["nothingWritten", "committedThenFailed", "unknown"] },
+            "correction": {
+              "$ref": "#/definitions/errorCorrection"
+            },
+            "resourceRevisionRecovery": {
+              "$ref": "#/definitions/resourceRevisionRecovery"
+            }
+          },
+          "description": "Technical detail for logs and recovery. A correctable refusal (arguments the schema or the request state refused) carries detail.correction: the bounded typed fields a model needs to fix the call itself; it survives the detail size budget, only raw diagnostic text is cut. EFFECT_NOT_RECORDED_AFTER_COMMIT carries {toolId, status: committed, result} (the committed data is real; retry must read, never write again; the next Host start settles the key from the native commit record). REQUEST_EVIDENCE_NOT_RECORDED carries {toolId, ran: true, ok, result, errorCode} (the call really ran; REQUEST_EVIDENCE_ROLLED_BACK means the business was rolled back with its evidence)."
+        }
+      }
+    },
+    "errorCorrection": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Machine-readable correction of a refused call. fieldPath names the refused argument (callContext.* for the call context), expectedSchemaRef names the published schema to read it against, currentRequest is the request as it stands now, allowedNextActions is a closed set. null means not applicable.",
+      "required": [
+        "fieldPath",
+        "expectedSchemaRef",
+        "currentRequest",
+        "allowedNextActions"
+      ],
+      "properties": {
+        "fieldPath": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "expectedSchemaRef": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "currentRequest": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/requestRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "allowedNextActions": {
+          "type": "array",
+          "maxItems": 4,
+          "items": {
+            "type": "string",
+            "enum": [
+              "fixArguments",
+              "readRequest",
+              "retryWithCurrentRevision",
+              "openRequest",
+              "readConversation",
+              "resolveTurn"
+            ]
+          }
+        }
+      }
+    },
+    "requestRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requestRef",
+        "revision",
+        "requestState"
+      ],
+      "properties": {
+        "requestRef": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "requestState": {
+          "type": "string",
+          "enum": [
+            "running",
+            "needsInput",
+            "previewReady",
+            "waitingTask",
+            "incomplete",
+            "completed",
+            "cancelled",
+            "blocked"
+          ]
+        },
+        "factRefs": {
+          "type": "array",
+          "description": "Execution-fact ids this call recorded in the request (its outcome fact and the observations it read); the only ids request.reply factRefs/sourceFactRefs may cite for this call.",
+          "minItems": 1,
+          "maxItems": 128,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "goals": {
+          "type": "array",
+          "description": "Goals this request has declared via request.checkpoint; the only ids callContext.goalRefs and request.reply authoredContent[].goalRef may cite.",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "goalId",
+              "goalKind"
+            ],
+            "properties": {
+              "goalId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256
+              },
+              "goalKind": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              }
+            }
+          }
+        }
+      }
+    },
+    "effectRef": {
+      "type": "object",
+      "description": "MCP-resolvable head of a creator-effect-receipt.schema.json canonical effect (other fields of that schema may follow).",
+      "required": [
+        "effectId",
+        "receiptRef",
+        "operationRef",
+        "effectSequence",
+        "toolId",
+        "receiptKind",
+        "outcomeState",
+        "scopes"
+      ],
+      "properties": {
+        "effectId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "receiptRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "operationRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "effectSequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "toolId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "receiptKind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "outcomeState": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scopes": {
+          "type": "array"
+        }
+      }
+    },
+    "resourceRevisionRecovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "revisionDomain",
+        "readToolId",
+        "readArguments",
+        "revisionFieldPath",
+        "contentFieldPath"
+      ],
+      "properties": {
+        "revisionDomain": {
+          "const": "canvasNode"
+        },
+        "readToolId": {
+          "const": "resource.get"
+        },
+        "readArguments": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "refs"
+          ],
+          "properties": {
+            "refs": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 1,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "kind",
+                  "projectId",
+                  "nodeId"
+                ],
+                "properties": {
+                  "kind": {
+                    "const": "canvasNode"
+                  },
+                  "projectId": {
+                    "type": "string"
+                  },
+                  "nodeId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "revisionFieldPath": {
+          "const": "items[0].revision"
+        },
+        "contentFieldPath": {
+          "const": "items[0].content.promptText"
+        }
+      }
+    },
+    "dialogueResolveData": {
+      "$ref": "creator-resource-resolve.schema.json#/definitions/outputData"
+    },
+    "dialogueCommitData": {
+      "$ref": "creator-text-edit.schema.json#/definitions/outputData"
+    },
+    "dialogueConflictDetail": {
+      "$ref": "creator-text-edit.schema.json#/definitions/conflictDetail"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "required": [
+          "ok",
+          "toolId"
+        ],
+        "properties": {
+          "ok": {
+            "const": true
+          },
+          "toolId": {
+            "const": "resource.resolve"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/definitions/dialogueResolveData"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "ok",
+          "toolId"
+        ],
+        "properties": {
+          "ok": {
+            "const": true
+          },
+          "toolId": {
+            "const": "text.edit.commit"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/definitions/dialogueCommitData"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "ok",
+          "toolId",
+          "error"
+        ],
+        "properties": {
+          "ok": {
+            "const": false
+          },
+          "toolId": {
+            "const": "text.edit.commit"
+          },
+          "error": {
+            "required": [
+              "code"
+            ],
+            "properties": {
+              "code": {
+                "const": "REVISION_STALE"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "error": {
+            "required": [
+              "detail"
+            ],
+            "properties": {
+              "detail": {
+                "$ref": "#/definitions/dialogueConflictDetail"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

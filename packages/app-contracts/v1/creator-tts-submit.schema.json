@@ -1,0 +1,70 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-tts-submit.schema.json",
+  "title": "Creator generation.submit TTS input (speech-v1 aligned)",
+  "description": "Host-side TTS input for generation.submit kind=tts. Nested reference matches speech-v1 promptText/styleControl; audio uses host relative path (not mediaId). Flat referencePromptText/referenceStyleControl are refused.",
+  "definitions": {
+    "ttsSubmitInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "voiceId": { "type": "string" },
+        "referenceAudioRelativePath": {
+          "type": "string",
+          "description": "Legacy top-level reference path; prefer reference.audioRelativePath."
+        },
+        "reference": { "$ref": "#/definitions/reference" },
+        "voiceDesign": { "$ref": "#/definitions/voiceDesign" },
+        "instruction": { "type": "string" },
+        "mode": {
+          "type": "string",
+          "enum": ["plain", "voice_design", "reference_clone"]
+        },
+        "lang": { "type": "string" },
+        "durationFactor": { "type": "number", "exclusiveMinimum": 0 },
+        "emotionControl": { "$ref": "#/definitions/emotionControl" }
+      }
+    },
+    "reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "audioRelativePath": { "type": "string" },
+        "promptText": { "type": "string" },
+        "styleControl": { "type": "string" }
+      }
+    },
+    "voiceDesign": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "genderHint": { "type": "string" },
+        "emotion": { "type": "string" },
+        "speakingStyle": { "type": "string" },
+        "speedHint": { "type": "string" },
+        "controlPrompt": { "type": "string" }
+      }
+    },
+    "emotionControl": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode"],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["none", "inherit_speaker", "text", "audio_reference", "vector"]
+        },
+        "text": { "type": "string" },
+        "audioRelativePath": { "type": "string" },
+        "vector": {
+          "type": "array",
+          "items": { "type": "number" }
+        },
+        "alpha": { "type": "number" },
+        "useRandom": { "type": "boolean" },
+        "intervalSilenceMs": { "type": "integer", "minimum": 0 },
+        "maxTextTokensPerSegment": { "type": "integer", "minimum": 1 }
+      }
+    }
+  }
+}

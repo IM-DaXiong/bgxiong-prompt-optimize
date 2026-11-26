@@ -1,0 +1,558 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-resource-text-fields.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "registryId",
+    "resources"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "registryId": {
+      "const": "creator-resource-text-fields"
+    },
+    "rules": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "resources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "fields"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "story",
+              "chapter",
+              "role",
+              "visualAsset",
+              "canvasProject",
+              "canvasNode",
+              "canvasEdge",
+              "mediaVersion",
+              "task",
+              "memory",
+              "chatAttachment",
+              "storySource",
+              "projectRoot",
+              "projectFile",
+              "actor",
+              "delivery",
+              "skill",
+              "skillDraft",
+              "storyProp",
+              "motionTemplate",
+              "motionScene",
+              "motionBundle",
+              "clipNode",
+              "singingPlan"
+            ]
+          },
+          "storyIdRequired": {
+            "type": "boolean"
+          },
+          "note": {
+            "type": "string"
+          },
+          "fields": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "fieldId",
+                "persistence",
+                "availability",
+                "writeToolId",
+                "actionType"
+              ],
+              "properties": {
+                "actionType": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "availability": {
+                  "enum": [
+                    "editable",
+                    "readonly",
+                    "unavailable",
+                    "readOnly"
+                  ]
+                },
+                "canonicalRead": {
+                  "type": "string"
+                },
+                "canonicalWrite": {
+                  "type": "string"
+                },
+                "cas": {
+                  "type": "string"
+                },
+                "fieldId": {
+                  "type": "string"
+                },
+                "owner": {
+                  "type": "string"
+                },
+                "persistence": {
+                  "enum": [
+                    "draftOnly",
+                    "durable"
+                  ]
+                },
+                "purpose": {
+                  "type": "string"
+                },
+                "reasonCode": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "saveModes": {
+                  "type": "array",
+                  "uniqueItems": true,
+                  "items": {
+                    "enum": [
+                      "persist",
+                      "newVersion"
+                    ]
+                  }
+                },
+                "storage": {
+                  "type": "string"
+                },
+                "targetField": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "uiName": {
+                  "type": "string"
+                },
+                "userHint": {
+                  "type": "string"
+                },
+                "valueSchemaRef": {
+                  "type": "string"
+                },
+                "workbenchRead": {
+                  "type": "string"
+                },
+                "writeToolId": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "surfaceAdapters": {
+                  "type": "array",
+                  "uniqueItems": true,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "adapterId": {
+                  "enum": [
+                    "chapter",
+                    "scene",
+                    "segment",
+                    "actor",
+                    "role",
+                    "storyProp",
+                    "visualAsset",
+                    "canvasNode"
+                  ]
+                },
+                "historyFamily": {
+                  "enum": [
+                    "nodeContent",
+                    "visualAssetContent",
+                    "freeCanvasContent",
+                    "storyPropField"
+                  ]
+                },
+                "casDomain": {
+                  "enum": [
+                    "document",
+                    "partition",
+                    "node"
+                  ]
+                }
+              },
+              "allOf": [
+                {
+                  "if": {
+                    "required": [
+                      "saveModes"
+                    ]
+                  },
+                  "then": {
+                    "required": [
+                      "adapterId",
+                      "historyFamily",
+                      "casDomain"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "chapter"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "fields": {
+                  "items": {
+                    "if": {
+                      "required": [
+                        "saveModes"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "fieldId": {
+                          "enum": [
+                            "script",
+                            "aiPrompt"
+                          ]
+                        },
+                        "adapterId": {
+                          "const": "chapter"
+                        },
+                        "historyFamily": {
+                          "const": "nodeContent"
+                        },
+                        "casDomain": {
+                          "const": "document"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "scene"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "fields": {
+                  "items": {
+                    "if": {
+                      "required": [
+                        "saveModes"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "fieldId": {
+                          "enum": [
+                            "script",
+                            "aiPrompt"
+                          ]
+                        },
+                        "adapterId": {
+                          "const": "scene"
+                        },
+                        "historyFamily": {
+                          "const": "nodeContent"
+                        },
+                        "casDomain": {
+                          "const": "document"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "segment"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "fields": {
+                  "items": {
+                    "if": {
+                      "required": [
+                        "saveModes"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "fieldId": {
+                          "enum": [
+                            "staticFramePrompt",
+                            "actionDescription"
+                          ]
+                        },
+                        "adapterId": {
+                          "const": "segment"
+                        },
+                        "historyFamily": {
+                          "const": "nodeContent"
+                        },
+                        "casDomain": {
+                          "const": "partition"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "actor"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "fields": {
+                  "items": {
+                    "if": {
+                      "required": [
+                        "saveModes"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "fieldId": {
+                          "enum": [
+                            "keyInfo",
+                            "keyInfoTop",
+                            "imagePrompt"
+                          ]
+                        },
+                        "adapterId": {
+                          "const": "actor"
+                        },
+                        "historyFamily": {
+                          "const": "nodeContent"
+                        },
+                        "casDomain": {
+                          "const": "document"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "role"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "fields": {
+                  "items": {
+                    "if": {
+                      "required": [
+                        "saveModes"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "fieldId": {
+                          "enum": [
+                            "roleBrief",
+                            "portraitPromptManual",
+                            "appearanceExcerptManual"
+                          ]
+                        },
+                        "adapterId": {
+                          "const": "role"
+                        },
+                        "historyFamily": {
+                          "const": "nodeContent"
+                        },
+                        "casDomain": {
+                          "const": "document"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "storyProp"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "fields": {
+                  "items": {
+                    "if": {
+                      "required": [
+                        "saveModes"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "fieldId": {
+                          "enum": [
+                            "narrativeRole",
+                            "notes",
+                            "visualSeed.prompt"
+                          ]
+                        },
+                        "adapterId": {
+                          "const": "storyProp"
+                        },
+                        "historyFamily": {
+                          "const": "storyPropField"
+                        },
+                        "casDomain": {
+                          "const": "document"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "visualAsset"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "fields": {
+                  "items": {
+                    "if": {
+                      "required": [
+                        "saveModes"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "fieldId": {
+                          "enum": [
+                            "prompt"
+                          ]
+                        },
+                        "adapterId": {
+                          "const": "visualAsset"
+                        },
+                        "historyFamily": {
+                          "const": "visualAssetContent"
+                        },
+                        "casDomain": {
+                          "const": "document"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "canvasNode"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "fields": {
+                  "items": {
+                    "if": {
+                      "required": [
+                        "saveModes"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "fieldId": {
+                          "enum": [
+                            "promptText"
+                          ]
+                        },
+                        "adapterId": {
+                          "const": "canvasNode"
+                        },
+                        "historyFamily": {
+                          "const": "freeCanvasContent"
+                        },
+                        "casDomain": {
+                          "const": "node"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "textValue": {
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,150 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "hierarchy-authoring-request-v1.schema.json",
+  "$ref": "#/definitions/AuthoringRequest",
+  "definitions": {
+    "RequestGoal": {
+      "type": "string",
+      "enum": [
+        "structure_only",
+        "complete"
+      ]
+    },
+    "SourcePolicy": {
+      "type": "string",
+      "enum": [
+        "preserve_source",
+        "generate"
+      ]
+    },
+    "Scope": {
+      "type": "string",
+      "enum": [
+        "chapter",
+        "scene"
+      ]
+    },
+    "Quality": {
+      "type": "string",
+      "enum": [
+        "unreviewed",
+        "ready",
+        "needs_attention"
+      ]
+    },
+    "DraftRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runId",
+        "draftRevision"
+      ],
+      "properties": {
+        "runId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "draftRevision": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "AuthoringRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requestGoal",
+        "sourcePolicy",
+        "pauseAfterOutline",
+        "draftRef",
+        "targetItemIds",
+        "expectedSourceDigest",
+        "expectedTargetRevision"
+      ],
+      "properties": {
+        "requestGoal": {
+          "$ref": "#/definitions/RequestGoal"
+        },
+        "sourcePolicy": {
+          "$ref": "#/definitions/SourcePolicy"
+        },
+        "pauseAfterOutline": {
+          "type": "boolean"
+        },
+        "draftRef": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/DraftRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "targetItemIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "expectedSourceDigest": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "expectedTargetRevision": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "AuthoringSelection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "draftRevision",
+        "targetItemIds",
+        "expectedSourceDigest",
+        "expectedTargetRevision"
+      ],
+      "properties": {
+        "draftRevision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "targetItemIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "expectedSourceDigest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedTargetRevision": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

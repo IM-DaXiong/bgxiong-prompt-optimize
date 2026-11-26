@@ -1,0 +1,400 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Story creation lossless stored content contract",
+  "schemaVersion": 1,
+  "definitions": {
+    "AuxiliaryKey": {
+      "type": "string",
+      "enum": [
+        "chapterAiPrompt",
+        "chapterKeyArt",
+        "chapterReferenceBindings",
+        "negativePrompt",
+        "aspectRatio",
+        "videoGeneration",
+        "shotMeta",
+        "characterLock",
+        "videoNarrative",
+        "videoPromptDocument",
+        "dialogue",
+        "referencePads",
+        "sourcePrompts",
+        "sceneEnvironment",
+        "scenePropContract",
+        "sceneSetting",
+        "chapterNotes",
+        "shotNarrative",
+        "legacyArchive"
+      ]
+    },
+    "AuxiliaryEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "key",
+        "value"
+      ],
+      "properties": {
+        "key": {
+          "$ref": "#/definitions/AuxiliaryKey"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "StoryTextFields": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "script"
+          ],
+          "properties": {
+            "kind": {
+              "const": "chapter"
+            },
+            "script": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "script",
+            "scenePrompt",
+            "storyboardHint"
+          ],
+          "properties": {
+            "kind": {
+              "const": "scene"
+            },
+            "script": {
+              "type": "string"
+            },
+            "scenePrompt": {
+              "type": "string"
+            },
+            "storyboardHint": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "staticFramePrompt",
+            "videoPrompt"
+          ],
+          "properties": {
+            "kind": {
+              "const": "shot"
+            },
+            "staticFramePrompt": {
+              "type": "string"
+            },
+            "videoPrompt": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "StoryTextContentV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format",
+        "title",
+        "fields",
+        "auxiliary"
+      ],
+      "properties": {
+        "format": {
+          "const": "story_text_v1"
+        },
+        "title": {
+          "type": "string"
+        },
+        "fields": {
+          "$ref": "#/definitions/StoryTextFields"
+        },
+        "auxiliary": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AuxiliaryEntry"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "fields": {
+                "properties": {
+                  "kind": {
+                    "const": "chapter"
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              }
+            },
+            "required": [
+              "fields"
+            ]
+          },
+          "then": {
+            "properties": {
+              "auxiliary": {
+                "items": {
+                  "properties": {
+                    "key": {
+                      "enum": [
+                        "chapterAiPrompt",
+                        "chapterKeyArt",
+                        "chapterReferenceBindings",
+                        "chapterNotes",
+                        "referencePads",
+                        "legacyArchive"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "fields": {
+                "properties": {
+                  "kind": {
+                    "const": "scene"
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              }
+            },
+            "required": [
+              "fields"
+            ]
+          },
+          "then": {
+            "properties": {
+              "auxiliary": {
+                "items": {
+                  "properties": {
+                    "key": {
+                      "enum": [
+                        "negativePrompt",
+                        "referencePads",
+                        "sceneEnvironment",
+                        "scenePropContract",
+                        "sceneSetting",
+                        "legacyArchive"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "fields": {
+                "properties": {
+                  "kind": {
+                    "const": "shot"
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              }
+            },
+            "required": [
+              "fields"
+            ]
+          },
+          "then": {
+            "properties": {
+              "auxiliary": {
+                "items": {
+                  "properties": {
+                    "key": {
+                      "enum": [
+                        "negativePrompt",
+                        "aspectRatio",
+                        "videoGeneration",
+                        "shotMeta",
+                        "characterLock",
+                        "videoNarrative",
+                        "videoPromptDocument",
+                        "dialogue",
+                        "referencePads",
+                        "sourcePrompts",
+                        "shotNarrative",
+                        "legacyArchive"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "OccurrenceRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "storyId",
+        "entityKind",
+        "entityId",
+        "chapterId",
+        "sceneId",
+        "shotId",
+        "commitId"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "story-creation.schema.json#/definitions/Id"
+        },
+        "storyId": {
+          "$ref": "story-creation.schema.json#/definitions/Id"
+        },
+        "entityKind": {
+          "$ref": "story-creation.schema.json#/definitions/EntityKind"
+        },
+        "entityId": {
+          "$ref": "story-creation.schema.json#/definitions/Id"
+        },
+        "chapterId": {
+          "$ref": "story-creation.schema.json#/definitions/Id"
+        },
+        "sceneId": {
+          "anyOf": [
+            {
+              "$ref": "story-creation.schema.json#/definitions/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "shotId": {
+          "anyOf": [
+            {
+              "$ref": "story-creation.schema.json#/definitions/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "commitId": {
+          "$ref": "story-creation.schema.json#/definitions/Id"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "shotId": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "shotId"
+            ]
+          },
+          "then": {
+            "properties": {
+              "sceneId": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "entityKind": {
+                "const": "role"
+              }
+            },
+            "required": [
+              "entityKind"
+            ]
+          },
+          "then": {
+            "anyOf": [
+              {
+                "properties": {
+                  "sceneId": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "shotId": {
+                    "type": "string"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "LineageRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "targetKind",
+        "targetId",
+        "sourceKind",
+        "sourceId",
+        "sourceRevision",
+        "commitId"
+      ],
+      "properties": {
+        "targetKind": {
+          "$ref": "story-creation.schema.json#/definitions/TargetKind"
+        },
+        "targetId": {
+          "$ref": "story-creation.schema.json#/definitions/Id"
+        },
+        "sourceKind": {
+          "$ref": "story-creation.schema.json#/definitions/TargetKind"
+        },
+        "sourceId": {
+          "$ref": "story-creation.schema.json#/definitions/Id"
+        },
+        "sourceRevision": {
+          "$ref": "story-creation.schema.json#/definitions/Revision"
+        },
+        "commitId": {
+          "$ref": "story-creation.schema.json#/definitions/Id"
+        }
+      }
+    }
+  }
+}

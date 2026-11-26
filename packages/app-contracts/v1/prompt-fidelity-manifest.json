@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "blockBeginMarker": "<<<FIDELITY_MAP",
+  "blockEndMarker": "FIDELITY_MAP>>>",
+  "mappingArrow": "=>",
+  "maxRepairNamedUnits": 12,
+  "maxAdvisoryHits": 12,
+  "minPhraseWords": 3,
+  "minPhraseChars": 12,
+  "elevateCompletionAtUnits": 12,
+  "warnUnits": 80
+}

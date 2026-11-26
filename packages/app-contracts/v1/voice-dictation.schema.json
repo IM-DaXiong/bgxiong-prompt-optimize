@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "voice-dictation.schema.json",
+  "title": "Voice dictation contract (constants + IPC DTOs)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contractId", "enabled", "language", "pcm", "vad", "clientBudget", "serverBudget", "event", "commands", "sessionStates", "segmentOutcomeKinds", "errors", "errorLocaleKeys", "writeModeSeparator", "resultVersionTitleKeys", "devicePreferenceKey"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "contractId": { "const": "voice-dictation" },
+    "enabled": { "type": "boolean" },
+    "language": { "const": "zh" },
+    "pcm": { "type": "object", "additionalProperties": false, "required": ["sampleRate", "channels", "bitsPerSample", "segmentMaxSamples", "wavHeaderBytes", "segmentMaxWavBytes"],
+      "properties": { "sampleRate": { "const": 16000 }, "channels": { "const": 1 }, "bitsPerSample": { "const": 16 }, "segmentMaxSamples": { "type": "integer", "minimum": 1 }, "wavHeaderBytes": { "const": 44 }, "segmentMaxWavBytes": { "type": "integer", "minimum": 45 } } },
+    "vad": { "type": "object", "additionalProperties": false,
+      "required": ["frameMs", "preRollMs", "silenceReleaseMs", "minSegmentMs", "forceCutMs", "forceCutSearchWindowMs", "rmsFloor", "noiseFloorMultiplier", "noiseFloorInitial", "noiseFloorDecay", "noiseFloorAlpha", "attackFrames", "releaseFrames"],
+      "properties": { "frameMs": { "type": "integer", "minimum": 1 }, "preRollMs": { "type": "integer", "minimum": 0 }, "silenceReleaseMs": { "type": "integer", "minimum": 1 }, "minSegmentMs": { "type": "integer", "minimum": 1 }, "forceCutMs": { "type": "integer", "minimum": 1 }, "forceCutSearchWindowMs": { "type": "integer", "minimum": 1 }, "rmsFloor": { "type": "number", "exclusiveMinimum": 0 }, "noiseFloorMultiplier": { "type": "number", "exclusiveMinimum": 0 }, "noiseFloorInitial": { "type": "number", "exclusiveMinimum": 0 }, "noiseFloorDecay": { "type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1 }, "noiseFloorAlpha": { "type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1 }, "attackFrames": { "type": "integer", "minimum": 1 }, "releaseFrames": { "type": "integer", "minimum": 1 } } },
+    "clientBudget": { "type": "object", "additionalProperties": false, "required": ["maxBufferedBytes", "maxInFlightUploads", "maxCutPendingSegments"], "properties": { "maxBufferedBytes": { "type": "integer", "minimum": 1 }, "maxInFlightUploads": { "const": 1 }, "maxCutPendingSegments": { "const": 1 } } },
+    "serverBudget": { "type": "object", "additionalProperties": false, "required": ["sessionDiskBytes", "maxQueuedSegments", "softWarnQueuedAudioMs", "hardStopReserveSegments", "minFreeDiskBytes", "inferenceTimeoutMs", "readResultsMaxPageBytes"], "properties": { "sessionDiskBytes": { "type": "integer", "minimum": 1 }, "maxQueuedSegments": { "type": "integer", "minimum": 1 }, "softWarnQueuedAudioMs": { "type": "integer", "minimum": 1 }, "hardStopReserveSegments": { "type": "integer", "minimum": 1 }, "minFreeDiskBytes": { "type": "integer", "minimum": 0 }, "inferenceTimeoutMs": { "type": "integer", "minimum": 1 }, "readResultsMaxPageBytes": { "type": "integer", "minimum": 1 } } },
+    "event": { "type": "object", "additionalProperties": false, "required": ["changed"], "properties": { "changed": { "const": "voice-dictation://changed" } } },
+    "commands": { "type": "array", "items": { "type": "string", "pattern": "^voice_dictation_[a-z_]+$" }, "uniqueItems": true, "minItems": 9, "maxItems": 9 },
+    "sessionStates": { "type": "array", "items": { "$ref": "#/$defs/SessionState" }, "uniqueItems": true },
+    "segmentOutcomeKinds": { "type": "array", "items": { "enum": ["text", "empty", "failed", "cancelled"] }, "uniqueItems": true },
+    "errors": { "type": "array", "items": { "$ref": "#/$defs/ErrorCode" }, "uniqueItems": true },
+    "errorLocaleKeys": { "type": "object", "propertyNames": { "$ref": "#/$defs/ErrorCode" }, "additionalProperties": { "type": "string", "pattern": "^voiceDictation\\.err\\.[A-Za-z]+$" } },
+    "writeModeSeparator": { "const": "\n" },
+    "resultVersionTitleKeys": { "type": "object", "additionalProperties": false, "required": ["append", "replace"], "properties": { "append": { "type": "string" }, "replace": { "type": "string" } } },
+    "devicePreferenceKey": { "const": "bgxiong.micCapture.devicePreference" }
+  },
+  "$defs": {
+    "ErrorCode": { "enum": ["featureDisabled", "runtimeMissing", "modelMissing", "modelEnglishOnly", "modelChanged", "cleanupPending", "modelBusy", "micPermissionDenied", "micNotFound", "micLost", "sessionBusy", "sessionNotFound", "ownerMismatch", "tokenInvalid", "invalidTicket", "invalidFormat", "invalidSequence", "duplicateMismatch", "sessionStopped", "finalSeqMismatch", "queueFull", "diskFull", "ioError", "engineWaitCancelled", "inferenceCancelled", "inferenceTimeout", "inferenceFailed", "prepareTimeout", "modelLoadFailed", "modelStopFailed", "cursorExpired", "ackOutOfRange", "surfaceBusy", "surfaceConflict", "commitReceiptMissing", "commitResultUnknown"] },
+    "SessionState": { "enum": ["preparing", "recording", "stopping", "draining", "committing", "cancelling", "saveFailed", "failed", "finished", "cancelled"] },
+    "NonNegInt": { "type": "integer", "minimum": 0 },
+    "Id": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "SurfaceIdentity": { "type": "object", "additionalProperties": false, "required": ["ownerWindowLabel", "windowEpoch", "sessionId", "adapterId", "instanceKey"],
+      "properties": { "ownerWindowLabel": { "type": "string", "minLength": 1 }, "windowEpoch": { "type": "integer", "minimum": 1 }, "sessionId": { "type": "string", "minLength": 1 }, "adapterId": { "type": "string", "minLength": 1 }, "instanceKey": { "type": "string" } } },
+    "DictationWriteMode": { "oneOf": [
+      { "type": "object", "additionalProperties": false, "required": ["kind", "placement"], "properties": { "kind": { "const": "append" }, "placement": { "enum": ["head", "tail"] } } },
+      { "type": "object", "additionalProperties": false, "required": ["kind", "anchorUtf16"], "properties": { "kind": { "const": "appendAtCursor" }, "anchorUtf16": { "type": "integer", "minimum": 0 } } },
+      { "type": "object", "additionalProperties": false, "required": ["kind"], "properties": { "kind": { "const": "replace" } } }
+    ] },
+    "FrozenModel": { "type": "object", "additionalProperties": false, "required": ["modelId", "displayName", "modelFileName", "multilingual"], "properties": { "modelId": { "$ref": "#/$defs/Id" }, "displayName": { "type": "string" }, "modelFileName": { "type": "string" }, "multilingual": { "const": true } } },
+    "Budgets": { "type": "object", "additionalProperties": false, "required": ["diskBytesUsed", "diskBytesLimit", "queuedSegments", "queuedAudioMs", "softWarn", "backpressure"], "properties": { "diskBytesUsed": { "$ref": "#/$defs/NonNegInt" }, "diskBytesLimit": { "$ref": "#/$defs/NonNegInt" }, "queuedSegments": { "$ref": "#/$defs/NonNegInt" }, "queuedAudioMs": { "$ref": "#/$defs/NonNegInt" }, "softWarn": { "type": "boolean" }, "backpressure": { "type": "boolean" } } },
+    "Watermarks": { "type": "object", "additionalProperties": false, "required": ["acceptedThrough", "completedThrough", "appliedThrough", "cancelledFrom"], "properties": { "acceptedThrough": { "type": ["integer", "null"], "minimum": 0 }, "completedThrough": { "type": ["integer", "null"], "minimum": 0 }, "appliedThrough": { "type": ["integer", "null"], "minimum": 0 }, "cancelledFrom": { "type": ["integer", "null"], "minimum": 0 } } },
+    "SegmentTicket": { "type": "object", "additionalProperties": false, "required": ["ticketId", "seq", "stagedPath", "maxBytes"], "properties": { "ticketId": { "$ref": "#/$defs/Id" }, "seq": { "$ref": "#/$defs/NonNegInt" }, "stagedPath": { "type": "string", "minLength": 1 }, "maxBytes": { "type": "integer", "minimum": 45 } } },
+    "SessionAuth": { "type": "object", "required": ["sessionId", "sessionToken"], "properties": { "sessionId": { "$ref": "#/$defs/Id" }, "sessionToken": { "$ref": "#/$defs/Id" } } },
+    "ProbeResult": { "oneOf": [
+      { "type": "object", "additionalProperties": false, "required": ["kind", "model"], "properties": { "kind": { "const": "ready" }, "model": { "$ref": "#/$defs/FrozenModel" } } },
+      { "type": "object", "additionalProperties": false, "required": ["kind"], "properties": { "kind": { "enum": ["featureDisabled", "runtimeMissing", "modelMissing", "cleanupPending", "modelBusy"] } } },
+      { "type": "object", "additionalProperties": false, "required": ["kind", "model"], "properties": { "kind": { "const": "modelEnglishOnly" }, "model": { "type": "object" } } }
+    ] },
+    "ProbeRequest": { "type": "object", "additionalProperties": false, "required":["selection"], "properties": { "selection": { "$ref": "asr.schema.json#/definitions/selectionV1" } } },
+    "StartRequest": { "type": "object", "additionalProperties": false, "required": ["operationId", "surfaceIdentity", "writeMode","selection"], "properties": { "operationId": { "$ref": "#/$defs/Id" }, "surfaceIdentity": { "$ref": "#/$defs/SurfaceIdentity" }, "writeMode": { "$ref": "#/$defs/DictationWriteMode" }, "selection": { "$ref": "asr.schema.json#/definitions/selectionV1" } } },
+    "StartResponse": { "type": "object", "additionalProperties": false, "required": ["sessionId", "sessionToken", "model", "budgets", "firstTicket"], "properties": { "sessionId": { "$ref": "#/$defs/Id" }, "sessionToken": { "$ref": "#/$defs/Id" }, "model": { "$ref": "#/$defs/FrozenModel" }, "budgets": { "$ref": "#/$defs/Budgets" }, "firstTicket": { "$ref": "#/$defs/SegmentTicket" } } },
+    "ReserveSegmentRequest": { "type": "object", "additionalProperties": false, "required": ["sessionId", "sessionToken", "seq"], "properties": { "sessionId": { "$ref": "#/$defs/Id" }, "sessionToken": { "$ref": "#/$defs/Id" }, "seq": { "$ref": "#/$defs/NonNegInt" } } },
+    "PushSegmentRequest": { "type": "object", "additionalProperties": false, "required": ["sessionId", "sessionToken", "seq", "ticketId", "sampleCount", "sampleRate", "byteLength"], "properties": { "sessionId": { "$ref": "#/$defs/Id" }, "sessionToken": { "$ref": "#/$defs/Id" }, "seq": { "$ref": "#/$defs/NonNegInt" }, "ticketId": { "$ref": "#/$defs/Id" }, "sampleCount": { "type": "integer", "minimum": 1 }, "sampleRate": { "const": 16000 }, "byteLength": { "type": "integer", "minimum": 46 } } },
+    "PushSegmentResponse": { "type": "object", "additionalProperties": false, "required": ["acceptedThrough", "budgets", "duplicate"], "properties": { "acceptedThrough": { "$ref": "#/$defs/NonNegInt" }, "budgets": { "$ref": "#/$defs/Budgets" }, "duplicate": { "type": "boolean" } } },
+    "StopRequest": { "type": "object", "additionalProperties": false, "required": ["sessionId", "sessionToken", "finalSeq"], "properties": { "sessionId": { "$ref": "#/$defs/Id" }, "sessionToken": { "$ref": "#/$defs/Id" }, "finalSeq": { "type": ["integer", "null"], "minimum": 0 } } },
+    "StopResponse": { "oneOf": [
+      { "type": "object", "additionalProperties": false, "required": ["kind", "watermarks"], "properties": { "kind": { "const": "draining" }, "watermarks": { "$ref": "#/$defs/Watermarks" } } },
+      { "type": "object", "additionalProperties": false, "required": ["kind", "expectedSeq"], "properties": { "kind": { "const": "incomplete" }, "expectedSeq": { "$ref": "#/$defs/NonNegInt" } } }
+    ] },
+    "CancelResponse": { "type": "object", "additionalProperties": false, "required": ["state", "watermarks"], "properties": { "state": { "$ref": "#/$defs/SessionState" }, "watermarks": { "$ref": "#/$defs/Watermarks" } } },
+    "ReadResultsRequest": { "type": "object", "additionalProperties": false, "required": ["sessionId", "sessionToken", "afterSeq", "pageBytes"], "properties": { "sessionId": { "$ref": "#/$defs/Id" }, "sessionToken": { "$ref": "#/$defs/Id" }, "afterSeq": { "type": ["integer", "null"], "minimum": 0 }, "pageBytes": { "type": "integer", "minimum": 1, "maximum": 262144 } } },
+    "SegmentOutcome": { "oneOf": [
+      { "type": "object", "additionalProperties": false, "required": ["kind", "seq", "text"], "properties": { "kind": { "const": "text" }, "seq": { "$ref": "#/$defs/NonNegInt" }, "text": { "type": "string", "minLength": 1 } } },
+      { "type": "object", "additionalProperties": false, "required": ["kind", "seq"], "properties": { "kind": { "const": "empty" }, "seq": { "$ref": "#/$defs/NonNegInt" } } },
+      { "type": "object", "additionalProperties": false, "required": ["kind", "seq", "error"], "properties": { "kind": { "const": "failed" }, "seq": { "$ref": "#/$defs/NonNegInt" }, "error": { "$ref": "#/$defs/ErrorCode" } } },
+      { "type": "object", "additionalProperties": false, "required": ["kind", "seq"], "properties": { "kind": { "const": "cancelled" }, "seq": { "$ref": "#/$defs/NonNegInt" } } }
+    ] },
+    "ReadResultsResponse": { "type": "object", "additionalProperties": false, "required": ["outcomes", "nextCursor", "state", "watermarks", "finalSeq"], "properties": { "outcomes": { "type": "array", "items": { "$ref": "#/$defs/SegmentOutcome" } }, "nextCursor": { "type": ["integer", "null"], "minimum": 0 }, "state": { "$ref": "#/$defs/SessionState" }, "watermarks": { "$ref": "#/$defs/Watermarks" }, "finalSeq": { "type": ["integer", "null"], "minimum": 0 } } },
+    "AckResultsRequest": { "type": "object", "additionalProperties": false, "required": ["sessionId", "sessionToken", "appliedThrough"], "properties": { "sessionId": { "$ref": "#/$defs/Id" }, "sessionToken": { "$ref": "#/$defs/Id" }, "appliedThrough": { "$ref": "#/$defs/NonNegInt" } } },
+    "FinishRequest": { "type": "object", "additionalProperties": false, "required": ["sessionId", "sessionToken"], "properties": { "sessionId": { "$ref": "#/$defs/Id" }, "sessionToken": { "$ref": "#/$defs/Id" } } },
+    "ChangedEvent": { "type": "object", "additionalProperties": false, "required": ["sessionId", "surfaceId", "ownerWindowLabel", "windowEpoch", "revision"], "properties": { "sessionId": { "$ref": "#/$defs/Id" }, "surfaceId": { "type": "string", "minLength": 1 }, "ownerWindowLabel": { "type": "string", "minLength": 1 }, "windowEpoch": { "type": "integer", "minimum": 1 }, "revision": { "$ref": "#/$defs/NonNegInt" } } },
+    "CommandError": { "type": "object", "additionalProperties": false, "required": ["code"], "properties": { "code": { "$ref": "#/$defs/ErrorCode" }, "expectedSeq": { "$ref": "#/$defs/NonNegInt" }, "logDetail": { "type": "string" } } }
+  }
+}

@@ -1,0 +1,4 @@
+{
+  "model": ["adapterAlias", "bindingAlias", "libraryAlias", "displayName", "modelId"],
+  "account": ["packageAlias", "accountName", "accountId"]
+}

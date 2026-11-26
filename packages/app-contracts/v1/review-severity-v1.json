@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "review-severity-v1.json",
+  "schemaVersion": 1,
+  "title": "Shared review severity (Q upstream review + D static-frame review-edit)",
+  "description": "Severity closed set extracted from the existing Q review (blocking/major/minor). Only blocking can fail a gate; major/minor are advisory hints. Q keeps its own category-level text/media gate semantics; this file only owns the scalar set.",
+  "definitions": {
+    "severity": {
+      "type": "string",
+      "enum": ["blocking", "major", "minor"]
+    }
+  },
+  "gateSemantics": {
+    "blocking": { "blocksGate": true },
+    "major": { "blocksGate": false },
+    "minor": { "blocksGate": false }
+  }
+}

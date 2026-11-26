@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creative-review-v1.schema.json",
+  "title": "CreativeReviewV1",
+  "description": "S12: structured review of a creative revision. severity is a closed set (blocking|minor). ruleId and evidenceRefs are required structured fields — hosts must not infer severity from free-text message. Only blocking findings authorize a semantic rewrite round.",
+  "definitions": {
+    "nonBlank": { "type": "string", "minLength": 1, "maxLength": 512, "pattern": "\\S" },
+    "severity": { "enum": ["blocking", "minor"] },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["findingId", "severity", "ruleId", "message", "evidenceRefs"],
+      "properties": {
+        "findingId": { "$ref": "#/definitions/nonBlank" },
+        "severity": { "$ref": "#/definitions/severity" },
+        "ruleId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-z][a-z0-9_.]*$",
+          "description": "Stable rule id from the review contract (e.g. role.visual.unverified). Not free text."
+        },
+        "message": { "type": "string", "minLength": 1 },
+        "evidenceRefs": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "items": { "$ref": "creator-resource-ref.schema.json" }
+        },
+        "changeId": {
+          "oneOf": [{ "type": "null" }, { "$ref": "#/definitions/nonBlank" }],
+          "description": "When set, points at creative-intent proposedChange.changeId."
+        }
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "reviewId", "verdict", "blockingCount", "minorCount", "findings"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "reviewId": { "$ref": "#/definitions/nonBlank" },
+    "verdict": {
+      "enum": ["pass", "passWithMinors", "rejectBlocking"],
+      "description": "Derived from findings: rejectBlocking iff blockingCount>0; passWithMinors iff only minors; pass iff none. Hosts recompute; do not trust a mismatched verdict."
+    },
+    "blockingCount": { "type": "integer", "minimum": 0 },
+    "minorCount": { "type": "integer", "minimum": 0 },
+    "findings": { "type": "array", "maxItems": 128, "items": { "$ref": "#/definitions/finding" } }
+  }
+}

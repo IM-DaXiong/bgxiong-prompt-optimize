@@ -1,0 +1,37 @@
+{
+  "image": {
+    "default": "jimeng",
+    "providers": {
+      "image_volc_seedream": "volcengine_ark_seedream",
+      "image_volc_i2i_portrait_3": "volcengine_visual_i2i_portrait_3",
+      "image_openai_compat": "jimeng",
+      "image_vendor_adapter": "image_vendor_adapter",
+      "image_volc_jimeng_seededit_v30": "volcengine_jimeng_seededit_v30",
+      "image_dashscope_wan": "dashscope_wan_image",
+      "image_kling_image_generation_t2i": "kling_image_generation_t2i",
+      "image_kling_image_generation_i2i": "kling_image_generation_i2i",
+      "image_kling_omni_image_t2i": "kling_omni_image_t2i",
+      "image_kling_omni_image_i2i": "kling_omni_image_i2i",
+      "image_minimax_image_t2i": "minimax_image_t2i",
+      "image_minimax_image_i2i": "minimax_image_i2i",
+      "image_comfyui": "comfyui",
+      "image_volc": "volcengine_ark",
+      "image_volc_i2i_general_3": "volcengine_ark"
+    }
+  },
+  "video": {
+    "default": "video_generic",
+    "providers": {
+      "video_comfyui": "video_comfyui",
+      "video_generic": "video_generic",
+      "video_vendor_adapter": "video_vendor_adapter",
+      "video_volc_jimeng_t2v": "volcengine_jimeng_t2v",
+      "video_kling": "video_kling",
+      "kling_omni_video": "kling_omni_video",
+      "video_seedance_2_0": "video_seedance_2_0",
+      "video_dashscope_wan": "video_dashscope_wan",
+      "video_dashscope_happyhorse": "video_dashscope_happyhorse",
+      "video_minimax_h3": "video_minimax_h3"
+    }
+  }
+}

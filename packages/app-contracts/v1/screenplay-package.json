@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "bgxSchemaVersion": 5,
+  "limits": {
+    "maxChaptersPerPackage": 20,
+    "maxScenesPerChapter": 80,
+    "maxShotsPerScene": 120,
+    "maxShotsPerPackage": 400,
+    "maxSourceBytes": 10485760,
+    "parseTimeoutMs": 30000,
+    "previewShotsPerPage": 50,
+    "maxRepairRoundsPerStage": 5,
+    "defaultRepairRoundsPerStage": 2,
+    "maxEpisodeDurationSeconds": 7200,
+    "minEpisodeDurationSeconds": 15,
+    "minAvgShotSeconds": 1,
+    "maxAvgShotSeconds": 30,
+    "minShotDurationSeconds": 0.5,
+    "maxShotDurationSeconds": 60
+  },
+  "draftStore": {
+    "maxTasks": 20,
+    "maxTotalBytes": 209715200,
+    "ttlDays": 30
+  },
+  "enums": {
+    "inputInterpretation": [
+      "auto",
+      "concept",
+      "novel",
+      "screenplay"
+    ],
+    "adaptationFidelity": [
+      "faithful",
+      "balanced",
+      "creative"
+    ],
+    "shotDensity": [
+      "economy",
+      "standard",
+      "detailed"
+    ],
+    "importDepth": [
+      "storyboardText",
+      "stills",
+      "storyboardVideo",
+      "stillsAndVideo"
+    ],
+    "targetMode": [
+      "new",
+      "append"
+    ],
+    "exportMode": [
+      "source",
+      "current"
+    ],
+    "templateKind": [
+      "fountain",
+      "schema",
+      "limits",
+      "instructions",
+      "golden"
+    ],
+    "roleBriefChoice": [
+      "keepExisting",
+      "usePackage"
+    ]
+  },
+  "stages": [
+    "s0Parse",
+    "s1Facts",
+    "s2Chapters",
+    "s3Scenes",
+    "s4Shots",
+    "s5Prompts",
+    "s6Assemble"
+  ]
+}

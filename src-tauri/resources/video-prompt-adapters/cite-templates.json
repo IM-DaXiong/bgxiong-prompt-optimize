@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Reference-marker templates of the video prompt target adapters, one entry per projection profile (profileId@version). Single source for the Rust projectors (build.rs emits CITE_TPL_<rustConst>_<SLOT>). Each entry lists only the media slots its projector writes; which entry a target uses is decided by its projector, never by provider kind, model id or name.",
+  "profiles": {
+    "h3@1": {
+      "rustConst": "H3",
+      "templates": {
+        "image": "<Picture {n}>",
+        "video": "<Video {n}>",
+        "audio": "<Audio {n}>"
+      }
+    },
+    "seedance@1": {
+      "rustConst": "SEEDANCE",
+      "templates": {
+        "image": "图片{n}",
+        "video": "视频{n}",
+        "audio": "音频{n}"
+      }
+    },
+    "kling.classic@1": {
+      "rustConst": "KLING_CLASSIC",
+      "templates": {
+        "image": "@image_{n}"
+      }
+    },
+    "kling.omni@1": {
+      "rustConst": "KLING_OMNI",
+      "templates": {
+        "image": "<<<image_{n}>>>",
+        "video": "<<<video_{n}>>>"
+      }
+    },
+    "kling.omni@2": {
+      "rustConst": "KLING_OMNI_V2",
+      "templates": {
+        "image": "@image_{n}",
+        "video": "@video_{n}"
+      }
+    },
+    "wan@1": {
+      "rustConst": "WAN",
+      "templates": {
+        "image": "图{n}",
+        "video": "视频{n}",
+        "audio": "音频{n}"
+      }
+    }
+  }
+}

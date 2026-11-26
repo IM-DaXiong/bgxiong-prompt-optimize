@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "baseKeys": [
+    "integrated_multimodal_description",
+    "overall_soundscape",
+    "non_diegetic_music"
+  ],
+  "refKeys": [
+    "subject_definitions",
+    "summary",
+    "retention_analysis",
+    "detailed_description",
+    "overall_soundscape",
+    "non_diegetic_music"
+  ]
+}

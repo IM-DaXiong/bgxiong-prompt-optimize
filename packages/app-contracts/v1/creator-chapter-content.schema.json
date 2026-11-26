@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-chapter-content.schema.json",
+  "title": "CreatorChapterContentProjection",
+  "description": "Parsed chapter fields returned by resource.get for a chapter node. chapterContentFingerprint is the same digest as fieldRevisions.content. It is not a second hash. Actions that change one field are chapter.title.patch, chapter.script.patch and chapter.aiPrompt.patch in creator-story-actions.schema.json.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["title", "script", "aiPrompt", "chapterContentFingerprint"],
+  "properties": {
+    "title": { "type": "string", "minLength": 1 },
+    "script": { "type": "string" },
+    "aiPrompt": { "type": "string" },
+    "chapterContentFingerprint": { "type": "string", "minLength": 1 }
+  }
+}

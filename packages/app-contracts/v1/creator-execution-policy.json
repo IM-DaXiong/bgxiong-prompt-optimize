@@ -1,0 +1,1063 @@
+{
+  "schemaVersion": 1,
+  "localAccess": "open",
+  "executionModes": [
+    "execute",
+    "previewOnly"
+  ],
+  "paidServiceAuth": "remoteMetered",
+  "projectFileScope": {
+    "schemaVersion": 1,
+    "projectRootAccess": "open",
+    "appDataAccess": "open",
+    "layers": [
+      "fileRead",
+      "contentParse",
+      "remoteUnderstand"
+    ],
+    "layerIndependence": true,
+    "textNotLimitedByChatAttachmentFormats": true,
+    "readableFileKinds": [
+      "text",
+      "image",
+      "audio",
+      "otherOriginal"
+    ],
+    "chatAttachmentDocumentFormats": [
+      "txt",
+      "md",
+      "markdown",
+      "json",
+      "csv",
+      "docx",
+      "rtf"
+    ],
+    "projectTextExtensions": [
+      "rs",
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "mjs",
+      "cjs",
+      "py",
+      "toml",
+      "yaml",
+      "yml",
+      "xml",
+      "sql",
+      "html",
+      "css",
+      "scss",
+      "sh",
+      "ps1",
+      "bat",
+      "go",
+      "java",
+      "c",
+      "h",
+      "cpp",
+      "hpp",
+      "cs",
+      "rb",
+      "php",
+      "lua",
+      "ini",
+      "cfg",
+      "conf",
+      "log",
+      "md",
+      "txt",
+      "json",
+      "csv",
+      "markdown"
+    ],
+    "note": "v1.3 section 9.7: project root and app_data default open. Chat attachment six-format whitelist must not block project text. fileRead, contentParse, and remoteUnderstand are separate layers."
+  },
+  "note": "S90 + F1 local open: local read/write/ui/task are not an ACL. previewOnly still blocks writes. paidServiceAuth stays on the remote metered exit. Catalog remains SSOT for effectClass/billingClass/undo. Tools omitted here inherit defaults derived from the catalog (fail-closed for paid). request.* are shared request coordination records in story.db (CAS by request revision inside the request service), not work-product writes, so previewOnly does not block them; request.review is the single nested Host model call.",
+  "permissionClasses": [
+    "read",
+    "write",
+    "paid",
+    "task",
+    "ui"
+  ],
+  "revisionPolicies": [
+    "none",
+    "resourceCas",
+    "draftCas",
+    "changeSetCas",
+    "uiContextCas"
+  ],
+  "atomicityGrades": [
+    "singleDbTransaction",
+    "compensated",
+    "irreversible",
+    "none"
+  ],
+  "recordPolicies": [
+    "none",
+    "journal",
+    "receipt",
+    "task"
+  ],
+  "defaultsByEffectClass": {
+    "read": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": false
+    },
+    "prepare": {
+      "permissions": [
+        "write"
+      ],
+      "revisionPolicy": "changeSetCas",
+      "atomicity": "compensated",
+      "recordPolicy": "journal",
+      "nestedRemoteModel": false
+    },
+    "apply": {
+      "permissions": [
+        "write"
+      ],
+      "revisionPolicy": "changeSetCas",
+      "atomicity": "compensated",
+      "recordPolicy": "journal",
+      "nestedRemoteModel": false
+    },
+    "undo": {
+      "permissions": [
+        "write"
+      ],
+      "revisionPolicy": "changeSetCas",
+      "atomicity": "compensated",
+      "recordPolicy": "journal",
+      "nestedRemoteModel": false
+    },
+    "task": {
+      "permissions": [
+        "task"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "none",
+      "recordPolicy": "task",
+      "nestedRemoteModel": false
+    },
+    "ui": {
+      "permissions": [
+        "ui"
+      ],
+      "revisionPolicy": "uiContextCas",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": false
+    }
+  },
+  "tools": {
+    "request.open": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "singleDbTransaction",
+      "recordPolicy": "receipt",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "request.checkpoint": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "singleDbTransaction",
+      "recordPolicy": "receipt",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "request.resume": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "singleDbTransaction",
+      "recordPolicy": "receipt",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "request.cancel": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "singleDbTransaction",
+      "recordPolicy": "receipt",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "request.reply": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "singleDbTransaction",
+      "recordPolicy": "receipt",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "conversation.open": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "singleDbTransaction",
+      "recordPolicy": "receipt",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "conversation.append": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "singleDbTransaction",
+      "recordPolicy": "receipt",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "conversation.get": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "singleDbTransaction",
+      "recordPolicy": "receipt",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "conversation.resolve": {
+      "permissions": [
+        "read",
+        "paid"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "singleDbTransaction",
+      "recordPolicy": "receipt",
+      "nestedRemoteModel": true,
+      "dependencies": []
+    },
+    "request.get": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "request.review": {
+      "permissions": [
+        "read",
+        "paid"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "singleDbTransaction",
+      "recordPolicy": "receipt",
+      "nestedRemoteModel": true,
+      "dependencies": []
+    },
+    "media.describe": {
+      "permissions": [
+        "read",
+        "paid"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": true,
+      "dependencies": []
+    },
+    "subtitle.format": {
+      "permissions": [
+        "read",
+        "paid"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": true,
+      "dependencies": []
+    },
+    "llm.chat": {
+      "permissions": [
+        "read",
+        "paid"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": true,
+      "dependencies": []
+    },
+    "llm.completion.describe": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "llm.completion.start": {
+      "permissions": [
+        "read",
+        "paid"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": true,
+      "dependencies": [
+        "llm.completion.describe"
+      ]
+    },
+    "text.organize": {
+      "permissions": [
+        "read",
+        "paid"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": true,
+      "dependencies": []
+    },
+    "text.organize.candidate.read": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "generation.quote": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "generation.submit": {
+      "permissions": [
+        "write",
+        "paid",
+        "task"
+      ],
+      "revisionPolicy": "resourceCas",
+      "atomicity": "compensated",
+      "recordPolicy": "journal",
+      "nestedRemoteModel": true,
+      "dependencies": [
+        "generation.quote"
+      ]
+    },
+    "task.get": {
+      "permissions": [
+        "read",
+        "task"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "task.list": {
+      "permissions": [
+        "read",
+        "task"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "task.wait": {
+      "permissions": [
+        "read",
+        "task"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "task.cancel": {
+      "permissions": [
+        "task"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "none",
+      "recordPolicy": "task",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "runtime.status.get": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "ui.state.get": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "ui.navigate": {
+      "permissions": [
+        "ui"
+      ],
+      "revisionPolicy": "uiContextCas",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "ui.focus": {
+      "permissions": [
+        "ui"
+      ],
+      "revisionPolicy": "uiContextCas",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "ui.selection.set": {
+      "permissions": [
+        "ui"
+      ],
+      "revisionPolicy": "uiContextCas",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "ui.surface.open": {
+      "permissions": [
+        "ui"
+      ],
+      "revisionPolicy": "uiContextCas",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "ui.surface.close": {
+      "permissions": [
+        "ui"
+      ],
+      "revisionPolicy": "uiContextCas",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "surface.read": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "draftCas",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "surface.patch": {
+      "permissions": [
+        "write"
+      ],
+      "revisionPolicy": "draftCas",
+      "atomicity": "compensated",
+      "recordPolicy": "journal",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "workbench.read": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "draftCas",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "workbench.patch": {
+      "permissions": [
+        "write"
+      ],
+      "revisionPolicy": "draftCas",
+      "atomicity": "compensated",
+      "recordPolicy": "journal",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "settings.binding.validate": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": false,
+      "dependencies": [],
+      "privilegedCredentialSummaryOnly": true
+    },
+    "video.prompt.describe": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "artifact.stage": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "singleDbTransaction",
+      "recordPolicy": "receipt",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "artifact.get": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "none",
+      "recordPolicy": "receipt",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "artifact.upload.begin": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "singleDbTransaction",
+      "recordPolicy": "receipt",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "artifact.upload.chunk": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "singleDbTransaction",
+      "recordPolicy": "receipt",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "artifact.upload.finish": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "singleDbTransaction",
+      "recordPolicy": "receipt",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "turn.advance": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "singleDbTransaction",
+      "recordPolicy": "receipt",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "resource.editable.get": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "context.windows.get": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "localSource.resolve": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "runtime.requirements.list": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "runtime.requirements.get": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "runtime.inventory.get": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "runtime.evidence.read": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "runtime.intake.get": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "runtime.targets.prepare": {
+      "permissions": [
+        "write"
+      ],
+      "revisionPolicy": "resourceCas",
+      "atomicity": "compensated",
+      "recordPolicy": "receipt",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "runtime.intake.inspect": {
+      "permissions": [
+        "write"
+      ],
+      "revisionPolicy": "resourceCas",
+      "atomicity": "compensated",
+      "recordPolicy": "receipt",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "runtime.intake.accept": {
+      "permissions": [
+        "write"
+      ],
+      "revisionPolicy": "resourceCas",
+      "atomicity": "compensated",
+      "recordPolicy": "receipt",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "runtime.validation.run": {
+      "permissions": [
+        "write"
+      ],
+      "revisionPolicy": "resourceCas",
+      "atomicity": "compensated",
+      "recordPolicy": "receipt",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "runtime.intake.resubmit": {
+      "permissions": [
+        "write"
+      ],
+      "revisionPolicy": "resourceCas",
+      "atomicity": "compensated",
+      "recordPolicy": "receipt",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "runtime.maintenance.prepare": {
+      "permissions": [
+        "write"
+      ],
+      "revisionPolicy": "resourceCas",
+      "atomicity": "compensated",
+      "recordPolicy": "receipt",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "runtime.maintenance.finish": {
+      "permissions": [
+        "write"
+      ],
+      "revisionPolicy": "resourceCas",
+      "atomicity": "compensated",
+      "recordPolicy": "receipt",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "comfy.workflow.documentation.extract": {
+      "permissions": [
+        "write",
+        "paid",
+        "task"
+      ],
+      "revisionPolicy": "resourceCas",
+      "atomicity": "compensated",
+      "recordPolicy": "task",
+      "nestedRemoteModel": true,
+      "dependencies": []
+    },
+    "story.creation.source.get": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "story.creation.source.save": {
+      "permissions": [
+        "write"
+      ],
+      "revisionPolicy": "resourceCas",
+      "atomicity": "singleDbTransaction",
+      "recordPolicy": "receipt",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "story.creation.defaults.get": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "story.creation.defaults.set": {
+      "permissions": [
+        "write"
+      ],
+      "revisionPolicy": "resourceCas",
+      "atomicity": "singleDbTransaction",
+      "recordPolicy": "receipt",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "story.creation.chapters.generate": {
+      "permissions": [
+        "write",
+        "paid",
+        "task"
+      ],
+      "revisionPolicy": "resourceCas",
+      "atomicity": "compensated",
+      "recordPolicy": "task",
+      "nestedRemoteModel": true,
+      "dependencies": []
+    },
+    "story.creation.roles.extract": {
+      "permissions": [
+        "write",
+        "paid",
+        "task"
+      ],
+      "revisionPolicy": "resourceCas",
+      "atomicity": "compensated",
+      "recordPolicy": "task",
+      "nestedRemoteModel": true,
+      "dependencies": []
+    },
+    "story.creation.props.extract": {
+      "permissions": [
+        "write",
+        "paid",
+        "task"
+      ],
+      "revisionPolicy": "resourceCas",
+      "atomicity": "compensated",
+      "recordPolicy": "task",
+      "nestedRemoteModel": true,
+      "dependencies": []
+    },
+    "story.creation.entities.integrate": {
+      "permissions": [
+        "write",
+        "paid",
+        "task"
+      ],
+      "revisionPolicy": "resourceCas",
+      "atomicity": "compensated",
+      "recordPolicy": "task",
+      "nestedRemoteModel": true,
+      "dependencies": []
+    },
+    "story.creation.text.optimize": {
+      "permissions": [
+        "write",
+        "paid",
+        "task"
+      ],
+      "revisionPolicy": "resourceCas",
+      "atomicity": "compensated",
+      "recordPolicy": "task",
+      "nestedRemoteModel": true,
+      "dependencies": []
+    },
+    "story.creation.batch.start": {
+      "permissions": [
+        "write",
+        "paid",
+        "task"
+      ],
+      "revisionPolicy": "resourceCas",
+      "atomicity": "compensated",
+      "recordPolicy": "task",
+      "nestedRemoteModel": true,
+      "dependencies": []
+    },
+    "story.creation.flow.start": {
+      "permissions": [
+        "write",
+        "paid",
+        "task"
+      ],
+      "revisionPolicy": "resourceCas",
+      "atomicity": "compensated",
+      "recordPolicy": "task",
+      "nestedRemoteModel": true,
+      "dependencies": []
+    },
+    "story.creation.run.get": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "story.creation.run.resume": {
+      "permissions": [
+        "write",
+        "paid",
+        "task"
+      ],
+      "revisionPolicy": "resourceCas",
+      "atomicity": "compensated",
+      "recordPolicy": "task",
+      "nestedRemoteModel": true,
+      "dependencies": []
+    },
+    "story.creation.run.cancel": {
+      "permissions": [
+        "task"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "singleDbTransaction",
+      "recordPolicy": "task",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "story.creation.entities.list": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "story.creation.entities.change": {
+      "permissions": [
+        "write"
+      ],
+      "revisionPolicy": "resourceCas",
+      "atomicity": "singleDbTransaction",
+      "recordPolicy": "receipt",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "dubbing.project.list": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "dubbing.project.read": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "dubbing.change.prepare": {
+      "permissions": [
+        "write"
+      ],
+      "revisionPolicy": "changeSetCas",
+      "atomicity": "singleDbTransaction",
+      "recordPolicy": "journal",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "dubbing.subtitle.inspect": {
+      "permissions": [
+        "read"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "none",
+      "recordPolicy": "none",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "dubbing.media.import": {
+      "permissions": [
+        "write"
+      ],
+      "revisionPolicy": "none",
+      "atomicity": "irreversible",
+      "recordPolicy": "receipt",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "dubbing.synthesize.submit": {
+      "permissions": [
+        "write",
+        "task"
+      ],
+      "revisionPolicy": "resourceCas",
+      "atomicity": "irreversible",
+      "recordPolicy": "task",
+      "nestedRemoteModel": true,
+      "dependencies": []
+    },
+    "dubbing.export.submit": {
+      "permissions": [
+        "write",
+        "task"
+      ],
+      "revisionPolicy": "resourceCas",
+      "atomicity": "irreversible",
+      "recordPolicy": "task",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "dubbing.analyze.submit": {
+      "permissions": [
+        "write",
+        "task"
+      ],
+      "revisionPolicy": "resourceCas",
+      "atomicity": "irreversible",
+      "recordPolicy": "task",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "dubbing.translate.submit": {
+      "permissions": [
+        "write",
+        "task"
+      ],
+      "revisionPolicy": "resourceCas",
+      "atomicity": "irreversible",
+      "recordPolicy": "task",
+      "nestedRemoteModel": true,
+      "dependencies": []
+    },
+    "dubbing.transcript.import": {
+      "permissions": [
+        "write",
+        "task"
+      ],
+      "revisionPolicy": "resourceCas",
+      "atomicity": "irreversible",
+      "recordPolicy": "task",
+      "nestedRemoteModel": false,
+      "dependencies": []
+    },
+    "dubbing.workflow.submit": {
+      "permissions": [
+        "write",
+        "task"
+      ],
+      "revisionPolicy": "resourceCas",
+      "atomicity": "irreversible",
+      "recordPolicy": "task",
+      "nestedRemoteModel": true,
+      "dependencies": []
+    }
+  }
+}

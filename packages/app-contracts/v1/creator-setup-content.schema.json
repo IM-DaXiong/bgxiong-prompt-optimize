@@ -1,0 +1,167 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "app-contracts/v1/creator-setup-content.schema.json",
+  "title": "SetupContentEditionV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "revision",
+    "locale",
+    "platform",
+    "minClientVersion",
+    "maxClientVersion",
+    "publishedAt",
+    "contentDigest",
+    "messages",
+    "resources"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "locale": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 16
+    },
+    "platform": {
+      "type": "string",
+      "enum": [
+        "windows",
+        "macos",
+        "linux"
+      ]
+    },
+    "channel": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 32
+    },
+    "minClientVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "maxClientVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "publishedAt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "contentDigest": {
+      "type": "string",
+      "minLength": 8
+    },
+    "messages": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Known messageKey -> template text; placeholders must be registered tokens only."
+    },
+    "resources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/resource"
+      }
+    }
+  },
+  "$defs": {
+    "resource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "resourceId",
+        "artifactRef",
+        "capabilityId",
+        "installHints",
+        "sources"
+      ],
+      "properties": {
+        "resourceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifactRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "capabilityId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "installHints": {
+          "type": "string"
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/source"
+          }
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceId",
+        "providerId",
+        "label",
+        "shareUrl",
+        "status"
+      ],
+      "properties": {
+        "sourceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "providerId": {
+          "type": "string",
+          "enum": [
+            "baidu-pan",
+            "quark-pan",
+            "other"
+          ]
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "shareUrl": {
+          "type": "string",
+          "pattern": "^https://"
+        },
+        "extractionCode": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "folderHint": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "active",
+            "disabled"
+          ]
+        }
+      }
+    }
+  }
+}

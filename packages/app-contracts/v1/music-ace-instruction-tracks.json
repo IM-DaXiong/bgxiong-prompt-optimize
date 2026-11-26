@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "tracks": [
+    "vocals",
+    "backing_vocals",
+    "drums",
+    "bass",
+    "guitar",
+    "keyboard",
+    "percussion",
+    "strings",
+    "synth",
+    "fx",
+    "brass",
+    "woodwinds"
+  ],
+  "defaultExtractTrack": "vocals",
+  "defaultCompleteTracks": ["drums", "bass", "guitar"],
+  "extractInstructionTemplate": "Extract the {track} track from the audio:",
+  "legoInstructionTemplate": "Generate the {track} track based on the audio context:",
+  "completeInstructionTemplate": "Complete the input track with {tracks}:"
+}

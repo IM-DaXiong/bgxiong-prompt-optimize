@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "type": "ContentSkillBindCtx",
+  "allowedBindKeys": [
+    "storyId",
+    "sourceText",
+    "sceneNodeId",
+    "chapterNodeId",
+    "writeMode",
+    "anchor"
+  ],
+  "allowedDirectiveTopKeys": ["prose", "structure"],
+  "allowedStructureKeys": [
+    "maxChapters",
+    "durationSeconds",
+    "durationSecondsPerChapter",
+    "maxScenesPerChapter"
+  ],
+  "notes": "Do not invent $ctx paths beyond Host injection. literaryMode is a host hint, not prose.style. SCOPE (Agent Skills plan K04, 2026-10-02): app-internal Plan bind/directive contract, kept (C04). It is not an author-package requirement and is never used to validate SKILL.md packages."
+}

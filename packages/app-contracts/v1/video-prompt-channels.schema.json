@@ -1,0 +1,312 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "video-prompt-channels.schema.json",
+  "schemaVersion": 1,
+  "description": "Shared expansion and negative channels. finalPrompt remains the only positive body. Optional persisted fields mean unrecorded on old versions, never implicit clear. Node-defined negative support and frozen source IDs are validated by the service.",
+  "definitions": {
+    "expansionMode": {
+      "$ref": "agent-skills.json#/definitions/expansionDeclaration"
+    },
+    "expansionSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceId",
+        "role",
+        "stableId",
+        "packageDigest",
+        "declaration",
+        "resourceRefs",
+        "ruleText"
+      ],
+      "properties": {
+        "sourceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "role": {
+          "$ref": "#/definitions/expansionRole"
+        },
+        "stableId": {
+          "type": "string"
+        },
+        "packageDigest": {
+          "type": "string"
+        },
+        "declaration": {
+          "$ref": "#/definitions/expansionMode"
+        },
+        "resourceRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "ruleText": {
+          "type": "string"
+        }
+      }
+    },
+    "expansionPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "sources",
+        "userInstructions"
+      ],
+      "properties": {
+        "mode": {
+          "$ref": "#/definitions/expansionMode"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/expansionSource"
+          }
+        },
+        "userInstructions": {
+          "type": "string"
+        }
+      }
+    },
+    "negativeInput": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "const": "unrecorded"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "const": "inherit"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "const": "clear"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "text"
+          ],
+          "properties": {
+            "kind": {
+              "const": "text"
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "negativeOperation": {
+      "type": "string",
+      "enum": [
+        "preserve",
+        "generate"
+      ]
+    },
+    "negativeResult": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "const": "unsupported"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "const": "clear"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "text",
+            "sourceRefs"
+          ],
+          "properties": {
+            "kind": {
+              "const": "text"
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sourceRefs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            }
+          }
+        }
+      ]
+    },
+    "promptChannels": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "negative",
+        "positiveSourceRefs"
+      ],
+      "properties": {
+        "negative": {
+          "$ref": "#/definitions/negativeResult"
+        },
+        "positiveSourceRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "negativeSourceMap": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/negativeSourceSpan"
+          }
+        }
+      }
+    },
+    "proposedFact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "factId",
+        "shotId",
+        "kind",
+        "semanticSlot",
+        "polarity",
+        "text",
+        "entityRefIds",
+        "sourceRef"
+      ],
+      "properties": {
+        "factId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "shotId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "type": "string"
+        },
+        "semanticSlot": {
+          "type": "string"
+        },
+        "polarity": {
+          "type": "string",
+          "enum": [
+            "positive",
+            "negative"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "entityRefIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "sourceRef": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "expansionRole": {
+      "type": "string",
+      "enum": [
+        "content",
+        "format",
+        "user"
+      ]
+    },
+    "negativeSourceSpan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "channel",
+        "startByte",
+        "endByte",
+        "sourceRefs"
+      ],
+      "properties": {
+        "channel": {
+          "const": "negative"
+        },
+        "startByte": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "endByte": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sourceRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

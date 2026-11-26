@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "engineKinds": [
+    {
+      "id": "llama",
+      "rustVariant": "Llama"
+    },
+    {
+      "id": "tts",
+      "rustVariant": "Tts"
+    },
+    {
+      "id": "music",
+      "rustVariant": "Music"
+    },
+    {
+      "id": "sfx",
+      "rustVariant": "Sfx"
+    },
+    {
+      "id": "comfyui",
+      "rustVariant": "Comfyui"
+    },
+    {
+      "id": "clearvoice",
+      "rustVariant": "Clearvoice"
+    },
+    {
+      "id": "vocal_separate",
+      "rustVariant": "VocalSeparate"
+    },
+    {
+      "id": "asr",
+      "rustVariant": "Asr"
+    },
+    {
+      "id": "singing",
+      "rustVariant": "Singing"
+    }
+  ]
+}

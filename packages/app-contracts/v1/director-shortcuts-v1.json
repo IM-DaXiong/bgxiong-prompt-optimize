@@ -1,0 +1,327 @@
+{
+  "version": 1,
+  "specialKeys": {
+    "Delete": "Delete",
+    "Home": "Home",
+    "End": "End",
+    "Space": "Space",
+    "PageUp": "PageUp",
+    "PageDown": "PageDown",
+    "ArrowUp": "Up",
+    "ArrowDown": "Down",
+    "ArrowLeft": "Left",
+    "ArrowRight": "Right",
+    "NumpadDecimal": "Kp Period",
+    "NumpadAdd": "Kp Add",
+    "NumpadSubtract": "Kp Subtract",
+    "NumpadMultiply": "Kp Multiply",
+    "NumpadDivide": "Kp Divide",
+    "BracketLeft": "[",
+    "BracketRight": "]",
+    "Minus": "-",
+    "Equal": "=",
+    "Comma": ",",
+    "Period": ".",
+    "Slash": "/",
+    "Backslash": "\\",
+    "Semicolon": ";",
+    "Quote": "'",
+    "Backquote": "`"
+  },
+  "actions": [
+    {
+      "id": "box_select",
+      "zh": "框选人物",
+      "en": "Box select",
+      "group": "编辑",
+      "defaultChord": {
+        "code": "KeyB"
+      },
+      "aliases": [],
+      "settings": false
+    },
+    {
+      "id": "move",
+      "zh": "移动工具 / 拖动位置",
+      "en": "Move tool / Joint translation",
+      "group": "编辑",
+      "defaultChord": {
+        "code": "KeyG"
+      },
+      "aliases": [],
+      "settings": true
+    },
+    {
+      "id": "rotate",
+      "zh": "旋转工具 / 旋转关节",
+      "en": "Rotate tool / Joint rotation",
+      "group": "编辑",
+      "defaultChord": {
+        "code": "KeyR"
+      },
+      "aliases": [],
+      "settings": true
+    },
+    {
+      "id": "pose",
+      "zh": "摆姿 / 整人编辑",
+      "en": "Pose / Object editing",
+      "group": "编辑",
+      "defaultChord": {
+        "code": "KeyP"
+      },
+      "aliases": [],
+      "settings": false
+    },
+    {
+      "id": "frame",
+      "zh": "聚焦所选人物 / 关节",
+      "en": "Frame selection",
+      "group": "视图",
+      "defaultChord": {
+        "code": "KeyF"
+      },
+      "aliases": [
+        {
+          "code": "NumpadDecimal"
+        }
+      ],
+      "settings": false
+    },
+    {
+      "id": "all",
+      "zh": "框住全部 / 适配取景框",
+      "en": "Frame all",
+      "group": "视图",
+      "defaultChord": {
+        "code": "Home"
+      },
+      "aliases": [],
+      "settings": false
+    },
+    {
+      "id": "camera_view",
+      "zh": "场景 / 相机",
+      "en": "Scene / Camera",
+      "group": "视图",
+      "defaultChord": {
+        "code": "Digit0"
+      },
+      "aliases": [
+        {
+          "code": "Numpad0"
+        }
+      ],
+      "settings": false
+    },
+    {
+      "id": "front",
+      "zh": "前视图",
+      "en": "Front",
+      "group": "视图",
+      "defaultChord": {
+        "code": "Numpad1"
+      },
+      "aliases": [],
+      "settings": false
+    },
+    {
+      "id": "back",
+      "zh": "后视图",
+      "en": "Back",
+      "group": "视图",
+      "defaultChord": {
+        "code": "Numpad1",
+        "ctrl": true
+      },
+      "aliases": [],
+      "settings": false
+    },
+    {
+      "id": "right",
+      "zh": "右视图",
+      "en": "Right",
+      "group": "视图",
+      "defaultChord": {
+        "code": "Numpad3"
+      },
+      "aliases": [],
+      "settings": false
+    },
+    {
+      "id": "left",
+      "zh": "左视图",
+      "en": "Left",
+      "group": "视图",
+      "defaultChord": {
+        "code": "Numpad3",
+        "ctrl": true
+      },
+      "aliases": [],
+      "settings": false
+    },
+    {
+      "id": "top",
+      "zh": "顶视图",
+      "en": "Top",
+      "group": "视图",
+      "defaultChord": {
+        "code": "Numpad7"
+      },
+      "aliases": [],
+      "settings": false
+    },
+    {
+      "id": "bottom",
+      "zh": "底视图",
+      "en": "Bottom",
+      "group": "视图",
+      "defaultChord": {
+        "code": "Numpad7",
+        "ctrl": true
+      },
+      "aliases": [],
+      "settings": false
+    },
+    {
+      "id": "projection",
+      "zh": "透视 / 正交",
+      "en": "Perspective / Orthographic",
+      "group": "视图",
+      "defaultChord": {
+        "code": "Numpad5"
+      },
+      "aliases": [],
+      "settings": false
+    },
+    {
+      "id": "align_camera",
+      "zh": "用当前视角设机位",
+      "en": "Align camera to view",
+      "group": "镜头",
+      "defaultChord": {
+        "code": "Numpad0",
+        "ctrl": true,
+        "alt": true
+      },
+      "aliases": [],
+      "settings": false
+    },
+    {
+      "id": "focus_view",
+      "zh": "专注视口",
+      "en": "Focus viewport",
+      "group": "界面",
+      "defaultChord": {
+        "code": "Space",
+        "ctrl": true
+      },
+      "aliases": [],
+      "settings": false
+    },
+    {
+      "id": "left_panel",
+      "zh": "场景栏",
+      "en": "Scene panel",
+      "group": "界面",
+      "defaultChord": {
+        "code": "KeyT"
+      },
+      "aliases": [],
+      "settings": false
+    },
+    {
+      "id": "right_panel",
+      "zh": "属性栏",
+      "en": "Inspector",
+      "group": "界面",
+      "defaultChord": {
+        "code": "KeyN"
+      },
+      "aliases": [],
+      "settings": false
+    },
+    {
+      "id": "save",
+      "zh": "保存到画布",
+      "en": "Save to canvas",
+      "group": "文件",
+      "defaultChord": {
+        "code": "KeyS",
+        "ctrl": true
+      },
+      "aliases": [],
+      "settings": false
+    },
+    {
+      "id": "undo",
+      "zh": "撤销",
+      "en": "Undo",
+      "group": "编辑",
+      "defaultChord": {
+        "code": "KeyZ",
+        "ctrl": true
+      },
+      "aliases": [],
+      "settings": false
+    },
+    {
+      "id": "redo",
+      "zh": "重做",
+      "en": "Redo",
+      "group": "编辑",
+      "defaultChord": {
+        "code": "KeyZ",
+        "ctrl": true,
+        "shift": true
+      },
+      "aliases": [],
+      "settings": false
+    },
+    {
+      "id": "rename",
+      "zh": "重命名人物",
+      "en": "Rename selection",
+      "group": "编辑",
+      "defaultChord": {
+        "code": "F2"
+      },
+      "aliases": [],
+      "settings": false
+    },
+    {
+      "id": "duplicate",
+      "zh": "复制人物",
+      "en": "Duplicate selection",
+      "group": "编辑",
+      "defaultChord": {
+        "code": "KeyD",
+        "shift": true
+      },
+      "aliases": [],
+      "settings": false
+    },
+    {
+      "id": "delete",
+      "zh": "删除人物",
+      "en": "Delete selection",
+      "group": "编辑",
+      "defaultChord": {
+        "code": "Delete"
+      },
+      "aliases": [],
+      "settings": false
+    },
+    {
+      "id": "help",
+      "zh": "快捷键与帮助",
+      "en": "Shortcut help",
+      "group": "界面",
+      "defaultChord": {
+        "code": "F1"
+      },
+      "aliases": [],
+      "settings": false
+    }
+  ]
+}

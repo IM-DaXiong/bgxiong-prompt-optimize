@@ -1,0 +1,72 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "storyId",
+    "chapterId",
+    "sceneId",
+    "shotIds"
+  ],
+  "properties": {
+    "storyId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "chapterId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sceneId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "shotIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    }
+  },
+  "definitions": {
+    "Result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "updatedShotIds",
+        "unchangedShotIds",
+        "historyVersionIds"
+      ],
+      "properties": {
+        "status": {
+          "const": "done"
+        },
+        "taskRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "updatedShotIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "unchangedShotIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "historyVersionIds": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }
+}

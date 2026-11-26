@@ -1,0 +1,164 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "bgx://contracts/storyboard-prompt-handoff.schema.json",
+  "title": "Storyboard prompt handoff (bgx-shot-update/1). Single source of truth for file/tool/IPC DTO shapes; field vocabularies live in storyboard-prompt-handoff-policy.json.",
+  "$defs": {
+    "formatVersion": { "const": "bgx-shot-update/1" },
+    "promptField": { "enum": ["title", "stillPrompt", "videoPrompt"] },
+    "bgxShotPrompts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "stillPrompt", "videoPrompt"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "title": { "type": "string" },
+        "stillPrompt": { "type": "string" },
+        "videoPrompt": { "type": "string" }
+      }
+    },
+    "resultShot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["refKey", "bgxShot"],
+      "properties": {
+        "refKey": { "type": "string", "minLength": 1 },
+        "bgxShot": { "$ref": "#/$defs/bgxShotPrompts" }
+      }
+    },
+    "resultPackage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["formatVersion", "kind", "handoffId", "exportId", "basisRevision", "shots"],
+      "properties": {
+        "formatVersion": { "$ref": "#/$defs/formatVersion" },
+        "kind": { "const": "result" },
+        "handoffId": { "type": "string", "minLength": 1 },
+        "exportId": { "type": "string", "minLength": 1 },
+        "basisRevision": { "type": "integer", "minimum": 0 },
+        "shots": { "type": "array", "items": { "$ref": "#/$defs/resultShot" } }
+      }
+    },
+    "inputShot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["refKey", "bgxShot", "readOnly"],
+      "properties": {
+        "refKey": { "type": "string", "minLength": 1 },
+        "bgxShot": { "$ref": "#/$defs/bgxShotPrompts" },
+        "readOnly": { "type": "object" }
+      }
+    },
+    "inputPackage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["formatVersion", "kind", "handoffId", "exportId", "basisRevision", "label", "instructions", "context", "shots", "outputSchema", "unchangedResult"],
+      "properties": {
+        "formatVersion": { "$ref": "#/$defs/formatVersion" },
+        "kind": { "const": "input" },
+        "handoffId": { "type": "string", "minLength": 1 },
+        "exportId": { "type": "string", "minLength": 1 },
+        "basisRevision": { "type": "integer", "minimum": 0 },
+        "label": { "type": "string" },
+        "instructions": { "type": "string" },
+        "context": { "type": "object" },
+        "shots": { "type": "array", "items": { "$ref": "#/$defs/inputShot" } },
+        "outputSchema": { "type": "object" },
+        "unchangedResult": { "$ref": "#/$defs/resultPackage" }
+      }
+    },
+    "contextRequestItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["op"],
+      "properties": {
+        "op": { "enum": ["discover", "read"] },
+        "query": { "type": "object" },
+        "resource": { "type": "object" },
+        "field": { "type": "string" },
+        "historyId": { "type": "string" }
+      }
+    },
+    "contextRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["formatVersion", "kind", "handoffId", "exportId", "requests"],
+      "properties": {
+        "formatVersion": { "$ref": "#/$defs/formatVersion" },
+        "kind": { "const": "contextRequest" },
+        "handoffId": { "type": "string", "minLength": 1 },
+        "exportId": { "type": "string", "minLength": 1 },
+        "requests": { "type": "array", "items": { "$ref": "#/$defs/contextRequestItem" } }
+      }
+    },
+    "submitBegin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "handoffId", "exportId", "basisRevision", "submitKey", "expectedTargetCount"],
+      "properties": {
+        "mode": { "const": "begin" },
+        "handoffId": { "type": "string" },
+        "exportId": { "type": "string" },
+        "basisRevision": { "type": "integer", "minimum": 0 },
+        "submitKey": { "type": "string", "minLength": 1 },
+        "expectedTargetCount": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "submitShotItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "refKey", "bgxShot"],
+      "properties": {
+        "kind": { "const": "shot" },
+        "refKey": { "type": "string" },
+        "bgxShot": { "$ref": "#/$defs/bgxShotPrompts" }
+      }
+    },
+    "submitFieldFragmentItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "refKey", "id", "field", "offset", "text", "isLast"],
+      "properties": {
+        "kind": { "const": "fieldFragment" },
+        "refKey": { "type": "string" },
+        "id": { "type": "string" },
+        "field": { "$ref": "#/$defs/promptField" },
+        "offset": { "type": "integer", "minimum": 0, "description": "Unicode scalar offset" },
+        "text": { "type": "string" },
+        "isLast": { "type": "boolean" }
+      }
+    },
+    "submitAppend": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "candidateId", "chunkKey", "items"],
+      "properties": {
+        "mode": { "const": "append" },
+        "candidateId": { "type": "string" },
+        "chunkKey": { "type": "string", "minLength": 1 },
+        "items": { "type": "array", "items": { "oneOf": [{ "$ref": "#/$defs/submitShotItem" }, { "$ref": "#/$defs/submitFieldFragmentItem" }] } }
+      }
+    },
+    "submitSeal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "candidateId"],
+      "properties": {
+        "mode": { "const": "seal" },
+        "candidateId": { "type": "string" }
+      }
+    },
+    "committedEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["handoffId", "candidateId", "applyKey", "storyId", "chapterNodeId", "sceneNodeId"],
+      "properties": {
+        "handoffId": { "type": "string" },
+        "candidateId": { "type": "string" },
+        "applyKey": { "type": "string" },
+        "storyId": { "type": "string" },
+        "chapterNodeId": { "type": "string" },
+        "sceneNodeId": { "type": "string" }
+      }
+    }
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "registryId": "creator-ui-names",
+  "note": "RC72: user-facing names the Host puts into reply/review materials. Every name points at an existing locale key of ui/src/i18n (zh-CN.ts / en.ts); zhCN and en must equal that locale text (Rust test rc72_ui_names_equal_the_ui_locale reads both locale files). null = the capability has no page of its own in the software; materials then describe it by what it does, never by an invented page name. groups must list every catalog group exactly once.",
+  "groups": {
+    "motion": null,
+    "soundDesign": null,
+    "discover": null,
+    "story": { "i18nKey": "sidebar.stories", "zhCN": "故事", "en": "Stories", "purpose": null },
+    "chapterReferences": null,
+    "storyCreation": null,
+    "changeset": null,
+    "canvas": {
+      "i18nKey": "sidebar.freeCanvas", "zhCN": "自由画布", "en": "Free Canvas",
+      "purpose": { "i18nKey": "welcome.freeCanvasHint", "zhCN": "与故事无关的自由生图 / 生视频画布", "en": "Story-independent free image / video canvas" }
+    },
+    "settings": {
+      "i18nKey": "sidebar.settings", "zhCN": "设置", "en": "Settings",
+      "purpose": { "i18nKey": "welcome.settingsHint", "zhCN": "配置 AI 服务商、模型与偏好", "en": "Configure AI providers, models & preferences" }
+    },
+    "clipWorkflow": {"i18nKey": "sidebar.clips", "zhCN": "片段", "en": "Clips", "purpose": null},
+    "singingRelyrics": null,
+    "content": null,
+    "media": null,
+    "transfer": null,
+    "generation": null,
+    "task": { "i18nKey": "sidebar.tasks", "zhCN": "AI 任务", "en": "AI Tasks", "purpose": null },
+    "ui": null,
+    "memory": null,
+    "audio": {
+      "i18nKey": "sidebar.voice", "zhCN": "声音", "en": "Voice",
+      "purpose": { "i18nKey": "welcome.voiceHint", "zhCN": "AI 语音合成与声音管理", "en": "AI voice synthesis & audio management" }
+    },
+    "files": null,
+    "runtime": null,
+    "delivery": { "i18nKey": "sidebar.clipsAll", "zhCN": "交付", "en": "Deliver", "purpose": null },
+    "skills": null,
+    "request": null,
+    "skillLibrary": null,
+    "conversation": null,
+    "effect": null,
+    "presenter": null
+  },
+  "resourceKinds": {
+    "story": { "i18nKey": "sidebar.stories", "zhCN": "故事", "en": "Stories", "purpose": null },
+    "chapter": { "i18nKey": "sidebar.chapters", "zhCN": "剧集", "en": "Chapters", "purpose": null },
+    "scene": { "i18nKey": "sidebar.scenes", "zhCN": "场次", "en": "Scenes", "purpose": null },
+    "segment": { "i18nKey": "sidebar.segments", "zhCN": "片段", "en": "Segments", "purpose": null },
+    "role": { "i18nKey": "sidebar.roles", "zhCN": "角色", "en": "Roles", "purpose": null },
+    "actor": { "i18nKey": "sidebar.characters", "zhCN": "演员", "en": "Cast", "purpose": null },
+    "visualAsset": { "i18nKey": "sidebar.assets", "zhCN": "资产", "en": "Assets", "purpose": null },
+    "storyboardNode": { "i18nKey": "sidebar.storyboard", "zhCN": "故事板", "en": "Storyboard", "purpose": null },
+    "canvasProject": { "i18nKey": "sidebar.freeCanvas", "zhCN": "自由画布", "en": "Free Canvas", "purpose": null },
+    "canvasNode": { "i18nKey": "sidebar.freeCanvas", "zhCN": "自由画布", "en": "Free Canvas", "purpose": null },
+    "task": { "i18nKey": "sidebar.tasks", "zhCN": "AI 任务", "en": "AI Tasks", "purpose": null }
+  }
+}

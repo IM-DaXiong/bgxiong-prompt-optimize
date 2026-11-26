@@ -1,0 +1,573 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-local-source-v1.schema.json",
+  "title": "Creator local source (authorized directory read) v1",
+  "definitions": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9_.:-]+$"
+    },
+    "permissions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "localRead",
+        "modelRead"
+      ],
+      "properties": {
+        "localRead": {
+          "type": "boolean"
+        },
+        "modelRead": {
+          "type": "boolean"
+        }
+      }
+    },
+    "entryKind": {
+      "type": "string",
+      "enum": [
+        "directory",
+        "text",
+        "image",
+        "audio",
+        "video",
+        "other"
+      ]
+    },
+    "availability": {
+      "type": "string",
+      "enum": [
+        "available",
+        "unsupported",
+        "denied",
+        "reparse"
+      ]
+    },
+    "scanStatus": {
+      "type": "string",
+      "enum": [
+        "complete",
+        "incomplete",
+        "failed"
+      ]
+    },
+    "representation": {
+      "type": "string",
+      "enum": [
+        "document",
+        "jsonStrings"
+      ]
+    },
+    "grant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rootId",
+        "label",
+        "grantRevision",
+        "permissions",
+        "availability"
+      ],
+      "properties": {
+        "rootId": {
+          "$ref": "#/definitions/id"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "grantRevision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "permissions": {
+          "$ref": "#/definitions/permissions"
+        },
+        "availability": {
+          "type": "string",
+          "enum": [
+            "available",
+            "revoked",
+            "rootChanged"
+          ]
+        }
+      }
+    },
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fileId",
+        "relativePath",
+        "kind",
+        "byteLen",
+        "revision",
+        "availability"
+      ],
+      "properties": {
+        "fileId": {
+          "$ref": "#/definitions/id"
+        },
+        "parentEntryId": {
+          "$ref": "#/definitions/id"
+        },
+        "relativePath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "kind": {
+          "$ref": "#/definitions/entryKind"
+        },
+        "byteLen": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "revision": {
+          "$ref": "#/definitions/id"
+        },
+        "availability": {
+          "$ref": "#/definitions/availability"
+        }
+      }
+    },
+    "fileRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fileId",
+        "revision"
+      ],
+      "properties": {
+        "fileId": {
+          "$ref": "#/definitions/id"
+        },
+        "revision": {
+          "$ref": "#/definitions/id"
+        }
+      }
+    },
+    "sourceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rootId",
+        "snapshotId",
+        "fileId",
+        "revision"
+      ],
+      "properties": {
+        "rootId": {
+          "$ref": "#/definitions/id"
+        },
+        "snapshotId": {
+          "$ref": "#/definitions/id"
+        },
+        "fileId": {
+          "$ref": "#/definitions/id"
+        },
+        "revision": {
+          "$ref": "#/definitions/id"
+        }
+      }
+    },
+    "sourceUnit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceUnitId",
+        "fileId",
+        "revision",
+        "representation",
+        "unitIndex",
+        "text",
+        "continuation"
+      ],
+      "properties": {
+        "sourceUnitId": {
+          "$ref": "#/definitions/id"
+        },
+        "fileId": {
+          "$ref": "#/definitions/id"
+        },
+        "revision": {
+          "$ref": "#/definitions/id"
+        },
+        "representation": {
+          "$ref": "#/definitions/representation"
+        },
+        "unitIndex": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "text": {
+          "type": "string"
+        },
+        "continuation": {
+          "type": "boolean"
+        },
+        "pointer": {
+          "type": "string",
+          "maxLength": 1024
+        }
+      }
+    },
+    "rootsInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {}
+    },
+    "rootsOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "roots"
+      ],
+      "properties": {
+        "roots": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/grant"
+          }
+        }
+      }
+    },
+    "listInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rootId"
+      ],
+      "properties": {
+        "rootId": {
+          "$ref": "#/definitions/id"
+        },
+        "snapshotId": {
+          "$ref": "#/definitions/id"
+        },
+        "parentEntryId": {
+          "$ref": "#/definitions/id"
+        },
+        "cursor": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        }
+      }
+    },
+    "listOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "snapshotId",
+        "entries",
+        "scanStatus",
+        "warnings"
+      ],
+      "properties": {
+        "snapshotId": {
+          "$ref": "#/definitions/id"
+        },
+        "entries": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "$ref": "#/definitions/entry"
+          }
+        },
+        "nextCursor": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "scanStatus": {
+          "$ref": "#/definitions/scanStatus"
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "readInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "snapshotId",
+        "fileId",
+        "expectedRevision",
+        "representation"
+      ],
+      "properties": {
+        "snapshotId": {
+          "$ref": "#/definitions/id"
+        },
+        "fileId": {
+          "$ref": "#/definitions/id"
+        },
+        "expectedRevision": {
+          "$ref": "#/definitions/id"
+        },
+        "representation": {
+          "$ref": "#/definitions/representation"
+        },
+        "chunkCursor": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        }
+      }
+    },
+    "readOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "units",
+        "format",
+        "encoding",
+        "readCoverage"
+      ],
+      "properties": {
+        "units": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/sourceUnit"
+          }
+        },
+        "format": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32
+        },
+        "encoding": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32
+        },
+        "nextCursor": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "readCoverage": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "totalUnits",
+            "returnedUnits",
+            "complete"
+          ],
+          "properties": {
+            "totalUnits": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "returnedUnits": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "complete": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    },
+    "describeInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "snapshotId",
+        "fileRefs"
+      ],
+      "properties": {
+        "snapshotId": {
+          "$ref": "#/definitions/id"
+        },
+        "fileRefs": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 12,
+          "items": {
+            "$ref": "#/definitions/fileRef"
+          }
+        }
+      }
+    },
+    "resolveInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rootId",
+        "relativePath"
+      ],
+      "properties": {
+        "rootId": {
+          "$ref": "#/definitions/id"
+        },
+        "relativePath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        }
+      }
+    },
+    "resolveOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceRef"
+      ],
+      "properties": {
+        "sourceRef": {
+          "$ref": "#/definitions/sourceRef"
+        }
+      }
+    },
+    "stageOptionalString": {
+      "type": "string"
+    },
+    "stageHostFileInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceKind",
+        "relPath"
+      ],
+      "properties": {
+        "sourceKind": {
+          "const": "hostFile"
+        },
+        "relPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "userPrompt": {
+          "$ref": "#/definitions/stageOptionalString"
+        },
+        "generationPrompt": {
+          "$ref": "#/definitions/stageOptionalString"
+        }
+      }
+    },
+    "stageHttpsInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceKind",
+        "url"
+      ],
+      "properties": {
+        "sourceKind": {
+          "const": "https"
+        },
+        "url": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "userPrompt": {
+          "$ref": "#/definitions/stageOptionalString"
+        },
+        "generationPrompt": {
+          "$ref": "#/definitions/stageOptionalString"
+        }
+      }
+    },
+    "stageUploadInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceKind",
+        "uploadRef"
+      ],
+      "properties": {
+        "sourceKind": {
+          "const": "upload"
+        },
+        "uploadRef": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "userPrompt": {
+          "$ref": "#/definitions/stageOptionalString"
+        },
+        "generationPrompt": {
+          "$ref": "#/definitions/stageOptionalString"
+        }
+      }
+    },
+    "stageProjectFileInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceKind",
+        "relPath"
+      ],
+      "properties": {
+        "sourceKind": {
+          "const": "projectFile"
+        },
+        "relPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "userPrompt": {
+          "$ref": "#/definitions/stageOptionalString"
+        },
+        "generationPrompt": {
+          "$ref": "#/definitions/stageOptionalString"
+        }
+      }
+    },
+    "stageLocalSourceInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceKind",
+        "sourceRef"
+      ],
+      "properties": {
+        "sourceKind": {
+          "const": "localSource"
+        },
+        "sourceRef": {
+          "$ref": "#/definitions/sourceRef"
+        },
+        "userPrompt": {
+          "$ref": "#/definitions/stageOptionalString"
+        },
+        "generationPrompt": {
+          "$ref": "#/definitions/stageOptionalString"
+        }
+      }
+    },
+    "stageInput": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/stageHostFileInput"
+        },
+        {
+          "$ref": "#/definitions/stageHttpsInput"
+        },
+        {
+          "$ref": "#/definitions/stageUploadInput"
+        },
+        {
+          "$ref": "#/definitions/stageProjectFileInput"
+        },
+        {
+          "$ref": "#/definitions/stageLocalSourceInput"
+        }
+      ]
+    }
+  }
+}

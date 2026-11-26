@@ -1,0 +1,51 @@
+{
+  "formatVersion": 2,
+  "task": "video-content-optimize",
+  "kind": "request",
+  "messages": [
+    {
+      "id": "system",
+      "role": "system",
+      "parts": [
+        {
+          "fileByLanguage": {
+            "zh": "../shared/request-guidance.zh.md",
+            "en": "../shared/request-guidance.en.md"
+          }
+        },
+        {
+          "fileByLanguage": {
+            "zh": "SKILL.md",
+            "en": "prompts/method.en.md"
+          }
+        }
+      ]
+    },
+    {
+      "id": "user",
+      "role": "user",
+      "parts": [
+        {
+          "fileByLanguage": {
+            "zh": "../shared/context-heading.zh.md",
+            "en": "../shared/context-heading.en.md"
+          }
+        },
+        {
+          "input": "taskContext",
+          "encoding": "json"
+        },
+        {
+          "fileByLanguage": {
+            "zh": "../shared/output-heading.zh.md",
+            "en": "../shared/output-heading.en.md"
+          }
+        },
+        {
+          "input": "outputContract",
+          "encoding": "json"
+        }
+      ]
+    }
+  ]
+}

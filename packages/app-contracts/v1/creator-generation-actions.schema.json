@@ -1,0 +1,639 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-generation-actions.schema.json",
+  "title": "CreatorGenerationActions",
+  "x-mediaGenerationDeferred": {
+    "errorCode": "CREATOR_MEDIA_GENERATION_DEFERRED",
+    "note": "Typed kind equality. These kinds are refused. The generation.submit and generation.quote tools stay available for text processing and binding-driven local TTS.",
+    "keys": [
+      "generation.quote#image",
+      "generation.quote#video",
+      "generation.submit#image",
+      "generation.submit#video",
+      "generation.submit#avatar",
+      "generation.submit#story.role.portrait.generate",
+      "generation.submit#story.visualAsset.conceptImage.generate",
+      "generation.submit#story.scene.conceptImage.generate",
+      "generation.submit#story.shot.image.generate",
+      "generation.submit#sb.batchStill.start",
+      "generation.submit#seg.video.generate",
+      "generation.submit#seg.video.batch.start",
+      "generation.submit#seg.video.batch.run",
+      "generation.submit#clips.generate.video",
+      "generation.submit#fc.video.generate",
+      "generation.submit#fc.image.generate"
+    ]
+  },
+  "x-bindingDrivenLocalTts": {
+    "bindingSource": "executionBinding",
+    "billingClass": "localFree",
+    "forbidCloudDefault": true,
+    "note": "Local TTS follows the frozen execution binding and the selected local engine. It must not inherit a cloud voice or cloud provider.",
+    "keys": [
+      "generation.quote#tts",
+      "generation.submit#tts",
+      "generation.submit#seg.dialogue.tts",
+      "generation.submit#seg.dialogue.tts.batch",
+      "generation.submit#fc.speech.generate"
+    ]
+  },
+  "x-textProcessingKinds": {
+    "note": "Text branches of generation.submit and generation.quote. They are not media generation and stay available.",
+    "keys": [
+      "generation.quote#video.prompt.process",
+      "generation.submit#video.prompt.process",
+      "generation.submit#promptOptimize",
+      "generation.submit#fc.extract.mediaText",
+      "generation.submit#story.role.extractFromChapters",
+      "generation.submit#story.prop.extractFromChapters",
+      "generation.submit#story.shot.prompt.optimize",
+      "generation.submit#story.role.portraitPrompt.generate",
+      "generation.submit#story.role.portraitPrompt.batch.start",
+      "generation.submit#story.prop.visualPrompt.batch.start",
+      "generation.submit#story.role.portraitPrompt.batch.run",
+      "generation.submit#story.prop.visualPrompt.batch.run",
+      "generation.quote#image.prompt.process",
+      "generation.submit#image.prompt.process"
+    ]
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "required": [
+        "type",
+        "kind"
+      ],
+      "additionalProperties": false,
+      "description": "W10: mirrors GenerationQuoteArgs (deny_unknown_fields). Price comes from model_capabilities::cost_for_kind for the provider generation.submit binds (service_binding_for_kind).",
+      "properties": {
+        "type": {
+          "const": "generation.quote"
+        },
+        "kind": {
+          "enum": [
+            "image",
+            "video",
+            "tts",
+            "audio",
+            "video.prompt.process",
+            "image.prompt.process",
+            "story.role.portraitPrompt.generate",
+            "story.role.portraitPrompt.batch.start",
+            "story.prop.visualPrompt.batch.start",
+            "story.role.portraitPrompt.batch.run",
+            "story.prop.visualPrompt.batch.run"
+          ]
+        },
+        "prompt": {
+          "type": "string",
+          "description": "per_char pricing (tts)"
+        },
+        "durationSeconds": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "per_second pricing (video)"
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "per_request pricing (image); default 1"
+        },
+        "input": {
+          "type": "object",
+          "description": "video.prompt.process uses pipelineBusinessRequest (existing video-prompt business DTO); no textServiceOverride or credential fields. promptOptimize uses {projectId,nodeId,appendPrompt?,optimizeSkillId?,optimizeSkillDigest?,optimizeSkillResourceRefs?}; a selected standard image-prompt Skill requires its installed package digest and runs one completion in the same image workbench runner."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "video.prompt.process"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "input"
+            ],
+            "properties": {
+              "input": {
+                "$ref": "video-prompt-projection.schema.json#/definitions/pipelineBusinessRequest"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "story.role.portraitPrompt.generate"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "input"
+            ],
+            "properties": {
+              "input": {
+                "$ref": "creator-role-portrait-prompt.schema.json#/definitions/generateInput"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "story.role.portraitPrompt.batch.start"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "input"
+            ],
+            "properties": {
+              "input": {
+                "$ref": "creator-role-portrait-prompt.schema.json#/definitions/batchStartInput"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "story.prop.visualPrompt.batch.start"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "input"
+            ],
+            "properties": {
+              "input": {
+                "$ref": "creator-role-portrait-prompt.schema.json#/definitions/propBatchStartInput"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "story.role.portraitPrompt.batch.run"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "input"
+            ],
+            "properties": {
+              "input": {
+                "$ref": "creator-role-portrait-prompt.schema.json#/definitions/batchRunInput"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "story.prop.visualPrompt.batch.run"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "input"
+            ],
+            "properties": {
+              "input": {
+                "$ref": "creator-role-portrait-prompt.schema.json#/definitions/propBatchRunInput"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "image.prompt.process"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "input"
+            ],
+            "properties": {
+              "input": {
+                "$ref": "image-prompt-process.schema.json#/definitions/request"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "required": [
+        "type",
+        "kind"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "generation.submit"
+        },
+        "kind": {
+          "enum": [
+            "image",
+            "video",
+            "tts",
+            "audio",
+            "promptOptimize",
+            "fc.extract.mediaText",
+            "story.role.portrait.generate",
+            "story.role.extractFromChapters",
+            "story.visualAsset.conceptImage.generate",
+            "story.prop.extractFromChapters",
+            "audio.voiceDesign.create",
+            "fc.speech.generate",
+            "fc.video.generate",
+            "fc.image.generate",
+            "video.prompt.process",
+            "image.prompt.process",
+            "story.role.portraitPrompt.generate",
+            "story.role.portraitPrompt.batch.start",
+            "story.prop.visualPrompt.batch.start",
+            "story.role.portraitPrompt.batch.run",
+            "story.prop.visualPrompt.batch.run"
+          ],
+          "description": "Media kinds (storyId+prompt), promptOptimize, or the published remote IPC-twin kinds (input). Story authoring uses story.creation.*."
+        },
+        "storyId": {
+          "type": "string"
+        },
+        "prompt": {
+          "type": "string"
+        },
+        "grantId": {
+          "type": "string"
+        },
+        "priceKnown": {
+          "type": "boolean"
+        },
+        "billingClass": {
+          "enum": [
+            "remoteMetered",
+            "localFree",
+            "none"
+          ]
+        },
+        "input": {
+          "type": "object",
+          "description": "video.prompt.process uses pipelineBusinessRequest; image.prompt.process uses its request DTO; kind=tts uses creator-tts-submit.schema.json#/definitions/ttsSubmitInput (speech-v1 nested reference; flat referencePromptText/referenceStyleControl refused)."
+        }
+      },
+      "description": "W10: mirrors GenerationSubmitArgs (deny_unknown_fields). Billing is derived from kind (BILLING_CLASS_MISMATCH on disagreement); remote metered needs the HOST-issued grant frozen in the execution binding (grantId, if sent, must name it): none -> COST_GRANT_REQUIRED; caller-only/unknown -> COST_GRANT_NOT_HOST_ISSUED; other service -> COST_GRANT_BINDING_MISMATCH; expired -> COST_GRANT_EXPIRED.",
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "tts"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "input": {
+                "$ref": "creator-tts-submit.schema.json#/definitions/ttsSubmitInput"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "video.prompt.process"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "input"
+            ],
+            "properties": {
+              "input": {
+                "$ref": "video-prompt-projection.schema.json#/definitions/pipelineBusinessRequest"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "story.role.portraitPrompt.generate"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "input"
+            ],
+            "properties": {
+              "input": {
+                "$ref": "creator-role-portrait-prompt.schema.json#/definitions/generateInput"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "story.role.portraitPrompt.batch.start"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "input"
+            ],
+            "properties": {
+              "input": {
+                "$ref": "creator-role-portrait-prompt.schema.json#/definitions/batchStartInput"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "story.prop.visualPrompt.batch.start"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "input"
+            ],
+            "properties": {
+              "input": {
+                "$ref": "creator-role-portrait-prompt.schema.json#/definitions/propBatchStartInput"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "story.role.portraitPrompt.batch.run"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "input"
+            ],
+            "properties": {
+              "input": {
+                "$ref": "creator-role-portrait-prompt.schema.json#/definitions/batchRunInput"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "story.prop.visualPrompt.batch.run"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "input"
+            ],
+            "properties": {
+              "input": {
+                "$ref": "creator-role-portrait-prompt.schema.json#/definitions/propBatchRunInput"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "image.prompt.process"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "input"
+            ],
+            "properties": {
+              "input": {
+                "$ref": "image-prompt-process.schema.json#/definitions/request"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "required": [
+        "type",
+        "kind",
+        "storyId",
+        "prompt"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "generation.submit"
+        },
+        "kind": {
+          "const": "avatar"
+        },
+        "storyId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "grantId": {
+          "type": "string"
+        },
+        "priceKnown": {
+          "type": "boolean"
+        },
+        "billingClass": {
+          "enum": [
+            "remoteMetered",
+            "localFree",
+            "none"
+          ]
+        },
+        "_note": {
+          "type": "string",
+          "const": "Avatar excluded by user deferral; must not be dispatched"
+        }
+      },
+      "description": "W5: aligned with GenerationSubmitArgs (deny_unknown_fields). Missing storyId/prompt → GENERATION_NEEDS_STORY / GENERATION_NEEDS_PROMPT; remote needs the host-issued grant (caller grantId alone → COST_GRANT_NOT_HOST_ISSUED; none → COST_GRANT_REQUIRED)."
+    },
+    {
+      "type": "object",
+      "required": [
+        "type",
+        "taskId"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "task.cancel"
+        },
+        "taskId": {
+          "type": "string"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "type",
+        "taskId"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "task.wait"
+        },
+        "taskId": {
+          "type": "string"
+        },
+        "timeoutMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "cursor": {
+          "type": "string",
+          "description": "SR39: singing progress page offset (same as task.get)."
+        },
+        "lastRevision": {
+          "type": "string",
+          "description": "SR39: singing progress revision short-circuit."
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "video.prompt.describe"
+        },
+        "videoProviderKind": {
+          "type": "string"
+        },
+        "videoModelId": {
+          "type": "string"
+        },
+        "intentInputMode": {
+          "type": "string"
+        },
+        "durationSeconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "projectionMethodSelection": {
+          "$ref": "video-prompt-projection.schema.json#/definitions/projectionMethodSelection"
+        },
+        "referenceMediaInventory": {
+          "type": "array",
+          "items": {
+            "$ref": "video-prompt-projection.schema.json#/definitions/referenceMediaInventoryItem"
+          }
+        }
+      },
+      "required": [
+        "type",
+        "videoProviderKind",
+        "intentInputMode",
+        "projectionMethodSelection",
+        "referenceMediaInventory"
+      ]
+    }
+  ],
+  "x-kindInputs": {
+    "video.prompt.process": {
+      "$ref": "video-prompt-projection.schema.json#/definitions/pipelineBusinessRequest"
+    },
+    "image.prompt.process": {
+      "$ref": "image-prompt-process.schema.json#/definitions/request"
+    },
+    "tts": {
+      "$ref": "creator-tts-submit.schema.json#/definitions/ttsSubmitInput"
+    }
+  }
+}

@@ -1,0 +1,214 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-effect-actions.schema.json",
+  "title": "CreatorEffectActions",
+  "description": "RC05/RC16/RC26: public effect delivery tools shared by F1/IPC/HTTP/stdio. effect.list pages committed effects (snapshot + scan cursor; the cursor is read progress, never refresh success). effect.get reads one durable receipt by effectId or receiptRef. ui.view.delivery manages Host-verified view owner leases and ACKs (window/instance come from the Host UI bridge, never from the model).",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "effect.list"
+        },
+        "afterSequence": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "scopeKey": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requestRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "type",
+        "lookup"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "effect.get"
+        },
+        "lookup": {
+          "oneOf": [
+            {
+              "type": "object",
+              "required": [
+                "by",
+                "effectId"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "by": {
+                  "const": "effectId"
+                },
+                "effectId": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "by",
+                "receiptRef"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "by": {
+                  "const": "receiptRef"
+                },
+                "receiptRef": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          ]
+        },
+        "resultPage": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "scopeKey": {
+              "type": "string",
+              "minLength": 1
+            },
+            "cursor": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "payloadId",
+                "byteOffset"
+              ],
+              "properties": {
+                "payloadId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "byteOffset": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "byteBudget": {
+              "type": "integer",
+              "minimum": 256,
+              "maximum": 16384
+            }
+          },
+          "description": "Read only this owning effect public result. Provide one of its scope routes as scopeKey; omit scopeKey only for an effect without scopes. Omit cursor for the first page and byteBudget for the default budget. Append UTF-8 JSON fragments using each returned nextCursor; null nextCursor ends the result. No payload-ID lookup or private inverse read."
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "type",
+        "action"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "ui.view.delivery"
+        },
+        "action": {
+          "enum": [
+            "register",
+            "list",
+            "ack",
+            "release"
+          ]
+        },
+        "scope": {
+          "$ref": "creator-view-refresh.schema.json#/$defs/scopeRef"
+        },
+        "ownerToken": {
+          "type": "string",
+          "minLength": 1
+        },
+        "effectId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "refreshed",
+            "failed",
+            "conflict"
+          ]
+        },
+        "generation": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "canonicalHead": {
+          "type": "string"
+        },
+        "coveredEffectSequence": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "renderProof": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schemaVersion",
+            "kind",
+            "algorithm",
+            "digest",
+            "byteLength"
+          ],
+          "properties": {
+            "schemaVersion": {
+              "type": "integer",
+              "const": 1
+            },
+            "kind": {
+              "type": "string",
+              "enum": [
+                "canonicalGraph",
+                "ownerRender"
+              ]
+            },
+            "algorithm": {
+              "type": "string",
+              "const": "sha256"
+            },
+            "digest": {
+              "type": "string",
+              "minLength": 64,
+              "maxLength": 64,
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "byteLength": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "failureCode": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  ]
+}

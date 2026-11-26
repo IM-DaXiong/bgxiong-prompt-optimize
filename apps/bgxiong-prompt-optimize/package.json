@@ -1,0 +1,31 @@
+{
+  "name": "bgxiong-prompt-optimize",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "提示词优化独立壳。在 T20/T28/T34 集成完成前不得称为可用。",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "test:layout": "node scripts/check-layout-contract.mjs",
+    "test:boundary": "node scripts/check-import-boundary.mjs",
+    "check:resources": "node scripts/check-resource-bundle.mjs",
+    "check:shared-ui": "node scripts/check-shared-ui-isolation.mjs",
+    "build:official": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-official.ps1"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.10.1",
+    "@tauri-apps/plugin-clipboard-manager": "^2.3.3",
+    "@tauri-apps/plugin-dialog": "^2.7.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "typescript": "~5.9.3",
+    "vite": "^8.0.1"
+  }
+}

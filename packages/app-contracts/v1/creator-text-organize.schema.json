@@ -1,0 +1,237 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "creator-text-organize.schema.json",
+  "title": "Creator tool text.organize input/output",
+  "$defs": {
+    "ModelBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "vendorId",
+        "modelId"
+      ],
+      "properties": {
+        "vendorId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "modelId": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "SurfaceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "surfaceId",
+        "ownerWindowLabel",
+        "windowEpoch",
+        "resourceRevision"
+      ],
+      "properties": {
+        "surfaceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ownerWindowLabel": {
+          "type": "string",
+          "minLength": 1
+        },
+        "windowEpoch": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "resourceRevision": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "Source": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "text"
+          ],
+          "properties": {
+            "kind": {
+              "const": "text"
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "surfaceRef"
+          ],
+          "properties": {
+            "kind": {
+              "const": "surface"
+            },
+            "surfaceRef": {
+              "$ref": "#/$defs/SurfaceRef"
+            }
+          }
+        }
+      ]
+    },
+    "Input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "presetId",
+        "instruction",
+        "format"
+      ],
+      "properties": {
+        "source": {
+          "$ref": "#/$defs/Source"
+        },
+        "presetId": {
+          "$ref": "text-organize.schema.json#/$defs/PresetId"
+        },
+        "instruction": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Complete user-editable prompt, never truncated."
+        },
+        "format": {
+          "$ref": "text-organize.schema.json#/$defs/Format"
+        },
+        "modelBinding": {
+          "$ref": "#/$defs/ModelBinding",
+          "description": "Omitted = creator execution_binding default text model, resolved once and frozen."
+        },
+        "operationToken": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Only for surface source; lease owner token later consumed by surface.patch."
+        }
+      }
+    },
+    "Output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "taskId",
+        "status",
+        "model",
+        "candidate",
+        "review",
+        "reviewState",
+        "reviewIssues"
+      ],
+      "properties": {
+        "taskId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "completed",
+            "failed",
+            "cancelled"
+          ]
+        },
+        "model": {
+          "$ref": "#/$defs/ModelBinding"
+        },
+        "candidate": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "artifactRef",
+                "charCount",
+                "chunkCount"
+              ],
+              "properties": {
+                "artifactRef": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "charCount": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "chunkCount": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "reviewRanges": {
+                  "description": "Advisory ranges in the full candidate, in UTF-16 units with an exclusive end. Present even when a partial review contains usable locations.",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["startUtf16", "endUtf16"],
+                    "properties": {
+                      "startUtf16": { "type": "integer", "minimum": 0 },
+                      "endUtf16": { "type": "integer", "minimum": 1 }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "review": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "text-organize.schema.json#/$defs/ReviewOutput"
+            }
+          ]
+        },
+        "error": {
+          "$ref": "text-organize.schema.json#/$defs/ErrorCode"
+        },
+        "reviewState": {
+          "enum": [
+            "completed",
+            "partial",
+            "notCompleted"
+          ]
+        },
+        "reviewIssues": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "chunkIndex",
+              "code"
+            ],
+            "properties": {
+              "chunkIndex": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "code": {
+                "$ref": "text-organize.schema.json#/$defs/ErrorCode"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

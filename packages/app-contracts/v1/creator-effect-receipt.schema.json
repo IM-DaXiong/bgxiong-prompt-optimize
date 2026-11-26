@@ -1,0 +1,106 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-effect-receipt.schema.json",
+  "title": "CreatorEffectReceipt",
+  "description": "RC05/§3.10: canonical effect produced once by the typed receipt decoder. operationRef = one domain operation; effectId = one confirmed effect; receiptRef = durable re-readable receipt; undoRef only when really undoable. The three are never substituted for each other. observation never fabricates a mutation; taskAccepted never claims a finished result.",
+  "type": "object",
+  "required": ["schemaVersion", "effectId", "receiptRef", "operationRef", "effectSequence", "toolId", "actionType", "receiptKind", "outcomeState", "undoRef", "reversesEffectRef", "requestRef", "planRef", "taskRef", "resources", "scopes", "committedAtMs"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "effectId": {"type": "string", "minLength": 1},
+    "receiptRef": {"type": "string", "minLength": 1},
+    "operationRef": {"type": "string", "minLength": 1},
+    "effectSequence": {"type": "integer", "minimum": 1},
+    "toolId": {"type": "string", "minLength": 1},
+    "actionType": {"type": ["string", "null"]},
+    "receiptKind": {"enum": ["observation", "requestControl", "sessionControl", "uiDraft", "plan", "mutation", "inverse", "planCancel", "taskAccepted", "taskControl", "fileEffect", "refreshDelivery"]},
+    "outcomeState": {"enum": ["observed", "partial", "failed", "accepted", "rejected", "activated", "acknowledged", "notOpen", "prepared", "previewReady", "applied", "unknown", "undone", "cancelled", "cancelRequested", "terminal", "pending", "written", "refreshed", "pendingRefresh"]},
+    "undoRef": {"type": ["string", "null"]},
+    "reversesEffectRef": {"type": ["string", "null"]},
+    "requestRef": {"type": ["string", "null"]},
+    "planRef": {"type": ["string", "null"]},
+    "taskRef": {"type": ["string", "null"]},
+    "resources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["ref", "change"],
+        "additionalProperties": false,
+        "properties": {
+          "ref": {"$ref": "creator-resource-ref.schema.json"},
+          "change": {"enum": ["created", "updated", "deleted", "moved", "observed"]},
+          "revision": {"type": ["string", "null"]}
+        }
+      }
+    },
+    "scopes": {"type": "array", "items": {"$ref": "creator-view-refresh.schema.json#/$defs/effectScope"}},
+    "resourcesPage": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["nextCursor", "total"],
+          "properties": {
+            "nextCursor": {"type": ["string", "null"]},
+            "total": {"type": "integer", "minimum": 0}
+          }
+        }
+      ]
+    },
+    "committedAtMs": {"type": "integer", "minimum": 0}
+  },
+  "examples": [
+    {
+      "schemaVersion": 1,
+      "effectId": "eff_0001",
+      "receiptRef": "rcpt_0001",
+      "operationRef": "op_chg_canvas-prepare-1",
+      "effectSequence": 1,
+      "toolId": "change.apply",
+      "actionType": null,
+      "receiptKind": "mutation",
+      "outcomeState": "applied",
+      "undoRef": "undo_chg_canvas-prepare-1",
+      "reversesEffectRef": null,
+      "requestRef": "req_d7d59596d06047cba1c2368200702bd5",
+      "planRef": "chg_canvas-prepare-1",
+      "taskRef": null,
+      "resources": [
+        {"ref": {"kind": "canvasNode", "projectId": "f17fba08-f043-4bcf-8a97-1d70974dca1f", "nodeId": "fct:3158b971-609b-4e6d-96a0-46d7e6189a11"}, "change": "created", "revision": null},
+        {"ref": {"kind": "canvasNode", "projectId": "f17fba08-f043-4bcf-8a97-1d70974dca1f", "nodeId": "fcv:f11284c0-8719-43d4-8e44-2eae196670e8"}, "change": "created", "revision": null},
+        {"ref": {"kind": "canvasEdge", "projectId": "f17fba08-f043-4bcf-8a97-1d70974dca1f", "edgeId": "95a1803f-0951-4b47-ba46-acb5bd136a87"}, "change": "created", "revision": null}
+      ],
+      "scopes": [
+        {"scopeKey": "collection:fcProjectGraph:fc-project:f17fba08-f043-4bcf-8a97-1d70974dca1f", "scope": {"scopeType": "collection", "collection": "fcProjectGraph", "parentRef": {"kind": "canvasProject", "projectId": "f17fba08-f043-4bcf-8a97-1d70974dca1f"}}, "before": true, "after": true, "tombstone": false}
+      ],
+      "resourcesPage": null,
+      "committedAtMs": 1791401510125
+    },
+    {
+      "schemaVersion": 1,
+      "effectId": "eff_0002",
+      "receiptRef": "rcpt_0002",
+      "operationRef": "op_chg_actor-1",
+      "effectSequence": 2,
+      "toolId": "change.apply",
+      "actionType": null,
+      "receiptKind": "mutation",
+      "outcomeState": "applied",
+      "undoRef": "undo_chg_actor-1",
+      "reversesEffectRef": null,
+      "requestRef": null,
+      "planRef": "chg_actor-1",
+      "taskRef": null,
+      "resources": [
+        {"ref": {"kind": "actor", "storyId": null, "nodeId": "actor-node-1"}, "change": "created", "revision": null}
+      ],
+      "scopes": [
+        {"scopeKey": "collection:actorList:global", "scope": {"scopeType": "collection", "collection": "actorList", "parentRef": null}, "before": false, "after": true, "tombstone": false}
+      ],
+      "resourcesPage": null,
+      "committedAtMs": 1791401600000
+    }
+  ]
+}

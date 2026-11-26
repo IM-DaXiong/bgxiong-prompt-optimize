@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://bgxiong.local/contracts/video-span-migration-resolution-v1",
+  "title": "Video span offline migration resolution",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "sourceDigest", "candidates"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "sourceDigest": { "$ref": "#/definitions/digest" },
+    "candidates": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/candidateResolution" }
+    }
+  },
+  "definitions": {
+    "id": { "type": "string", "minLength": 1, "pattern": "\\S" },
+    "digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "candidateResolution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidateId", "sourceDigest", "decision", "orderedSourceShotIds"],
+      "properties": {
+        "candidateId": { "$ref": "#/definitions/id" },
+        "sourceDigest": { "$ref": "#/definitions/digest" },
+        "decision": { "enum": ["adopt", "keepStandalone", "archive"] },
+        "orderedSourceShotIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/definitions/id" }
+        },
+        "separateTargetNodeId": { "$ref": "#/definitions/id" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "decision": { "const": "adopt" } } },
+          "then": { "properties": { "orderedSourceShotIds": { "minItems": 1 } } },
+          "else": { "properties": { "orderedSourceShotIds": { "maxItems": 0 } } }
+        }
+      ]
+    }
+  }
+}

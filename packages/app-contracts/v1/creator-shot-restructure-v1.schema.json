@@ -1,0 +1,512 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-shot-restructure-v1.schema.json",
+  "title": "CreatorShotRestructureV1",
+  "description": "S14: semantic storyboard shot restructure (merge N shots into one / split one shot into N) inside ONE scene graph. This is NOT video concatenation, NOT scene.merge, and NOT the storyboard_merge prompt assembly: it rewrites the storyboard graph (nodes, edges, order) while keeping every source asset accounted for. The source set is closed (explicit shot ids, at least 2 for merge with no upper cap (SP023), exactly 1 for split into at least 2 parts); expectedRevisions must cover the graph and exactly the source shots; every inventoried asset carries an explicit disposition. The applier (S59 single-transaction repository, wired through the S92 production transaction entry; singleDbTransaction) is the only writer; until it lands this action is not exposed on storyboard.change.prepare (no published tool without an applier).",
+  "definitions": {
+    "nonBlank": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "pattern": "\\S"
+    },
+    "prompt": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S",
+      "description": "User/creative body text; never truncated by the host (no maxLength)."
+    },
+    "durationMs": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 600000
+    },
+    "unitRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "id"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "sourceUnit",
+            "role",
+            "lockedAsset"
+          ]
+        },
+        "id": {
+          "$ref": "#/definitions/nonBlank"
+        }
+      }
+    },
+    "unitRefs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/unitRef"
+      }
+    },
+    "shotRevision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "shotNodeId",
+        "revision"
+      ],
+      "properties": {
+        "shotNodeId": {
+          "$ref": "#/definitions/nonBlank"
+        },
+        "revision": {
+          "$ref": "#/definitions/nonBlank"
+        }
+      }
+    },
+    "expectedRevisions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "graphRevision",
+        "shots"
+      ],
+      "description": "Full CAS set: scene graph revision + one revision per source shot (no more, no fewer).",
+      "properties": {
+        "graphRevision": {
+          "$ref": "#/definitions/nonBlank"
+        },
+        "shots": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/shotRevision"
+          }
+        }
+      }
+    },
+    "assetKind": {
+      "enum": [
+        "mediaVersion",
+        "referenceImage",
+        "promptDraft",
+        "inboundEdge",
+        "outboundEdge"
+      ]
+    },
+    "assetDispositionKind": {
+      "enum": [
+        "keepOnTarget",
+        "archive",
+        "rewireToTarget"
+      ],
+      "description": "keepOnTarget/archive for mediaVersion|referenceImage|promptDraft; rewireToTarget/archive for edges. No delete."
+    },
+    "assetDisposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "assetKind",
+        "assetId",
+        "sourceShotNodeId",
+        "disposition"
+      ],
+      "properties": {
+        "assetKind": {
+          "$ref": "#/definitions/assetKind"
+        },
+        "assetId": {
+          "$ref": "#/definitions/nonBlank"
+        },
+        "sourceShotNodeId": {
+          "$ref": "#/definitions/nonBlank"
+        },
+        "disposition": {
+          "$ref": "#/definitions/assetDispositionKind"
+        },
+        "targetPartKey": {
+          "$ref": "#/definitions/nonBlank",
+          "description": "split only: which part receives keepOnTarget/rewireToTarget. Forbidden on merge."
+        }
+      }
+    },
+    "mergeTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "prompt"
+      ],
+      "properties": {
+        "prompt": {
+          "$ref": "#/definitions/prompt"
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "durationMs": {
+          "$ref": "#/definitions/durationMs"
+        }
+      }
+    },
+    "splitPart": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "partKey",
+        "prompt"
+      ],
+      "properties": {
+        "partKey": {
+          "$ref": "#/definitions/nonBlank"
+        },
+        "prompt": {
+          "$ref": "#/definitions/prompt"
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "durationMs": {
+          "$ref": "#/definitions/durationMs"
+        },
+        "unitRefs": {
+          "$ref": "#/definitions/unitRefs"
+        }
+      }
+    },
+    "merge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "op",
+        "actionId",
+        "storyId",
+        "chapterNodeId",
+        "sceneNodeId",
+        "expectedRevisions",
+        "assetInventoryDigest",
+        "assets",
+        "sources",
+        "anchorShotNodeId",
+        "target",
+        "placement"
+      ],
+      "properties": {
+        "op": {
+          "const": "merge"
+        },
+        "actionId": {
+          "$ref": "#/definitions/nonBlank"
+        },
+        "storyId": {
+          "$ref": "#/definitions/nonBlank"
+        },
+        "chapterNodeId": {
+          "$ref": "#/definitions/nonBlank"
+        },
+        "sceneNodeId": {
+          "$ref": "#/definitions/nonBlank"
+        },
+        "expectedRevisions": {
+          "$ref": "#/definitions/expectedRevisions"
+        },
+        "assetInventoryDigest": {
+          "$ref": "#/definitions/nonBlank",
+          "description": "Digest of the host-enumerated asset inventory of ALL source shots at prepare time (media versions, reference images, prompt drafts, in/out edges). The applier recomputes it under the same transaction and rejects with SHOT_RESTRUCTURE_ASSET_INVENTORY_STALE on mismatch, so no asset can be dropped silently."
+        },
+        "assets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/assetDisposition"
+          },
+          "description": "Exactly one entry per inventoried asset. There is no delete disposition: media/reference/prompt history is kept on the target or archived."
+        },
+        "reason": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/definitions/nonBlank"
+          }
+        },
+        "anchorShotNodeId": {
+          "$ref": "#/definitions/nonBlank",
+          "description": "Must be one of sources; its node id is retained for the merged shot (stable refs/history)."
+        },
+        "target": {
+          "$ref": "#/definitions/mergeTarget"
+        },
+        "unitRefs": {
+          "$ref": "#/definitions/unitRefs"
+        },
+        "placement": {
+          "enum": [
+            "atAnchor",
+            "atFirstSource",
+            "atLastSource"
+          ]
+        }
+      }
+    },
+    "split": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "op",
+        "actionId",
+        "storyId",
+        "chapterNodeId",
+        "sceneNodeId",
+        "expectedRevisions",
+        "assetInventoryDigest",
+        "assets",
+        "source",
+        "anchorPartKey",
+        "parts"
+      ],
+      "properties": {
+        "op": {
+          "const": "split"
+        },
+        "actionId": {
+          "$ref": "#/definitions/nonBlank"
+        },
+        "storyId": {
+          "$ref": "#/definitions/nonBlank"
+        },
+        "chapterNodeId": {
+          "$ref": "#/definitions/nonBlank"
+        },
+        "sceneNodeId": {
+          "$ref": "#/definitions/nonBlank"
+        },
+        "expectedRevisions": {
+          "$ref": "#/definitions/expectedRevisions"
+        },
+        "assetInventoryDigest": {
+          "$ref": "#/definitions/nonBlank",
+          "description": "Digest of the host-enumerated asset inventory of ALL source shots at prepare time (media versions, reference images, prompt drafts, in/out edges). The applier recomputes it under the same transaction and rejects with SHOT_RESTRUCTURE_ASSET_INVENTORY_STALE on mismatch, so no asset can be dropped silently."
+        },
+        "assets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/assetDisposition"
+          },
+          "description": "Exactly one entry per inventoried asset. There is no delete disposition: media/reference/prompt history is kept on the target or archived."
+        },
+        "reason": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "source": {
+          "$ref": "#/definitions/nonBlank"
+        },
+        "anchorPartKey": {
+          "$ref": "#/definitions/nonBlank",
+          "description": "The part that retains the source node id; must be one of parts[].partKey."
+        },
+        "parts": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "$ref": "#/definitions/splitPart"
+          },
+          "description": "Ordered; the graph order of the new shots equals this order at the source position."
+        }
+      }
+    },
+    "limits": {
+      "type": "object",
+      "description": "Closed constants mirrored by shot_restructure.rs (tested).",
+      "properties": {
+        "minSources": {
+          "const": 2
+        },
+        "minParts": {
+          "const": 2
+        },
+        "ops": {
+          "const": [
+            "merge",
+            "split"
+          ]
+        },
+        "atomicity": {
+          "const": "singleDbTransaction"
+        },
+        "notOps": {
+          "const": [
+            "video.concat",
+            "scene.merge",
+            "storyboard_merge"
+          ]
+        }
+      }
+    },
+    "factDispositionKind": {
+      "description": "S58: role/dialogue fact disposition (facts are never assets; nothing is silently dropped).",
+      "type": "string",
+      "enum": [
+        "carriedToResult",
+        "keptOnSourceHistory"
+      ]
+    },
+    "factDisposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "factKind",
+        "factId",
+        "sourceShotNodeId",
+        "disposition",
+        "carriedBy"
+      ],
+      "properties": {
+        "factKind": {
+          "type": "string",
+          "enum": [
+            "role",
+            "dialogue"
+          ]
+        },
+        "factId": {
+          "$ref": "#/definitions/nonBlank"
+        },
+        "sourceShotNodeId": {
+          "$ref": "#/definitions/nonBlank"
+        },
+        "disposition": {
+          "$ref": "#/definitions/factDispositionKind"
+        },
+        "carriedBy": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "regenerateItem": {
+      "description": "S58: result that must be regenerated; existing media stays history only and is never presented as matching the new body.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "result",
+        "reason",
+        "staleMediaAssetIds"
+      ],
+      "properties": {
+        "result": {
+          "$ref": "#/definitions/nonBlank"
+        },
+        "reason": {
+          "type": "string",
+          "enum": [
+            "mergedPromptChanged",
+            "splitPromptChanged",
+            "newShotNoMedia"
+          ]
+        },
+        "staleMediaAssetIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/nonBlank"
+          }
+        }
+      }
+    },
+    "planPreview": {
+      "description": "S58 planner preview shown by every host before apply (source->result mapping, every fact/asset disposition, regenerate list).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action",
+        "proposalHash",
+        "archivedSources",
+        "resultMapping",
+        "facts",
+        "regenerate",
+        "warnings"
+      ],
+      "properties": {
+        "action": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/merge"
+            },
+            {
+              "$ref": "#/definitions/split"
+            }
+          ]
+        },
+        "proposalHash": {
+          "$ref": "#/definitions/nonBlank"
+        },
+        "archivedSources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/nonBlank"
+          }
+        },
+        "resultMapping": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "source",
+              "result",
+              "identity"
+            ],
+            "properties": {
+              "source": {
+                "$ref": "#/definitions/nonBlank"
+              },
+              "result": {
+                "$ref": "#/definitions/nonBlank"
+              },
+              "identity": {
+                "type": "string",
+                "enum": [
+                  "retained",
+                  "archived",
+                  "new"
+                ]
+              }
+            }
+          }
+        },
+        "facts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/factDisposition"
+          }
+        },
+        "regenerate": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/regenerateItem"
+          }
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "$ref": "#/definitions/merge"
+    },
+    {
+      "$ref": "#/definitions/split"
+    }
+  ]
+}

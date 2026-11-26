@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "stages": {
+    "recommend": {
+      "operation": "recommend",
+      "name": "motion.recommend",
+      "aliases": [
+        "motion.design.recommend"
+      ],
+      "description": "Read the entire source document and propose only editorially useful cards. Zero proposals is a successful result. Human review is required before placement.",
+      "method": "motion-recommend/method.md",
+      "outputSchema": "shared/data/motion-candidates.schema.json",
+      "fields": {
+        "quote": "quote",
+        "reason": "reason",
+        "start": "start",
+        "end": "end",
+        "precedingContext": "precedingContext",
+        "followingContext": "followingContext",
+        "templateRef": "templateRef",
+        "layoutId": "layoutId",
+        "props": "props"
+      }
+    }
+  }
+}

@@ -1,0 +1,251 @@
+{
+  "schemaVersion": 4,
+  "projectFormatVersion": 3,
+  "projectorVersion": 7,
+  "motherPromptVersion": 9,
+  "reviewPromptVersion": 10,
+  "outputContract": "video_prompt_semantic_patch_v1",
+  "maxSemanticRepairRounds": 3,
+  "methodResourceMaxChars": 96000,
+  "issueCodes": [
+    "DRAFT_JSON",
+    "DRAFT_SHAPE",
+    "SHOT_MISSING",
+    "SHOT_UNKNOWN",
+    "SHOT_DUPLICATE",
+    "FACT_ID",
+    "KIND_UNKNOWN",
+    "SLOT_UNKNOWN",
+    "SLOT_REQUIRED",
+    "KIND_SLOT_INCOMPATIBLE",
+    "POLARITY_INVALID",
+    "INFERRED_FORBIDDEN",
+    "FACT_TEXT_EMPTY",
+    "QUOTE_EMPTY",
+    "QUOTE_ID_UNKNOWN",
+    "QUOTE_ROLE_UNKNOWN",
+    "QUOTE_SOURCE_MISMATCH",
+    "SINGER_AMBIGUOUS",
+    "H3_SINGING_OCCURRENCE",
+    "COVERAGE",
+    "POLARITY",
+    "QUOTE_VERBATIM",
+    "ORDER",
+    "ITEM_ID_MISSING",
+    "ITEM_ID_DUPLICATE",
+    "ORDINAL_INVALID",
+    "DECLARED_IDENTITY_INCOMPLETE",
+    "UNKNOWN_SUBJECT",
+    "UNKNOWN_USE",
+    "APPEARANCE_ENTITY_MISSING",
+    "APPEARANCE_ENTITY_UNKNOWN",
+    "FROZEN_APPEARANCE_MISSING",
+    "FROZEN_APPEARANCE_CHANGED",
+    "AMBIGUOUS_PRIMARY_BINDING",
+    "TEMPLATE_INVALID",
+    "SOURCE_UNIT_MISSING",
+    "SOURCE_UNIT_UNKNOWN",
+    "SOURCE_UNIT_OUT_OF_SCOPE",
+    "SOURCE_OMITTED",
+    "SOURCE_ALTERED",
+    "SOURCE_NOT_REQUIRED_INVALID",
+    "REFERENCE_USE_OMITTED",
+    "REFERENCE_USE_ALTERED",
+    "REFERENCE_SUBJECT_AMBIGUOUS",
+    "METHOD_STAGE_VIOLATION"
+  ],
+  "motherReviewIssueCodes": [
+    "COVERAGE",
+    "POLARITY",
+    "ORDER",
+    "SOURCE_OMITTED",
+    "SOURCE_ALTERED",
+    "REFERENCE_USE_OMITTED",
+    "REFERENCE_USE_ALTERED",
+    "REFERENCE_SUBJECT_AMBIGUOUS",
+    "METHOD_STAGE_VIOLATION"
+  ],
+  "reviewSeverities": [
+    "blocking",
+    "minor"
+  ],
+  "pendingReasons": [
+    "REPAIR_EXHAUSTED",
+    "MODEL_EMPTY",
+    "MODEL_UNAVAILABLE",
+    "MODEL_OUTPUT_UNREADABLE"
+  ],
+  "semanticSlots": [
+    "subject",
+    "action_interaction",
+    "environment",
+    "visual_style",
+    "cinematography_style",
+    "camera",
+    "optics_composition",
+    "lighting_color",
+    "timing_physics",
+    "dialogue_voice_visible_text",
+    "sound_music",
+    "continuity",
+    "constraints"
+  ],
+  "quoteRoles": [
+    "dialogue",
+    "voiceover",
+    "singing",
+    "visible_text",
+    "non_vocal_quote"
+  ],
+  "factKinds": [
+    "appearance",
+    "action",
+    "interaction",
+    "relation",
+    "environment",
+    "environment_motion",
+    "camera",
+    "optics",
+    "composition",
+    "lighting",
+    "timing",
+    "physics",
+    "style",
+    "dialogue",
+    "voiceover",
+    "singing",
+    "visible_text",
+    "sound",
+    "music",
+    "continuity",
+    "ban"
+  ],
+  "identityLockTemplates": {
+    "placeholders": [
+      "name",
+      "token"
+    ],
+    "zh": "{name}（五官外貌与{token}一致）",
+    "en": "{name} (same facial features as {token})",
+    "neutralZh": "{name}（五官外貌与参考图一致）",
+    "neutralEn": "{name} (same facial features as the reference image)"
+  },
+  "kindSlotCompatibility": {
+    "appearance": [
+      "subject"
+    ],
+    "action": [
+      "action_interaction"
+    ],
+    "interaction": [
+      "action_interaction"
+    ],
+    "relation": [
+      "action_interaction"
+    ],
+    "environment": [
+      "environment"
+    ],
+    "environment_motion": [
+      "environment"
+    ],
+    "style": [
+      "visual_style",
+      "cinematography_style"
+    ],
+    "camera": [
+      "camera"
+    ],
+    "optics": [
+      "optics_composition"
+    ],
+    "composition": [
+      "optics_composition"
+    ],
+    "lighting": [
+      "lighting_color"
+    ],
+    "timing": [
+      "timing_physics"
+    ],
+    "physics": [
+      "timing_physics"
+    ],
+    "dialogue": [
+      "dialogue_voice_visible_text"
+    ],
+    "voiceover": [
+      "dialogue_voice_visible_text"
+    ],
+    "singing": [
+      "dialogue_voice_visible_text"
+    ],
+    "visible_text": [
+      "dialogue_voice_visible_text"
+    ],
+    "sound": [
+      "sound_music"
+    ],
+    "music": [
+      "sound_music"
+    ],
+    "continuity": [
+      "continuity"
+    ],
+    "ban": [
+      "constraints"
+    ]
+  },
+  "provenances": [
+    "user_text",
+    "structured_storyboard",
+    "declared_asset",
+    "reference_vision",
+    "inferred_open_dimension",
+    "skill_expansion"
+  ],
+  "visualClasses": [
+    "character_portrait",
+    "empty_environment_plate",
+    "isolated_prop",
+    "composite_reference_sheet",
+    "story_frame",
+    "other",
+    "ambiguous"
+  ],
+  "decisions": [
+    "adopted_declared",
+    "adopted_vision",
+    "adopted_composite_partial",
+    "ignored_irrelevant",
+    "ignored_ambiguous",
+    "ignored_declared_conflict",
+    "not_analyzed_no_vision",
+    "not_analyzed_limit",
+    "temporal_only"
+  ],
+  "sectionLabels": {
+    "zh": {
+      "shot": "镜头",
+      "picture": "画面",
+      "dialogue": "对白",
+      "voiceover": "旁白/歌词",
+      "visibleText": "可见文字",
+      "sound": "声音",
+      "continuity": "连续性",
+      "constraints": "约束",
+      "transition": "转场"
+    },
+    "en": {
+      "shot": "Shot",
+      "picture": "Picture",
+      "dialogue": "Dialogue",
+      "voiceover": "Voiceover / lyrics",
+      "visibleText": "Visible text",
+      "sound": "Sound",
+      "continuity": "Continuity",
+      "constraints": "Constraints",
+      "transition": "Transition"
+    }
+  }
+}

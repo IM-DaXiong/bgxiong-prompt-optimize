@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "choices": [
+    {
+      "id": "generic@1",
+      "label": "Generic",
+      "descriptor": {
+        "profileId": "generic",
+        "version": 1,
+        "defaultMethodName": "generic-video-prompt-writing",
+        "inputModes": [
+          "text_to_video",
+          "image_to_video",
+          "first_last_frame",
+          "last_frame_only",
+          "multi_image_to_video",
+          "reference_to_video"
+        ]
+      }
+    },
+    {
+      "id": "h3@1",
+      "label": "H3",
+      "descriptor": {
+        "profileId": "h3",
+        "version": 1,
+        "defaultMethodName": "h3-prompt-writing",
+        "inputModes": [
+          "text_to_video",
+          "image_to_video",
+          "first_last_frame",
+          "last_frame_only",
+          "multi_image_to_video",
+          "reference_to_video"
+        ]
+      }
+    },
+    {
+      "id": "seedance@1",
+      "label": "Seedance",
+      "descriptor": {
+        "profileId": "seedance",
+        "version": 1,
+        "defaultMethodName": "seedance-prompt-writing",
+        "inputModes": [
+          "text_to_video",
+          "image_to_video",
+          "first_last_frame",
+          "last_frame_only",
+          "multi_image_to_video",
+          "reference_to_video"
+        ]
+      }
+    },
+    {
+      "id": "kling.classic@1",
+      "label": "Kling Classic",
+      "descriptor": {
+        "profileId": "kling.classic",
+        "version": 1,
+        "defaultMethodName": "kling-prompt-writing",
+        "inputModes": [
+          "text_to_video",
+          "image_to_video",
+          "first_last_frame",
+          "multi_image_to_video"
+        ]
+      }
+    },
+    {
+      "id": "kling.omni@1",
+      "label": "Kling Omni v1",
+      "descriptor": {
+        "profileId": "kling.omni",
+        "version": 1,
+        "defaultMethodName": "kling-prompt-writing",
+        "inputModes": [
+          "text_to_video",
+          "image_to_video",
+          "first_last_frame",
+          "multi_image_to_video",
+          "reference_to_video"
+        ]
+      }
+    },
+    {
+      "id": "kling.omni@2",
+      "label": "Kling Omni v2",
+      "descriptor": {
+        "profileId": "kling.omni",
+        "version": 2,
+        "defaultMethodName": "kling-prompt-writing",
+        "inputModes": [
+          "text_to_video",
+          "image_to_video",
+          "first_last_frame",
+          "multi_image_to_video"
+        ]
+      }
+    },
+    {
+      "id": "wan@1",
+      "label": "Wan",
+      "descriptor": {
+        "profileId": "wan",
+        "version": 1,
+        "defaultMethodName": "wan-prompt-writing",
+        "inputModes": [
+          "text_to_video",
+          "image_to_video",
+          "first_last_frame",
+          "reference_to_video"
+        ]
+      }
+    },
+    {
+      "id": "ltx@1",
+      "label": "LTX 视频段落格式",
+      "descriptor": {
+        "profileId": "ltx",
+        "version": 1,
+        "defaultMethodName": "ltx-2-5-prompt-writing",
+        "inputModes": [
+          "text_to_video",
+          "image_to_video",
+          "first_last_frame"
+        ]
+      }
+    }
+  ]
+}

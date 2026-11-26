@@ -1,0 +1,946 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "generative-video-edit-v1.schema.json",
+  "title": "Generative video edit business contract v1",
+  "description": "Model-agnostic neutral submission shared by GUI, F1 and MCP. Vendor parameters live only in the selected operation's closed params schema. Owner: src-tauri/src/generative_video_edit.",
+  "definitions": {
+    "mediaRef": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "sourceRef"
+          ],
+          "properties": {
+            "kind": {
+              "const": "localSource"
+            },
+            "sourceRef": {
+              "$ref": "creator-local-source-v1.schema.json#/definitions/sourceRef"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "mediaRef"
+          ],
+          "properties": {
+            "kind": {
+              "const": "hostMedia"
+            },
+            "mediaRef": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "submission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "capability",
+        "source",
+        "output",
+        "writeBack"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "capability": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "capabilityKey",
+            "modelId",
+            "operationId",
+            "operationVersion",
+            "inputSchemaDigest"
+          ],
+          "properties": {
+            "capabilityKey": {
+              "type": "string",
+              "minLength": 1
+            },
+            "modelId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "operationId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "operationVersion": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "inputSchemaDigest": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          }
+        },
+        "source": {
+          "$ref": "#/definitions/sourceRange"
+        },
+        "inputs": {
+          "type": "object",
+          "additionalProperties": {
+            "oneOf": [
+              { "$ref": "#/definitions/mediaRef" },
+              { "type": "array", "items": { "$ref": "#/definitions/mediaRef" } }
+            ]
+          }
+        },
+        "targetSelection": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "timeMs",
+            "frameWidth",
+            "frameHeight",
+            "points"
+          ],
+          "properties": {
+            "frameWidth": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "frameHeight": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "points": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "x",
+                  "y",
+                  "label"
+                ],
+                "properties": {
+                  "x": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "y": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "label": {
+                    "enum": [
+                      "positive",
+                      "negative"
+                    ]
+                  }
+                }
+              }
+            },
+            "timeMs": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Absolute source-timeline time in milliseconds for the selected person frame; must satisfy rangeStartMs <= timeMs < rangeEndMs."
+            }
+          }
+        },
+        "prompt": {
+          "type": "string"
+        },
+        "negativePrompt": {
+          "type": "string"
+        },
+        "output": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "width",
+            "height",
+            "fps",
+            "audio"
+          ],
+          "properties": {
+            "width": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "height": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "fps": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 120
+            },
+            "audio": {
+              "enum": [
+                "source",
+                "none"
+              ]
+            }
+          }
+        },
+        "params": {
+          "type": "object",
+          "description": "Closed set declared by the selected operation's paramsSchema."
+        },
+        "writeBack": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "hostKind",
+            "projectId",
+            "targetId"
+          ],
+          "properties": {
+            "hostKind": {
+              "enum": [
+                "freeCanvas",
+                "segmentCanvas",
+                "clipCanvas"
+              ]
+            },
+            "projectId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "targetId": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "mediaTargetSelection": {
+          "$ref": "#/definitions/mediaTargetSelection"
+        },
+        "dependsOnTaskIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "targetKeyframeSelection": {
+          "$ref": "#/definitions/targetKeyframeSelection"
+        }
+      },
+      "description": "generationFreeze is exclusive with targetSelection and mediaTargetSelection. targetKeyframeSelection is exclusive with targetSelection and mediaTargetSelection."
+    },
+    "operation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capabilityKey",
+        "modelId",
+        "displayName",
+        "operationId",
+        "operationVersion",
+        "inputSchemaDigest",
+        "mediaSlots",
+        "targetSelection",
+        "prompt",
+        "output",
+        "paramsSchema"
+      ],
+      "properties": {
+        "capabilityKey": {
+          "type": "string"
+        },
+        "modelId": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "operationVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "inputSchemaDigest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "declaredInput": {
+          "type": "boolean"
+        },
+        "mediaSlots": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "slotId",
+              "kind",
+              "required"
+            ],
+            "properties": {
+              "slotId": {
+                "type": "string"
+              },
+              "minCount": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "maxCount": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "kind": {
+                "enum": [
+                  "image",
+                  "video",
+                  "audio"
+                ]
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "label": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Display label from the input schema property title; null when the package declares none."
+              }
+            }
+          }
+        },
+        "targetSelection": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "positive",
+                "negative"
+              ],
+              "properties": {
+                "positive": {
+                  "type": "boolean"
+                },
+                "negative": {
+                  "type": "boolean"
+                }
+              }
+            }
+          ]
+        },
+        "prompt": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "positive",
+            "negative"
+          ],
+          "properties": {
+            "positive": {
+              "type": "boolean"
+            },
+            "negative": {
+              "type": "boolean"
+            }
+          }
+        },
+        "output": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "sizeAlignment",
+            "fpsMin",
+            "fpsMax",
+            "fpsDefault",
+            "sizeDefault",
+            "portraitSizeDefault"
+          ],
+          "properties": {
+            "sizeAlignment": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "fpsMin": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "fpsMax": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 1
+            },
+            "fpsDefault": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 1
+            },
+            "sizeDefault": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "additionalProperties": false,
+              "required": [
+                "width",
+                "height"
+              ],
+              "properties": {
+                "width": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "height": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            },
+            "portraitSizeDefault": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "additionalProperties": false,
+              "required": [
+                "width",
+                "height"
+              ],
+              "properties": {
+                "width": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "height": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          }
+        },
+        "resourceHint": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Non-blocking pre-submit note from the package (x-resourceHint)."
+        },
+        "paramsSchema": {
+          "type": "object"
+        },
+        "paramsUiSchema": {},
+        "interactionProfiles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "kind",
+                "pluginId",
+                "version"
+              ],
+              "properties": {
+                "kind": {
+                  "const": "installed"
+                },
+                "pluginId": {
+                  "type": "string"
+                },
+                "version": {
+                  "type": "string"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "kind",
+                "entryId"
+              ],
+              "properties": {
+                "kind": {
+                  "const": "workflow"
+                },
+                "entryId": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "mediaTargetProfile": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "const": "media-target-selection-v1"
+            }
+          ],
+          "description": "When set, host enables analyze/select/preview/refine UI. Never inferred from pluginId."
+        },
+        "targetKeyframeProfile": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "When set to video-target-keyframes-v1, host shows keyframe correction / tracking UI. Never inferred from pluginId."
+        },
+        "targetTracking": {
+          "description": "Projected x-targetTracking declaration (UI subset).",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/targetTrackingDeclaration"
+            }
+          ]
+        },
+        "generateCandidate": {
+          "type": "boolean",
+          "default": true,
+          "description": "False for trackingPreview-only ops that must not appear as generate candidates."
+        }
+      }
+    },
+    "taskGet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "taskId"
+      ],
+      "properties": {
+        "taskId": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "taskView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "taskId",
+        "state"
+      ],
+      "properties": {
+        "taskId": {
+          "type": "string"
+        },
+        "state": {
+          "enum": [
+            "accepted",
+            "running",
+            "succeeded",
+            "failed",
+            "cancelled"
+          ]
+        },
+        "stage": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "resultVersionRef": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "shotChoice": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "candidateId"
+          ],
+          "properties": {
+            "kind": {
+              "const": "target"
+            },
+            "candidateId": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "const": "absent"
+            }
+          }
+        }
+      ]
+    },
+    "mediaTargetSelection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "analysisId",
+        "analysisRevision",
+        "analysisDigest",
+        "shots",
+        "selectionDigest"
+      ],
+      "properties": {
+        "analysisId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "analysisRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "analysisDigest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "selectionDigest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "shots": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "shotId",
+              "choice"
+            ],
+            "properties": {
+              "shotId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "choice": {
+                "$ref": "#/definitions/shotChoice"
+              }
+            }
+          }
+        }
+      },
+      "description": "Frozen media-target-selection-v1 selection (Lane A selection.schema.json). Unselected invalid; use absent or target."
+    },
+    "targetKeyframeSelection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "profileId",
+        "targetId",
+        "revision",
+        "frameGeometry",
+        "keyframes",
+        "selectionDigest",
+        "direction",
+        "anchorKeyframeId"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "type": "integer",
+          "const": 1
+        },
+        "profileId": {
+          "type": "string",
+          "const": "video-target-keyframes-v1"
+        },
+        "targetId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "frameGeometry": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "width",
+            "height"
+          ],
+          "properties": {
+            "width": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "height": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "rotation": {
+              "type": "integer",
+              "enum": [
+                0,
+                90,
+                180,
+                270
+              ]
+            }
+          }
+        },
+        "keyframes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object"
+          }
+        },
+        "selectionDigest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "direction": {
+          "type": "string",
+          "enum": [
+            "towardStart",
+            "towardEnd",
+            "both"
+          ]
+        },
+        "anchorKeyframeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tracking": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "requestId",
+                "selectionDigest",
+                "direction",
+                "ready"
+              ],
+              "properties": {
+                "requestId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "selectionDigest": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "direction": {
+                  "type": "string",
+                  "enum": [
+                    "towardStart",
+                    "towardEnd",
+                    "both"
+                  ]
+                },
+                "ready": {
+                  "type": "boolean"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "description": "Frozen video-target-keyframes-v1 selection + tracking ref. Exclusive with targetSelection/mediaTargetSelection."
+    },
+    "targetTrackingDeclaration": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "profileId",
+        "revision",
+        "tools",
+        "directions"
+      ],
+      "properties": {
+        "profileId": {
+          "type": "string",
+          "const": "video-target-keyframes-v1"
+        },
+        "revision": {
+          "type": "integer",
+          "const": 1
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "directions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "referenceChangeInvalidatesTracking": {
+          "type": "boolean"
+        },
+        "trackingDependencies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "sourceRange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "media",
+        "rangeStartMs",
+        "rangeEndMs"
+      ],
+      "properties": {
+        "media": {
+          "$ref": "#/definitions/mediaRef"
+        },
+        "rangeStartMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rangeEndMs": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "sourceFrame": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "frameIndex",
+        "ptsUs",
+        "timeMs"
+      ],
+      "properties": {
+        "frameIndex": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ptsUs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "timeMs": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "sourceFramePage": {
+      "description": "Source frame navigation uses normalized ptsUs/timeMs; presentationOriginUs is the signed raw first video-frame PTS. Media clock microseconds = presentationOriginUs + frame.ptsUs. Container start_time is not this origin. Shared GUI/F1/MCP read owner.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceDigest",
+        "presentationOriginUs",
+        "displayGeometry",
+        "frames",
+        "selectedFrameIndex",
+        "previousCursor",
+        "nextCursor"
+      ],
+      "properties": {
+        "sourceDigest": {
+          "type": "string"
+        },
+        "presentationOriginUs": {
+          "type": "integer",
+          "description": "Mandatory signed raw first-video-frame presentation timestamp, in microseconds. Never default missing origins to zero."
+        },
+        "displayGeometry": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "width",
+            "height",
+            "rotation"
+          ],
+          "properties": {
+            "width": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "height": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "rotation": {
+              "type": "integer"
+            }
+          }
+        },
+        "frames": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/sourceFrame"
+          }
+        },
+        "selectedFrameIndex": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "previousCursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "nextCursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}

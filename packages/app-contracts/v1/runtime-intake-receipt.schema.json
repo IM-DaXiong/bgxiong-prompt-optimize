@@ -1,0 +1,555 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "runtime-intake-receipt.schema.json",
+  "title": "RuntimeIntakeDeliveryAndReceiptV1",
+  "description": "RI004. External delivery manifest, host verification evidence and receipt.",
+  "schemaVersion": 1,
+  "definitions": {
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "slotRef",
+        "relativePath",
+        "bytes",
+        "sha256"
+      ],
+      "properties": {
+        "slotRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "relativePath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64
+        }
+      }
+    },
+    "sourceClaim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "identity"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "upstreamRelease",
+            "modelRepository",
+            "packageIndex",
+            "userLocal",
+            "other"
+          ]
+        },
+        "identity": {
+          "type": "string",
+          "minLength": 1
+        },
+        "redactedLocator": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "moduleDelivery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "moduleRef",
+        "resolvedVersion",
+        "targetSlotRefs",
+        "files",
+        "environmentFacts",
+        "sourceClaims",
+        "completedRequirementRefs"
+      ],
+      "properties": {
+        "moduleRef": {
+          "$ref": "runtime-requirements.schema.json#/definitions/id"
+        },
+        "resolvedVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "targetSlotRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/file"
+          },
+          "minItems": 1
+        },
+        "environmentFacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "key",
+              "value"
+            ],
+            "properties": {
+              "key": {
+                "type": "string",
+                "minLength": 1
+              },
+              "value": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "minItems": 0
+        },
+        "serviceCandidate": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "bindAddress",
+            "port"
+          ],
+          "properties": {
+            "bindAddress": {
+              "type": "string",
+              "minLength": 1
+            },
+            "port": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 65535
+            }
+          }
+        },
+        "sourceClaims": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/sourceClaim"
+          },
+          "minItems": 0
+        },
+        "completedRequirementRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        }
+      }
+    },
+    "deliveryManifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "ticketRef",
+        "expectedTicketRevision",
+        "requirementBundleRef",
+        "requirementBundleRevision",
+        "baselineFingerprint",
+        "deliveryRef",
+        "moduleDeliveries",
+        "externalWorkSummary",
+        "preparedAt",
+        "evidenceRefs"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "ticketRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedTicketRevision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "requirementBundleRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requirementBundleRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "baselineFingerprint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "deliveryRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "moduleDeliveries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/moduleDelivery"
+          },
+          "minItems": 1
+        },
+        "externalWorkSummary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "preparedAt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidenceRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        }
+      },
+      "description": "Results only. No status/passed field: an agent cannot self-report acceptance."
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirementRef",
+        "probeId",
+        "level",
+        "observedAt",
+        "hostId",
+        "instanceRef",
+        "candidateFingerprint",
+        "status",
+        "expected",
+        "observed",
+        "evidenceRefs",
+        "validity"
+      ],
+      "properties": {
+        "requirementRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "probeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "level": {
+          "$ref": "runtime-requirements.schema.json#/definitions/verifyLevel"
+        },
+        "observedAt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "hostId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "instanceRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "candidateFingerprint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "passed",
+            "failed",
+            "notRun",
+            "unknown"
+          ]
+        },
+        "expected": {
+          "type": "string",
+          "minLength": 1
+        },
+        "observed": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidenceRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "validity": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "issue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "issueId",
+        "moduleRef",
+        "requirementRef",
+        "severity",
+        "reasonCode",
+        "userMessage",
+        "expected",
+        "observed",
+        "evidenceRefs",
+        "allowedTargetRefs",
+        "requiredExternalAction",
+        "resubmitTool",
+        "completionCriterion",
+        "retryable",
+        "requiresUserInput"
+      ],
+      "properties": {
+        "issueId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "moduleRef": {
+          "$ref": "runtime-requirements.schema.json#/definitions/id"
+        },
+        "requirementRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "severity": {
+          "enum": [
+            "blocking",
+            "warning"
+          ]
+        },
+        "reasonCode": {
+          "type": "string",
+          "minLength": 1
+        },
+        "userMessage": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected": {
+          "type": "string",
+          "minLength": 1
+        },
+        "observed": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidenceRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "allowedTargetRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "requiredExternalAction": {
+          "type": "string",
+          "minLength": 1
+        },
+        "resubmitTool": {
+          "enum": [
+            "runtime.intake.resubmit",
+            "runtime.targets.prepare"
+          ]
+        },
+        "completionCriterion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "retryable": {
+          "type": "boolean"
+        },
+        "requiresUserInput": {
+          "type": "boolean"
+        }
+      }
+    },
+    "nextAction": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "tool",
+            "reason"
+          ],
+          "properties": {
+            "tool": {
+              "enum": [
+                "runtime.intake.get",
+                "runtime.intake.accept",
+                "runtime.validation.run",
+                "runtime.intake.resubmit",
+                "runtime.targets.prepare",
+                "runtime.maintenance.prepare",
+                "runtime.maintenance.finish"
+              ]
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "receiptRef",
+        "ticketRef",
+        "deliveryRef",
+        "status",
+        "origin",
+        "verification",
+        "issues",
+        "nextAction"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "receiptRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ticketRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "deliveryRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "received",
+            "accepted",
+            "ready",
+            "rejected",
+            "needsExternalAction"
+          ]
+        },
+        "origin": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "originReported",
+            "originVerified",
+            "contentVerified"
+          ],
+          "properties": {
+            "originReported": {
+              "type": "boolean"
+            },
+            "originVerified": {
+              "type": "boolean"
+            },
+            "contentVerified": {
+              "type": "boolean"
+            }
+          }
+        },
+        "verification": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/evidence"
+          },
+          "minItems": 0
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/issue"
+          },
+          "minItems": 0
+        },
+        "nextAction": {
+          "$ref": "#/definitions/nextAction"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "rejected",
+                  "needsExternalAction"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "issues": {
+                "minItems": 1
+              },
+              "nextAction": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "ready"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "issues": {
+                "maxItems": 0
+              },
+              "verification": {
+                "minItems": 1,
+                "items": {
+                  "properties": {
+                    "status": {
+                      "const": "passed"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

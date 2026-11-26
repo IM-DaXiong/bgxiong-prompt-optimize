@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "comfy-workflow-documentation-review-v1.schema.json",
+  "schemaVersion": 1,
+  "title": "ComfyWorkflowDocumentationReviewV1",
+  "description": "PLAN 20261014 §3.2 / CW13. Independent semantic review by the same frozen model. Exactly one finding per claim of the reviewed document (a missing result is never an implicit accept; a document without claims has findings: []). severity/action pairs are fixed: none->accept, minor->advisory (never rejects, never escalates however many), blocking->rewrite (the only severity that may request a rewrite). evidenceRefs cite only note ids of the document coverage or node/field refs present in the document. Code checks structure only, never review wording.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["findings"],
+  "properties": {
+    "findings": { "type": "array", "items": { "$ref": "#/$defs/finding" } }
+  },
+  "$defs": {
+    "id": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "finding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["findingId", "claimId", "severity", "action", "evidenceRefs"],
+      "properties": {
+        "findingId": { "$ref": "#/$defs/id" },
+        "claimId": { "$ref": "#/$defs/id" },
+        "severity": { "enum": ["none", "minor", "blocking"] },
+        "action": { "enum": ["accept", "advisory", "rewrite"] },
+        "evidenceRefs": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } }
+      }
+    }
+  },
+  "examples": [
+    {
+      "findings": [
+        { "findingId": "f-1", "claimId": "c-1", "severity": "none", "action": "accept", "evidenceRefs": ["note-1"] },
+        { "findingId": "f-2", "claimId": "c-2", "severity": "none", "action": "accept", "evidenceRefs": ["note-2", "4"] },
+        { "findingId": "f-3", "claimId": "c-3", "severity": "none", "action": "accept", "evidenceRefs": ["note-1"] },
+        { "findingId": "f-4", "claimId": "c-4", "severity": "minor", "action": "advisory", "evidenceRefs": ["note-2"] },
+        { "findingId": "f-5", "claimId": "c-5", "severity": "none", "action": "accept", "evidenceRefs": ["note-1"] },
+        { "findingId": "f-6", "claimId": "c-6", "severity": "none", "action": "accept", "evidenceRefs": ["note-2", "field:3:steps"] },
+        { "findingId": "f-7", "claimId": "c-7", "severity": "none", "action": "accept", "evidenceRefs": ["note-1", "6"] }
+      ]
+    }
+  ]
+}

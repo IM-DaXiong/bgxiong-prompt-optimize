@@ -1,0 +1,477 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "bgxiong://contracts/screenplay-package-bgx-v5",
+  "title": "BgxScreenplayPackageBlockV5",
+  "description": "One ===BGX-<KIND>=== block body of a BGX v5 screenplay package. The JSON inside each block must validate against the property named by its marker, e.g. ===BGX-PROP=== body validates as properties[\"BGX-PROP\"]. Block order, uniqueness and cross-block references are frozen in screenplay-package.md (they are not expressible in JSON Schema).",
+  "type": "object",
+  "additionalProperties": false,
+  "minProperties": 1,
+  "maxProperties": 1,
+  "properties": {
+    "BGX-META": {
+      "$ref": "#/$defs/meta"
+    },
+    "BGX-ROLE": {
+      "$ref": "#/$defs/role"
+    },
+    "BGX-PROP": {
+      "$ref": "#/$defs/prop"
+    },
+    "BGX-SCENE": {
+      "$ref": "#/$defs/scene"
+    },
+    "BGX-SHOT": {
+      "$ref": "#/$defs/shot"
+    }
+  },
+  "$defs": {
+    "roleName": {
+      "type": "string",
+      "pattern": "^\\S(?:.*\\S)?$"
+    },
+    "propId": {
+      "type": "string",
+      "pattern": "^P[0-9]{3}$"
+    },
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "storyName"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "type": "integer",
+          "const": 5,
+          "x-bgxSsot": {
+            "const": "screenplay-package.json#/bgxSchemaVersion"
+          }
+        },
+        "storyName": {
+          "type": "string",
+          "pattern": "\\S"
+        },
+        "storyDesc": {
+          "type": "string"
+        },
+        "episodeTitle": {
+          "type": "string"
+        },
+        "aspectRatio": {
+          "type": "string",
+          "enum": [
+            "16:9",
+            "9:16",
+            "1:1",
+            "4:3",
+            "3:4",
+            "21:9",
+            "4:5"
+          ],
+          "x-bgxSsot": {
+            "enum": "rust:crate::screenplay_package::validate::KNOWN_ASPECT_RATIO_IDS"
+          }
+        },
+        "visualStyleId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]+$"
+        }
+      }
+    },
+    "role": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/roleName"
+        },
+        "roleBrief": {
+          "type": "string"
+        },
+        "age": {
+          "type": "string"
+        },
+        "facialFeatures": {
+          "type": "string"
+        },
+        "hair": {
+          "type": "string"
+        },
+        "outfit": {
+          "type": "string"
+        },
+        "portraitPrompt": {
+          "type": "string"
+        }
+      }
+    },
+    "prop": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/propId"
+        },
+        "name": {
+          "type": "string",
+          "pattern": "^\\S(?:.*\\S)?$"
+        },
+        "appearancePrompt": {
+          "type": "string"
+        },
+        "subjectKind": {
+          "type": "string",
+          "enum": [
+            "clothing",
+            "jewelry",
+            "handheld",
+            "generic"
+          ],
+          "x-bgxSsot": {
+            "enum": "rust:crate::visual_asset::prop_subject_kind::PropSubjectKind"
+          }
+        },
+        "material": {
+          "type": "string"
+        },
+        "dimensions": {
+          "type": "string"
+        },
+        "keyDetails": {
+          "type": "string"
+        },
+        "narrativeRole": {
+          "type": "string"
+        },
+        "aliases": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^\\S(?:.*\\S)?$"
+          }
+        }
+      }
+    },
+    "sceneEnv": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "location",
+        "timeOfDay"
+      ],
+      "properties": {
+        "location": {
+          "type": "string",
+          "pattern": "\\S"
+        },
+        "timeOfDay": {
+          "type": "string",
+          "pattern": "\\S"
+        },
+        "weather": {
+          "type": "string"
+        }
+      }
+    },
+    "scene": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sceneEnv"
+      ],
+      "properties": {
+        "sceneEnv": {
+          "$ref": "#/$defs/sceneEnv"
+        },
+        "environmentPrompt": {
+          "type": "string"
+        },
+        "chars": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/roleName"
+          }
+        },
+        "propIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/propId"
+          }
+        }
+      }
+    },
+    "dialogueLine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "text"
+      ],
+      "properties": {
+        "speaker": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "pattern": "\\S"
+        }
+      }
+    },
+    "shot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^\\S(?:.*\\S)?$"
+        },
+        "title": {
+          "type": "string"
+        },
+        "beat": {
+          "type": "string"
+        },
+        "actionVisual": {
+          "type": "string"
+        },
+        "chars": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/roleName"
+          }
+        },
+        "size": {
+          "type": "string",
+          "enum": [
+            "extreme_long_shot",
+            "long_shot",
+            "full_shot",
+            "medium_shot",
+            "medium_close_up",
+            "close_up",
+            "extreme_close_up"
+          ],
+          "x-bgxSsot": {
+            "enum": "rust:crate::cinematic_language::ShotSizeId"
+          }
+        },
+        "angle": {
+          "type": "string",
+          "enum": [
+            "bird_eye",
+            "high_angle",
+            "eye_level",
+            "low_angle",
+            "worm_eye"
+          ],
+          "x-bgxSsot": {
+            "enum": "rust:crate::cinematic_language::CameraAngleId"
+          }
+        },
+        "move": {
+          "type": "string",
+          "enum": [
+            "static",
+            "dolly_in",
+            "dolly_out",
+            "pan_left",
+            "pan_right",
+            "tilt_up",
+            "tilt_down",
+            "truck_left",
+            "truck_right",
+            "pedestal_up",
+            "pedestal_down",
+            "crane",
+            "handheld",
+            "gimbal",
+            "whip_pan",
+            "roll",
+            "combo"
+          ],
+          "x-bgxSsot": {
+            "enum": "rust:crate::cinematic_language::CameraMovementId"
+          }
+        },
+        "coverage": {
+          "type": "string",
+          "enum": [
+            "master",
+            "establishing",
+            "ots",
+            "single",
+            "two_shot",
+            "reaction",
+            "insert",
+            "cutaway",
+            "pov",
+            "transition"
+          ],
+          "x-bgxSsot": {
+            "enum": "rust:crate::cinematic_language::CoverageRoleId"
+          }
+        },
+        "durationSec": {
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 60,
+          "x-bgxSsot": {
+            "minimum": "screenplay-package.json#/limits/minShotDurationSeconds",
+            "maximum": "screenplay-package.json#/limits/maxShotDurationSeconds"
+          }
+        },
+        "stillPrompt": {
+          "type": "string"
+        },
+        "videoPrompt": {
+          "type": "string"
+        },
+        "dialogueMode": {
+          "type": "string",
+          "enum": [
+            "on_screen",
+            "off_screen",
+            "internal_monologue",
+            "voice_over",
+            "silent"
+          ],
+          "x-bgxSsot": {
+            "enum": "rust:crate::screenplay_package::validate::DIALOGUE_MODE_IDS"
+          }
+        },
+        "dialogueLines": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/dialogueLine"
+          }
+        },
+        "propIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/propId"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "not": {
+            "properties": {
+              "actionVisual": { "maxLength": 0 },
+              "stillPrompt": { "maxLength": 0 },
+              "videoPrompt": { "maxLength": 0 }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "dialogueLines"
+            ],
+            "properties": {
+              "dialogueLines": {
+                "minItems": 1
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "dialogueMode"
+            ]
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "dialogueMode"
+            ],
+            "properties": {
+              "dialogueMode": {
+                "const": "silent"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "dialogueLines": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "dialogueMode"
+            ],
+            "properties": {
+              "dialogueMode": {
+                "const": "voice_over"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "dialogueLines": {
+                "items": {
+                  "properties": {
+                    "speaker": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "dialogueMode"
+            ],
+            "properties": {
+              "dialogueMode": {
+                "enum": [
+                  "on_screen",
+                  "off_screen",
+                  "internal_monologue"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "dialogueLines": {
+                "items": {
+                  "required": [
+                    "speaker"
+                  ],
+                  "properties": {
+                    "speaker": {
+                      "$ref": "#/$defs/roleName"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

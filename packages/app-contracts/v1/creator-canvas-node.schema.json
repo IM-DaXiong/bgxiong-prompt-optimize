@@ -1,0 +1,296 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Canvas node generation tools",
+  "definitions": {
+    "identifier": { "type": "string", "minLength": 1, "maxLength": 512, "pattern": "\\S" },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["workspaceKind", "workspaceId", "nodeId"],
+      "properties": {
+        "workspaceKind": { "enum": ["freeCanvas", "clips"] },
+        "workspaceId": { "$ref": "#/definitions/identifier" },
+        "nodeId": { "$ref": "#/definitions/identifier" }
+      }
+    },
+    "modelIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bindingId", "modelId"],
+      "properties": {
+        "bindingId": { "$ref": "#/definitions/identifier" },
+        "modelId": { "$ref": "#/definitions/identifier" },
+        "workflowId": { "$ref": "#/definitions/identifier" },
+        "operationId": { "$ref": "#/definitions/identifier" },
+        "operationVersion": { "type": "integer", "minimum": 1 },
+        "inputSchemaDigest": { "$ref": "#/definitions/identifier" }
+      },
+      "if": {
+        "anyOf": [
+          { "required": ["operationId"] },
+          { "required": ["operationVersion"] },
+          { "required": ["inputSchemaDigest"] }
+        ]
+      },
+      "then": { "required": ["operationId", "operationVersion", "inputSchemaDigest"] }
+    },
+    "parameterKey": {
+      "type": "string",
+      "pattern": "^(?:[A-Za-z][A-Za-z0-9]*|operation:(/([^~/]|~[01])*)+)$"
+    },
+    "bindingIds": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/identifier" },
+      "uniqueItems": true
+    },
+    "mediaCategories": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "image": { "$ref": "#/definitions/bindingIds" },
+        "audio": { "$ref": "#/definitions/bindingIds" },
+        "video": { "$ref": "#/definitions/bindingIds" }
+      }
+    },
+    "inputChanges": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "order": { "$ref": "#/definitions/mediaCategories" },
+        "excluded": { "$ref": "#/definitions/mediaCategories" },
+        "audioUsageByBindingId": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": { "$ref": "#/definitions/identifier" },
+          "additionalProperties": { "enum": ["voice_timbre", "soundtrack_copy", null] }
+        }
+      }
+    },
+    "changes": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "prompt": { "type": "string" },
+        "model": { "$ref": "#/definitions/modelIdentity" },
+        "mode": { "$ref": "#/definitions/identifier" },
+        "parameters": {
+          "description": "Use returned editable field keys. Types and combinations are validated against the target operation after applying model and mode selections.",
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": { "$ref": "#/definitions/parameterKey" }
+        },
+        "resetKeys": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/parameterKey" },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "inputs": { "$ref": "#/definitions/inputChanges" }
+      }
+    },
+    "readInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target"],
+      "properties": { "target": { "$ref": "#/definitions/target" } }
+    },
+    "configureInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target", "expectedStateToken", "changes"],
+      "properties": {
+        "target": { "$ref": "#/definitions/target" },
+        "expectedStateToken": { "$ref": "#/definitions/identifier" },
+        "changes": { "$ref": "#/definitions/changes" }
+      }
+    },
+    "generateInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target", "expectedStateToken", "requestId"],
+      "properties": {
+        "target": { "$ref": "#/definitions/target" },
+        "expectedStateToken": { "$ref": "#/definitions/identifier" },
+        "requestId": { "$ref": "#/definitions/identifier" }
+      }
+    },
+    "material": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["materialId", "label", "ordinal", "referenceLabel", "origin", "role"],
+      "properties": {
+        "materialId": { "$ref": "#/definitions/identifier" },
+        "bindingId": { "type": ["string", "null"] },
+        "sourceNodeId": { "type": ["string", "null"] },
+        "mediaVersionId": { "type": ["string", "null"] },
+        "label": { "type": "string" },
+        "ordinal": { "type": "integer", "minimum": 1 },
+        "referenceLabel": { "$ref": "#/definitions/identifier" },
+        "origin": { "enum": ["edge", "workbench", "continuity", "soundtrack", "editor"] },
+        "role": { "type": ["string", "null"] },
+        "token": { "type": ["string", "null"] },
+        "ref": { "$ref": "creator-resource-ref.schema.json" }
+      }
+    },
+    "materials": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["image", "audio", "video"],
+      "properties": {
+        "image": { "type": "array", "items": { "$ref": "#/definitions/material" } },
+        "audio": { "type": "array", "items": { "$ref": "#/definitions/material" } },
+        "video": { "type": "array", "items": { "$ref": "#/definitions/material" } }
+      }
+    },
+    "difference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["materialId", "kind", "change"],
+      "properties": {
+        "materialId": { "$ref": "#/definitions/identifier" },
+        "kind": { "enum": ["image", "audio", "video"] },
+        "change": { "enum": ["added", "replaced", "reordered", "excluded", "usageChanged", "unavailable"] },
+        "reason": { "type": "string" },
+        "blocksGeneration": { "type": "boolean" },
+        "previous": { "$ref": "#/definitions/material" },
+        "current": { "$ref": "#/definitions/material" }
+      }
+    },
+    "referenceState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["defaults", "selected", "effective", "effectiveKnown", "differences"],
+      "properties": {
+        "defaults": { "$ref": "#/definitions/materials" },
+        "selected": { "$ref": "#/definitions/materials" },
+        "effective": { "$ref": "#/definitions/materials" },
+        "effectiveKnown": { "type": "boolean" },
+        "differences": { "type": "array", "items": { "$ref": "#/definitions/difference" } }
+      }
+    },
+    "modelState": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": { "enum": ["ready", "missing", "unavailable"] },
+        "bindingId": { "$ref": "#/definitions/identifier" },
+        "modelId": { "$ref": "#/definitions/identifier" },
+        "label": { "type": "string" },
+        "mode": { "type": ["string", "null"] },
+        "workflowId": { "$ref": "#/definitions/identifier" },
+        "adapterSelection": { "$ref": "#/definitions/modelIdentity" },
+        "capsDigest": { "$ref": "#/definitions/identifier" }
+      }
+    },
+    "parameterState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "value", "type", "editable", "valueSource"],
+      "properties": {
+        "label": { "type": "string" },
+        "value": {},
+        "type": { "enum": ["string", "number", "integer", "boolean", "object", "array", "null"] },
+        "unit": { "type": "string" },
+        "editable": { "type": "boolean" },
+        "valueSource": { "enum": ["user", "modelDefault", "workflowFixed", "auto", "unknown"] },
+        "reason": { "type": "string" },
+        "constraints": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "allowedValues": { "type": "array" },
+            "minimum": { "type": "number" },
+            "maximum": { "type": "number" },
+            "step": { "type": "number", "exclusiveMinimum": 0 },
+            "minItems": { "type": "integer", "minimum": 0 },
+            "maxItems": { "type": "integer", "minimum": 0 },
+            "dependsOn": { "type": "array", "items": { "$ref": "#/definitions/parameterKey" } },
+            "mutuallyExclusiveWith": { "type": "array", "items": { "$ref": "#/definitions/parameterKey" } }
+          }
+        }
+      }
+    },
+    "generationState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["canSubmit", "missingRequirements"],
+      "properties": {
+        "canSubmit": { "type": "boolean" },
+        "missingRequirements": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["code"],
+            "properties": {
+              "code": { "$ref": "#/definitions/identifier" },
+              "field": { "$ref": "#/definitions/parameterKey" },
+              "materialId": { "$ref": "#/definitions/identifier" }
+            }
+          }
+        }
+      }
+    },
+    "readOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target", "nodeKind", "prompt", "stateToken", "source", "references", "model", "parameters", "generation"],
+      "properties": {
+        "target": { "$ref": "#/definitions/target" },
+        "nodeKind": { "$ref": "#/definitions/identifier" },
+        "prompt": { "type": "string" },
+        "stateToken": { "$ref": "#/definitions/identifier" },
+        "source": { "enum": ["live", "reopened"] },
+        "references": { "$ref": "#/definitions/referenceState" },
+        "model": { "$ref": "#/definitions/modelState" },
+        "parameters": {
+          "type": "object",
+          "propertyNames": { "$ref": "#/definitions/parameterKey" },
+          "additionalProperties": { "$ref": "#/definitions/parameterState" }
+        },
+        "generation": { "$ref": "#/definitions/generationState" }
+      }
+    },
+    "configureOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "changedKeys", "saveStatus"],
+      "properties": {
+        "state": { "$ref": "#/definitions/readOutput" },
+        "changedKeys": { "$ref": "#/definitions/bindingIds" },
+        "saveStatus": { "enum": ["draft", "persisted"] }
+      }
+    },
+    "acceptedGeneration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "requestId", "jobId", "resultNodeId", "mediaKind"],
+      "properties": {
+        "status": { "const": "accepted" },
+        "requestId": { "$ref": "#/definitions/identifier" },
+        "jobId": { "$ref": "#/definitions/identifier" },
+        "resultNodeId": { "$ref": "#/definitions/identifier" },
+        "mediaKind": { "enum": ["image", "video"] }
+      }
+    },
+    "pendingGeneration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "requestId"],
+      "properties": {
+        "status": { "enum": ["pending", "unknown"] },
+        "requestId": { "$ref": "#/definitions/identifier" }
+      }
+    },
+    "generateOutput": {
+      "oneOf": [
+        { "$ref": "#/definitions/acceptedGeneration" },
+        { "$ref": "#/definitions/pendingGeneration" }
+      ]
+    }
+  }
+}

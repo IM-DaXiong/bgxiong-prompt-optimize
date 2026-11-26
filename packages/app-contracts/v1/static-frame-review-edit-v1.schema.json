@@ -1,0 +1,147 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "static-frame-review-edit-v1.schema.json",
+  "schemaVersion": 1,
+  "title": "StaticFrameReviewEditResultV1: D reviews the frozen draft and, in the same reply, returns keep | revise | needs_attention",
+  "description": "No C'/D' rounds. keep: no replacement, returns audit for the byte-exact input prompt. revise: complete replacement draft + changes; finalChecks judge the replacement. needs_attention: no replacement, at least one unresolved blocking. Cross-field rules (exactly one finalCheck per ruleId, at most one entry per ruleId per array, action/resolution/severity combinations, canBlock, reference closure) are enforced by the host validator bound to the same contract (x-hostRules); the bound per-request schema additionally narrows ids.",
+  "$ref": "#/definitions/reviewEditResultV1",
+  "definitions": {
+    "ruleId": {
+      "type": "string",
+      "enum": [
+        "SF-CAMERA",
+        "SF-SUBJECT",
+        "SF-LAYOUT",
+        "SF-MOMENT",
+        "SF-ENVIRONMENT",
+        "SF-LIGHT",
+        "SF-COMPOSITION",
+        "SF-STYLE",
+        "SF-REFERENCE",
+        "SF-FIDELITY",
+        "SF-HOST",
+        "SF-CRAFT"
+      ]
+    },
+    "findingResolution": {
+      "type": "string",
+      "enum": ["addressed_in_reply", "advisory", "unresolved"]
+    },
+    "checkStatus": {
+      "type": "string",
+      "enum": ["pass", "finding", "not_applicable", "unverifiable"]
+    },
+    "idList": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "inputFindingV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ruleId", "severity", "sourceUnitIds", "factIds", "explanation", "resolution"],
+      "properties": {
+        "ruleId": { "$ref": "#/definitions/ruleId" },
+        "severity": { "$ref": "review-severity-v1.json#/definitions/severity" },
+        "sourceUnitIds": { "$ref": "#/definitions/idList", "x-bindEnum": "frozen.sourceUnitIds" },
+        "factIds": { "$ref": "#/definitions/idList", "x-bindEnum": "frozen.factIds" },
+        "explanation": { "type": "string", "minLength": 1 },
+        "resolution": { "$ref": "#/definitions/findingResolution" }
+      }
+    },
+    "changeV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ruleId", "sourceUnitIds", "factIds", "note"],
+      "properties": {
+        "ruleId": { "$ref": "#/definitions/ruleId" },
+        "sourceUnitIds": { "$ref": "#/definitions/idList", "x-bindEnum": "frozen.sourceUnitIds" },
+        "factIds": { "$ref": "#/definitions/idList", "x-bindEnum": "frozen.factIds" },
+        "note": { "type": "string", "minLength": 1 }
+      }
+    },
+    "finalCheckV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ruleId", "status", "severity", "score", "sourceUnitIds", "factIds", "explanation"],
+      "properties": {
+        "ruleId": { "$ref": "#/definitions/ruleId" },
+        "status": { "$ref": "#/definitions/checkStatus" },
+        "severity": {
+          "anyOf": [{ "$ref": "review-severity-v1.json#/definitions/severity" }, { "type": "null" }],
+          "description": "pass/not_applicable: null; finding: non-null; unverifiable: never blocking. blocking only when the rule has canBlock=true."
+        },
+        "score": { "type": "integer", "minimum": 0, "maximum": 100, "description": "Display only; never overrides severity." },
+        "sourceUnitIds": { "$ref": "#/definitions/idList", "x-bindEnum": "frozen.sourceUnitIds" },
+        "factIds": { "$ref": "#/definitions/idList", "x-bindEnum": "frozen.factIds" },
+        "explanation": { "type": "string", "minLength": 1 }
+      }
+    },
+    "inputFindingList": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/inputFindingV1" },
+      "x-uniqueBy": ["ruleId"]
+    },
+    "finalCheckList": {
+      "type": "array",
+      "minItems": 12,
+      "maxItems": 12,
+      "items": { "$ref": "#/definitions/finalCheckV1" },
+      "x-uniqueBy": ["ruleId"],
+      "x-coversEnum": "#/definitions/ruleId"
+    },
+    "reviewEditResultV1": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["action", "inputFindings", "finalChecks", "audit"],
+          "properties": {
+            "action": { "const": "keep" },
+            "inputFindings": { "$ref": "#/definitions/inputFindingList" },
+            "finalChecks": { "$ref": "#/definitions/finalCheckList" },
+            "audit": { "$ref": "static-frame-authoring-v1.schema.json#/definitions/auditV1" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["action", "inputFindings", "finalChecks", "replacement", "changes"],
+          "properties": {
+            "action": { "const": "revise" },
+            "inputFindings": { "$ref": "#/definitions/inputFindingList" },
+            "finalChecks": { "$ref": "#/definitions/finalCheckList" },
+            "replacement": { "$ref": "static-frame-authoring-v1.schema.json#/definitions/draftV1" },
+            "changes": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "$ref": "#/definitions/changeV1" },
+              "x-uniqueBy": ["ruleId"]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["action", "inputFindings", "finalChecks"],
+          "properties": {
+            "action": { "const": "needs_attention" },
+            "inputFindings": { "$ref": "#/definitions/inputFindingList", "minItems": 1 },
+            "finalChecks": { "$ref": "#/definitions/finalCheckList" }
+          }
+        }
+      ]
+    }
+  },
+  "x-hostRules": [
+    "finalChecks: exactly one entry per ruleId of static-frame-review-rules-v1.json (12).",
+    "inputFindings/changes: at most one entry per ruleId; multiple facts of one rule are merged into its id lists.",
+    "status pass|not_applicable => severity null; status finding => severity non-null; status unverifiable => severity != blocking.",
+    "severity blocking (inputFindings or finalChecks) only for rules with canBlock=true.",
+    "keep: no inputFinding with resolution addressed_in_reply; no unresolved blocking; no finalCheck blocking.",
+    "revise: every addressed_in_reply inputFinding has a change with the same ruleId; at least one addressed_in_reply blocking; no unresolved blocking; no finalCheck blocking; finalChecks judge the replacement.",
+    "needs_attention: at least one inputFinding with severity blocking and resolution unresolved.",
+    "Only revise may use resolution addressed_in_reply.",
+    "All sourceUnitIds/factIds/subjectRefs/padRefs belong to this request's frozen closed sets."
+  ]
+}

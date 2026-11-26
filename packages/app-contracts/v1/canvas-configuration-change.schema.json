@@ -1,0 +1,398 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "const": "configuration.patch"
+          },
+          "request": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "workspaceKind": {
+                "enum": [
+                  "freeCanvas",
+                  "clips"
+                ]
+              },
+              "workspaceId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "nodeId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "expectedConfigurationRevision": {
+                "type": "string",
+                "minLength": 1,
+                "description": "configurationRevision from canvas.workbench.read, captured before editing."
+              },
+              "changes": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "type": {
+                          "const": "model.select"
+                        },
+                        "bindingId": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "modelId": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "bindingId",
+                        "modelId"
+                      ],
+                      "description": "Select this exact configured UI model identity on the node. Selecting a different model also removes the previous model's adapterParameters, which belong only to the operation they were chosen for; general parameters, inputs and prompt stay unchanged. Does not change global defaults or generate."
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "type": {
+                          "const": "model.clear"
+                        },
+                        "capabilitySlot": {
+                          "enum": [
+                            "video",
+                            "imageT2i",
+                            "imageI2i"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "capabilitySlot"
+                      ],
+                      "description": "Clear only the named node model slot."
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "type": {
+                          "const": "mode.set"
+                        },
+                        "taskType": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ],
+                      "description": "Save an explicit taskType, or omit it to clear the mode. Never infers a mode from assets."
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "type": {
+                          "const": "parameters.patch"
+                        },
+                        "parameters": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "aspectRatio": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "resolutionId": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "resolution": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "durationSeconds": {
+                              "type": [
+                                "number",
+                                "null"
+                              ]
+                            },
+                            "fps": {
+                              "type": [
+                                "number",
+                                "null"
+                              ]
+                            },
+                            "seed": {
+                              "type": [
+                                "integer",
+                                "null"
+                              ]
+                            },
+                            "pixelSize": {
+                              "anyOf": [
+                                {
+                                  "type": "object",
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "width": {
+                                      "type": "integer",
+                                      "minimum": 1
+                                    },
+                                    "height": {
+                                      "type": "integer",
+                                      "minimum": 1
+                                    }
+                                  },
+                                  "required": [
+                                    "width",
+                                    "height"
+                                  ]
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "resolutionValue": {
+                              "type": [
+                                "object",
+                                "null"
+                              ]
+                            }
+                          },
+                          "required": []
+                        },
+                        "adapterParameters": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": [
+                              "string",
+                              "number",
+                              "boolean",
+                              "null"
+                            ]
+                          },
+                          "description": "Declared package scalar input JSON pointers of the currently selected model's operation. Null removes an explicit override. Prompt, media and credentials have separate owners."
+                        },
+                        "adapterSelection": {
+                          "type": "object",
+                          "properties": {
+                            "pluginId": { "type": "string", "minLength": 1 },
+                            "version": { "type": "string", "minLength": 1 },
+                            "modelId": { "type": "string", "minLength": 1 },
+                            "capabilityKey": { "type": "string", "minLength": 1 },
+                            "operationId": { "type": "string", "minLength": 1 },
+                            "operationVersion": { "type": "integer", "minimum": 1 },
+                            "inputSchemaDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+                            "source": { "type": "object" }
+                          },
+                          "required": ["pluginId", "version", "modelId", "capabilityKey", "operationId", "operationVersion", "inputSchemaDigest"],
+                          "additionalProperties": false,
+                          "description": "Exact current adapter selection from the workbench."
+                        },
+                        "operationInput": {
+                          "type": "object",
+                          "description": "Replace the entire draft for the given adapterSelection with this operation's declared JSON values."
+                        }
+                      },
+                      "if": { "required": ["operationInput"] },
+                      "then": { "required": ["adapterSelection"] },
+                      "anyOf": [
+                        { "required": ["parameters"], "properties": { "parameters": { "minProperties": 1 } } },
+                        { "required": ["adapterParameters"], "properties": { "adapterParameters": { "minProperties": 1 } } },
+                        { "required": ["operationInput"] }
+                      ],
+                      "required": [
+                        "type"
+                      ],
+                      "description": "Patch only supplied parameters. Null removes an override; omissions preserve the other draft choices."
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "type": {
+                          "const": "parameters.reset"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ],
+                      "description": "Remove explicit parameter overrides; model, inputs and prompt stay unchanged."
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "type": { "const": "parameters.setEffective" },
+                        "expectedConfigDigest": { "type": "string", "minLength": 1 },
+                        "fields": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": ["aspectRatio"],
+                          "properties": {
+                            "aspectRatio": { "type": "string", "minLength": 1 }
+                          }
+                        }
+                      },
+                      "required": ["type", "expectedConfigDigest", "fields"],
+                      "description": "Set a declared image aspectRatio. Read effectiveParameterFields and configDigest first. Use as the only change for this node. Prepare verifies the actual generation parameter; apply persists and verifies it again without submitting generation."
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "type": {
+                          "const": "inputs.patch"
+                        },
+                        "patch": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "excluded": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "properties": {
+                                "image": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "uniqueItems": true
+                                },
+                                "audio": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "uniqueItems": true
+                                },
+                                "video": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "uniqueItems": true
+                                }
+                              },
+                              "required": []
+                            },
+                            "order": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "properties": {
+                                "image": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "uniqueItems": true
+                                },
+                                "audio": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "uniqueItems": true
+                                },
+                                "video": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "uniqueItems": true
+                                }
+                              },
+                              "required": []
+                            },
+                            "audioUsageByBindingId": {
+                              "type": "object",
+                              "additionalProperties": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              }
+                            }
+                          },
+                          "required": []
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "patch"
+                      ],
+                      "description": "Change selected material exclusions, order or audio usage by stable edge binding ID. Does not connect/disconnect or delete anything."
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "type": {
+                          "const": "inputs.reset"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ],
+                      "description": "Return material selection to the graph defaults without changing any graph edge."
+                    }
+                  ]
+                }
+              }
+            },
+            "required": [
+              "workspaceKind",
+              "workspaceId",
+              "nodeId",
+              "expectedConfigurationRevision",
+              "changes"
+            ]
+          },
+          "actionId": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "type",
+          "request",
+          "actionId"
+        ],
+        "description": "Apply explicit changes atomically to one node. Multiple nodes can share the transaction."
+      }
+    }
+  },
+  "required": [
+    "actions"
+  ]
+}

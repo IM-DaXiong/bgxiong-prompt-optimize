@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "pageEntries": 100,
+  "scanEntries": 10000,
+  "maxDepth": 12,
+  "rawTextBytes": 10485760,
+  "textChunkChars": 12000,
+  "imageBytes": 67108864,
+  "mediaBytes": 536870912,
+  "extractedTextBytes": 33554432,
+  "planItems": 100,
+  "imagesPerItem": 12,
+  "stagingBatchBytes": 536870912,
+  "scanDeadlineSecs": 30,
+  "snapshotTtlSecs": 86400,
+  "proposalTtlSecs": 86400,
+  "inactiveStagingTtlSecs": 86400,
+  "maxActiveSnapshotsPerPrincipal": 8,
+  "maxPendingProposalsPerPrincipal": 8,
+  "maxParallelSourceWorkers": 2,
+  "maxDocumentUnits": 1000
+}

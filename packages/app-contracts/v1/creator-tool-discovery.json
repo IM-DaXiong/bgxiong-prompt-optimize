@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "bootstrapToolIds": [
+    "capabilities.search",
+    "capabilities.get",
+    "capabilities.rules.get",
+    "context.get",
+    "conversation.get",
+    "request.get",
+    "request.resume",
+    "task.wait",
+    "change.apply"
+  ],
+  "navigationReadTools": {
+    "clips": "clip.workflow.read",
+    "freeCanvas": "resource.get",
+    "stories": "resource.get",
+    "chapters": "resource.children",
+    "roles": "resource.search",
+    "characters": "resource.search",
+    "sceneAssets": "resource.search",
+    "propAssets": "resource.search",
+    "tasks": "task.list"
+  },
+  "coreRuleIds": [
+    "core",
+    "request_calls"
+  ],
+  "ruleIds": [
+    "asr",
+    "core",
+    "request_calls",
+    "canvas_edges",
+    "scene_replan",
+    "runtime_intake",
+    "text_edit",
+    "request_stop",
+    "external_image_delivery"
+  ],
+  "maxPageBytes": 262144,
+  "maxSchemaToolIds": 32,
+  "maxLoadedToolIds": 256,
+  "maxCacheBytes": 16777216,
+  "maxCacheEntries": 32,
+  "bm25": {
+    "k1": 1.2,
+    "b": 0.75,
+    "toolIdWeight": 8,
+    "aliasesWeight": 5,
+    "summaryWeight": 3,
+    "descriptionWeight": 1
+  },
+  "cursorVersion": 1,
+  "revisionDomains": [
+    "catalog",
+    "inputSchema",
+    "outputSchema",
+    "rules",
+    "discoveryConfig"
+  ],
+  "errorCodes": [
+    "TOOL_ARGS_INVALID",
+    "UNKNOWN_TOOL",
+    "CURSOR_INVALID",
+    "CURSOR_STALE",
+    "TOOL_DESCRIPTOR_TOO_LARGE",
+    "TOOL_CONTEXT_BUDGET_EXCEEDED",
+    "CREATOR_CONTRACT_INVALID",
+    "TOOL_RULE_TOO_LARGE"
+  ],
+  "maxActiveToolBytes": 98304,
+  "maxActiveRuleBytes": 32768,
+  "maxRulePageBytes": 32768,
+  "maxSearchPageBytes": 8192
+}

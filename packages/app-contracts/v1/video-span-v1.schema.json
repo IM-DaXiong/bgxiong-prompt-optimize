@@ -1,0 +1,204 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "video-span-v1.schema.json",
+  "title": "VideoSpanV1",
+  "definitions": {
+    "id": { "type": "string", "minLength": 1, "maxLength": 512, "pattern": "\\S" },
+    "revision": { "type": "integer", "minimum": 0, "maximum": 4294967295 },
+    "scope": {
+      "type": "object", "required": ["storyId", "sceneId"], "additionalProperties": false,
+      "properties": { "storyId": { "$ref": "#/definitions/id" }, "sceneId": { "$ref": "#/definitions/id" } }
+    },
+    "anchor": {
+      "oneOf": [
+        { "type": "object", "required": ["kind"], "additionalProperties": false, "properties": { "kind": { "const": "auto" } } },
+        { "type": "object", "required": ["kind", "spanId"], "additionalProperties": false, "properties": { "kind": { "const": "eligibleExisting" }, "spanId": { "$ref": "#/definitions/id" } } }
+      ]
+    },
+    "destination": {
+      "oneOf": [
+        { "type": "object", "required": ["kind"], "additionalProperties": false, "properties": { "kind": { "const": "create" } } },
+        { "type": "object", "required": ["kind", "spanId"], "additionalProperties": false, "properties": { "kind": { "const": "existing" }, "spanId": { "$ref": "#/definitions/id" } } }
+      ]
+    },
+    "frameworkRefSkip": {
+      "type": "object", "required": ["kind", "key", "reason"], "additionalProperties": false,
+      "properties": { "kind": { "type": "string" }, "key": { "type": "string" }, "reason": { "type": "string" } }
+    },
+    "frameworkImportReceipt": {
+      "type": "object",
+      "required": ["createdSegments", "refNodesCreated", "refSkips", "archivedGhostSpanIds", "dialogueTracksSeeded"],
+      "additionalProperties": false,
+      "properties": {
+        "createdSegments": { "$ref": "#/definitions/revision" },
+        "refNodesCreated": { "$ref": "#/definitions/revision" },
+        "refSkips": { "type": "array", "items": { "$ref": "#/definitions/frameworkRefSkip" } },
+        "archivedGhostSpanIds": { "type": "array", "items": { "$ref": "#/definitions/id" } },
+        "dialogueTracksSeeded": { "$ref": "#/definitions/revision" }
+      }
+    },
+    "frameworkImportOperation": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": { "kind": { "const": "createFramework" } }
+    },
+    "frameworkLegacyResolution": {
+      "type": "object",
+      "required": ["schemaVersion", "sourceDigest", "candidates"],
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "sourceDigest": { "type": "string", "minLength": 64, "maxLength": 64 },
+        "candidates": {
+          "type": "array",
+          "items": { "$ref": "video-span-migration-resolution.schema.json#/definitions/candidateResolution" }
+        }
+      }
+    },
+    "frameworkReferenceSelection": {
+      "type": "object",
+      "required": ["includeRoles", "includeScenes"],
+      "additionalProperties": false,
+      "properties": {
+        "includeRoles": { "type": "boolean" },
+        "includeScenes": { "type": "boolean" }
+      }
+    },
+    "frameworkTarget": {
+      "type": "object",
+      "required": ["videoProviderKind", "intentInputMode"],
+      "additionalProperties": false,
+      "properties": {
+        "videoProviderKind": { "$ref": "#/definitions/id" },
+        "videoModelId": { "$ref": "#/definitions/id" },
+        "intentInputMode": { "$ref": "#/definitions/id" }
+      }
+    },
+    "frameworkDurationSelection": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["kind"],
+          "additionalProperties": false,
+          "properties": { "kind": { "const": "sourceSum" } }
+        },
+        {
+          "type": "object",
+          "required": ["kind", "items"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": { "const": "perGroup" },
+            "items": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": ["groupRef", "seconds"],
+                "additionalProperties": false,
+                "properties": {
+                  "groupRef": { "$ref": "#/definitions/id" },
+                  "seconds": { "type": "number", "exclusiveMinimum": 0 }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "frameworkReferenceSelectionsItem": {
+      "type": "object",
+      "required": ["groupRef", "itemIds"],
+      "additionalProperties": false,
+      "properties": {
+        "groupRef": { "$ref": "#/definitions/id" },
+        "itemIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/definitions/id" }
+        }
+      }
+    },
+    "frameworkComposeChoice": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["kind"],
+          "additionalProperties": false,
+          "properties": { "kind": { "const": "structureOnly" } }
+        },
+        {
+          "type": "object",
+          "required": ["kind", "target", "projectionMethodSelection", "durationSelection"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": { "const": "composeMerged" },
+            "target": { "$ref": "#/definitions/frameworkTarget" },
+            "projectionMethodSelection": { "$ref": "video-prompt-projection.schema.json#/definitions/projectionMethodSelection" },
+            "durationSelection": { "$ref": "#/definitions/frameworkDurationSelection" },
+            "referenceSelections": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/frameworkReferenceSelectionsItem" }
+            }
+          }
+        }
+      ]
+    },
+    "intent": {
+      "oneOf": [
+        { "type": "object", "required": ["type", "sourceShotIds", "anchor"], "additionalProperties": false, "properties": { "type": { "const": "video.span.merge" }, "sourceShotIds": { "type": "array", "minItems": 2, "uniqueItems": true, "items": { "$ref": "#/definitions/id" } }, "anchor": { "$ref": "#/definitions/anchor" } } },
+        { "type": "object", "required": ["type", "spanId", "splitAfterSourceShotIds"], "additionalProperties": false, "properties": { "type": { "const": "video.span.split" }, "spanId": { "$ref": "#/definitions/id" }, "splitAfterSourceShotIds": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/definitions/id" } } } },
+        { "type": "object", "required": ["type", "sourceShotIds", "destination"], "additionalProperties": false, "properties": { "type": { "const": "video.span.reassign" }, "sourceShotIds": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/definitions/id" } }, "destination": { "$ref": "#/definitions/destination" } } },
+        { "type": "object", "required": ["type", "proposalRef", "resolutionRefs"], "additionalProperties": false, "properties": { "type": { "const": "video.span.import" }, "proposalRef": { "$ref": "#/definitions/id" }, "resolutionRefs": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/definitions/id" } } } },
+        {
+          "type": "object",
+          "required": ["type", "operation", "referenceSelection", "promptPolicy", "composeChoice"],
+          "additionalProperties": false,
+          "properties": {
+            "type": { "const": "video.span.framework.import" },
+            "operation": { "$ref": "#/definitions/frameworkImportOperation" },
+            "referenceSelection": { "$ref": "#/definitions/frameworkReferenceSelection" },
+            "promptPolicy": { "const": "inheritSingleComposeMerged" },
+            "composeChoice": { "$ref": "#/definitions/frameworkComposeChoice" }
+          }
+        },
+        { "type": "object", "required": ["type", "spanIds"], "additionalProperties": false, "properties": { "type": { "const": "video.span.archive" }, "spanIds": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/definitions/id" } } } }
+      ]
+    },
+    "submitAcknowledgement": {
+      "type": "object", "required": [], "additionalProperties": false,
+      "properties": {
+        "spanStaleAckDigest": { "anyOf": [{ "$ref": "#/definitions/id" }, { "type": "null" }] }
+      }
+    },
+    "readiness": {
+      "type": "object", "required": ["artifactKind", "freshness", "reasons", "attemptState", "attemptSeq", "taskRef", "currentSnapshotDigest"], "additionalProperties": false,
+      "properties": {
+        "currentSnapshotDigest": { "$ref": "#/definitions/id" },
+        "artifactKind": { "enum": ["absent", "manual", "reviewedMother"] },
+        "freshness": { "enum": ["current", "stale"] },
+        "reasons": { "type": "array", "uniqueItems": true, "items": { "enum": ["membershipChanged", "sourceChanged", "referenceChanged", "dialogueChanged", "contentChanged", "projectionChanged", "unknownLegacy"] } },
+        "attemptState": { "enum": ["idle", "queued", "running", "failed", "cancelled", "interrupted"] },
+        "attemptSeq": { "$ref": "#/definitions/revision" },
+        "taskRef": { "anyOf": [{ "type": "null" }, { "$ref": "#/definitions/id" }] }
+      }
+    },
+    "vm": {
+      "type": "object", "required": ["spanId", "storyId", "sceneId", "segmentNodeId", "revision", "lifecycle", "orderedSourceShotIds", "readiness", "acceptedArtifactRef", "referenceProjectionRef", "dialogueBindingRef"], "additionalProperties": false,
+      "properties": {
+        "spanId": { "$ref": "#/definitions/id" }, "storyId": { "$ref": "#/definitions/id" }, "sceneId": { "$ref": "#/definitions/id" }, "segmentNodeId": { "$ref": "#/definitions/id" }, "revision": { "$ref": "#/definitions/revision" },
+        "lifecycle": { "enum": ["active", "archived"] }, "orderedSourceShotIds": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/definitions/id" } },
+        "readiness": { "$ref": "#/definitions/readiness" }, "acceptedArtifactRef": { "anyOf": [{ "type": "null" }, { "$ref": "#/definitions/id" }] },
+        "referenceProjectionRef": { "anyOf": [{ "type": "null" }, { "$ref": "#/definitions/id" }] }, "dialogueBindingRef": { "anyOf": [{ "type": "null" }, { "$ref": "#/definitions/id" }] }
+      }
+    },
+    "readArgs": {
+      "type": "object", "required": ["schemaVersion", "scope", "includeArchived"], "additionalProperties": false,
+      "properties": { "schemaVersion": { "const": 1 }, "scope": { "$ref": "#/definitions/scope" }, "includeArchived": { "type": "boolean" }, "cursor": { "$ref": "#/definitions/id" }, "snapshotRef": { "$ref": "#/definitions/id" } }
+    },
+    "prepareArgs": {
+      "type": "object", "required": ["schemaVersion", "scope", "readSetRef", "intents", "resolutions"], "additionalProperties": false,
+      "properties": { "schemaVersion": { "const": 1 }, "scope": { "$ref": "#/definitions/scope" }, "readSetRef": { "$ref": "#/definitions/id" }, "intents": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/intent" } }, "resolutions": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/definitions/id" } } }
+    }
+  }
+}

@@ -1,0 +1,566 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-resource-resolve.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "locator"
+  ],
+  "properties": {
+    "locator": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "ref"
+          ],
+          "properties": {
+            "kind": {
+              "const": "ref"
+            },
+            "ref": {
+              "$ref": "creator-resource-ref.schema.json"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "storyName"
+          ],
+          "properties": {
+            "kind": {
+              "const": "path"
+            },
+            "storyName": {
+              "type": "string",
+              "minLength": 1
+            },
+            "chapterOrdinal": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "chapterName": {
+              "type": "string",
+              "minLength": 1
+            },
+            "resourceKind": {
+              "enum": [
+                "story",
+                "chapter",
+                "role",
+                "actor",
+                "storyProp",
+                "visualAsset"
+              ]
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "allOf": [
+            {
+              "not": {
+                "required": [
+                  "chapterOrdinal",
+                  "chapterName"
+                ]
+              }
+            },
+            {},
+            {
+              "if": {
+                "required": [
+                  "resourceKind"
+                ],
+                "properties": {
+                  "resourceKind": {
+                    "enum": [
+                      "actor",
+                      "role",
+                      "storyProp",
+                      "visualAsset"
+                    ]
+                  }
+                }
+              },
+              "then": {
+                "required": [
+                  "name"
+                ]
+              }
+            },
+            {
+              "if": {
+                "required": [
+                  "name"
+                ]
+              },
+              "then": {
+                "required": [
+                  "resourceKind"
+                ],
+                "properties": {
+                  "resourceKind": {
+                    "enum": [
+                      "actor",
+                      "role",
+                      "storyProp",
+                      "visualAsset"
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "selection"
+          ],
+          "properties": {
+            "kind": {
+              "const": "context"
+            },
+            "selection": {
+              "enum": [
+                "currentCanvas",
+                "lastCanvas",
+                "creationTarget",
+                "currentSelection"
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "sourceFactRef"
+          ],
+          "properties": {
+            "kind": {
+              "const": "fact"
+            },
+            "sourceFactRef": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "nodeId"
+          ],
+          "properties": {
+            "kind": {
+              "const": "node"
+            },
+            "nodeId": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "assetKind",
+            "assetId"
+          ],
+          "properties": {
+            "kind": {
+              "const": "asset"
+            },
+            "assetKind": {
+              "enum": [
+                "scene",
+                "prop"
+              ]
+            },
+            "assetId": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "fieldId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "cursor": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "const": "canonical"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "surfaceId"
+          ],
+          "properties": {
+            "kind": {
+              "const": "publishedDraft"
+            },
+            "surfaceId": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "historyRef"
+          ],
+          "properties": {
+            "kind": {
+              "const": "history"
+            },
+            "historyRef": {
+              "type": "string",
+              "pattern": "^hist:[1-9][0-9]*$"
+            }
+          }
+        }
+      ]
+    },
+    "metadataOnly": {
+      "type": "boolean"
+    }
+  },
+  "definitions": {
+    "sourcePage": {
+      "type": "object",
+      "required": [
+        "ref",
+        "fieldId",
+        "revisionToken",
+        "sourceKind",
+        "textDigest",
+        "persistModes"
+      ],
+      "properties": {
+        "ref": {
+          "$ref": "creator-resource-ref.schema.json"
+        },
+        "fieldId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revisionToken": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceKind": {
+          "enum": [
+            "canonical",
+            "history",
+            "publishedDraft"
+          ]
+        },
+        "textDigest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "chosenHistoryRef": {
+          "type": "string",
+          "pattern": "^hist:[1-9][0-9]*$"
+        },
+        "value": {
+          "type": "string"
+        },
+        "offsetBytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "totalBytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "complete": {
+          "type": "boolean"
+        },
+        "persistModes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "persist",
+              "newVersion"
+            ]
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "value"
+            ]
+          },
+          "then": {
+            "required": [
+              "offsetBytes",
+              "totalBytes",
+              "complete"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "sourceKind": {
+                "const": "history"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "chosenHistoryRef"
+            ]
+          }
+        }
+      ]
+    },
+    "outputData": {
+      "type": "object",
+      "required": [
+        "disposition"
+      ],
+      "properties": {
+        "disposition": {
+          "enum": [
+            "resolved",
+            "ambiguous",
+            "notFound",
+            "sourceChoiceRequired",
+            "candidate"
+          ]
+        },
+        "ref": {
+          "$ref": "creator-resource-ref.schema.json"
+        },
+        "candidates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "ref"
+            ],
+            "properties": {
+              "ref": {
+                "$ref": "creator-resource-ref.schema.json"
+              }
+            }
+          }
+        },
+        "source": {
+          "type": "object"
+        },
+        "sourceChoices": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "kind"
+                ],
+                "properties": {
+                  "kind": {
+                    "const": "canonical"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "kind",
+                  "surfaceId"
+                ],
+                "properties": {
+                  "kind": {
+                    "const": "publishedDraft"
+                  },
+                  "surfaceId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "kind",
+                  "historyRef"
+                ],
+                "properties": {
+                  "kind": {
+                    "const": "history"
+                  },
+                  "historyRef": {
+                    "type": "string",
+                    "pattern": "^hist:[1-9][0-9]*$"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "hasMore": {
+          "type": "boolean"
+        },
+        "nextCursor": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pageOffset": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "disposition": {
+                "const": "resolved"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "ref",
+              "candidates",
+              "hasMore"
+            ],
+            "properties": {
+              "source": {
+                "$ref": "#/definitions/sourcePage"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "disposition": {
+                "const": "sourceChoiceRequired"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "sourceChoices"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "required": [
+          "cursor"
+        ]
+      },
+      "then": {
+        "properties": {
+          "locator": {
+            "properties": {
+              "kind": {
+                "const": "fact"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "source"
+        ]
+      },
+      "then": {
+        "required": [
+          "fieldId"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "locator": {
+            "properties": {
+              "kind": {
+                "const": "fact"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "not": {
+          "anyOf": [
+            {
+              "required": [
+                "fieldId"
+              ]
+            },
+            {
+              "required": [
+                "source"
+              ]
+            },
+            {
+              "required": [
+                "metadataOnly"
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

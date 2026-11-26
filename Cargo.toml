@@ -1,0 +1,13 @@
+[workspace]
+resolver = "2"
+members = ["src-tauri/crates/bgx-prompt-optimize", "crates/prompt-optimize-runtime", "examples/rust"]
+exclude = [
+  "apps/bgxiong-prompt-optimize/src-tauri",
+  "src-tauri/crates/bgx-agent-skills-core",
+  "src-tauri/crates/bgx-contract-gen",
+  "src-tauri/crates/bgx-internal-prompts",
+  "src-tauri/crates/bgx-creator-contract",
+  "src-tauri/crates/bgx-text-http",
+  "src-tauri/crates/bgx-skill-distribution",
+  "src-tauri/crates/bgx-video-prompt-contract",
+]

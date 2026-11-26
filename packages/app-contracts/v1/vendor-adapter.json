@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "providerKinds": {
+    "image": "image_vendor_adapter",
+    "imageToImage": "image_vendor_adapter",
+    "video": "video_vendor_adapter",
+    "keyframe": "video_vendor_adapter",
+    "text": "text_vendor_adapter",
+    "speech": "speech_vendor_adapter",
+    "voiceDesign": "voice_design_vendor_adapter"
+  },
+  "modelIdPrefix": "adapter:"
+}

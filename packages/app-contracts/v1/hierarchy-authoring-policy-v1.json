@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "schemaRepairRounds": 0,
+  "reviewEditCallsPerUnit": 1,
+  "outputSafetyPercent": 20,
+  "phases": [
+    "preflight",
+    "navigation",
+    "structure",
+    "structure_review",
+    "detail",
+    "review_edit",
+    "derived",
+    "publish"
+  ],
+  "errors": [
+    "context_invalid",
+    "context_overflow",
+    "schema_invalid",
+    "truncated",
+    "transport_failed",
+    "checkpoint_failed",
+    "stale_input",
+    "cas_conflict",
+    "outcome_unknown",
+    "cancelled",
+    "dependency_missing",
+    "source_coverage_invalid"
+  ],
+  "capacitySources": [
+    "catalog",
+    "config",
+    "estimated"
+  ],
+  "resumeRefKey": "hierarchyResumeRef",
+  "sceneMetadataSeparator": "\n---HIERARCHY_SCENE_METADATA_V1---\n",
+  "imageTokenEstimatePerImage": 4096,
+  "workingContextTokens": 131072,
+  "phaseOutputReserveTokens": {
+    "preflight": 4096,
+    "navigation": 4096,
+    "structure": 32768,
+    "structure_review": 32768,
+    "detail": 32768,
+    "review_edit": 32768,
+    "derived": 8192
+  },
+  "literaryMetadataSeparator": "\n---LITERARY_AUTHORING_JSON---\n"
+}

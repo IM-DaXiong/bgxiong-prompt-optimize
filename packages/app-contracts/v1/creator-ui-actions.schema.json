@@ -1,0 +1,266 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-ui-actions.schema.json",
+  "title": "CreatorUiActions",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "ui.state.get"
+        },
+        "windowLabel": {
+          "description": "Omit the key to read the main window. A label reads that published window.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "ui.panelSkill.get"
+        },
+        "scope": {
+          "type": "object",
+          "required": [
+            "panelKind",
+            "storyId",
+            "hostId"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "panelKind": {
+              "type": "string",
+              "minLength": 1
+            },
+            "storyId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "hostId": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "type",
+        "target"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "ui.navigate"
+        },
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "mainTab": {
+              "type": "string"
+            },
+            "subTab": {
+              "type": "string"
+            },
+            "storyId": {
+              "type": "string"
+            },
+            "chapterId": {
+              "type": "string"
+            },
+            "sceneId": {
+              "type": "string"
+            },
+            "canvasProjectId": {
+              "type": "string"
+            },
+            "panelId": {
+              "type": "string"
+            }
+          }
+        },
+        "expectedContextRevision": {
+          "type": "string"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "type",
+        "surface"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "ui.focus"
+        },
+        "surface": {
+          "$ref": "creator-editable-surface.schema.json"
+        },
+        "expectedContextRevision": {
+          "type": "string"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "type",
+        "surfaceId",
+        "refs"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "ui.selection.set"
+        },
+        "surfaceId": {
+          "type": "string"
+        },
+        "refs": {
+          "type": "array",
+          "items": {
+            "$ref": "creator-resource-ref.schema.json"
+          }
+        },
+        "expectedContextRevision": {
+          "type": "string"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "type",
+        "surface"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "ui.surface.open"
+        },
+        "surface": {
+          "$ref": "creator-editable-surface.schema.json"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "type",
+        "surfaceId"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "ui.surface.close"
+        },
+        "surfaceId": {
+          "type": "string"
+        },
+        "discardDirty": {
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "type",
+        "effectId"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "ui.view.refresh"
+        },
+        "effectId": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "type",
+        "surfaceId"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "surface.read"
+        },
+        "surfaceId": {
+          "type": "string"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "type",
+        "surfaceId",
+        "patch",
+        "expectedDraftRevision",
+        "persistMode"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "surface.patch"
+        },
+        "surfaceId": {
+          "type": "string"
+        },
+        "patch": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value"
+          ],
+          "properties": {
+            "value": {
+              "type": "string",
+              "description": "full replacement text of the surface draft"
+            }
+          }
+        },
+        "expectedDraftRevision": {
+          "type": "string"
+        },
+        "persistMode": {
+          "type": "string",
+          "enum": [
+            "draft",
+            "persist",
+            "newVersion"
+          ],
+          "description": "draft keeps an unpersisted surface draft. persist writes the current durable field. newVersion writes a new durable version. There is no boolean persist alias."
+        },
+        "expectedResourceRevision": {
+          "type": "string"
+        },
+        "expectedHistoryRef": {
+          "type": "string"
+        }
+      }
+    }
+  ]
+}

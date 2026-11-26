@@ -1,0 +1,1911 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-twin-actions.schema.json",
+  "title": "CreatorTwinActions",
+  "description": "W5 remainder: IPC-twin actions (host_twin.rs). Local twins: <tool>.prepare {actions:[exactly 1]} -> change.apply (plan kind twin.change, undoClass none; the same UI command runs). Remote twins: generation.submit {kind, input, grantId} (Cost Gate first). The commands keep their own authz. Generated from TwinAction serde shape; Rust test w5f asserts type/required parity.",
+  "type": "object",
+  "required": [
+    "actions"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "actions": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/definitions/audio_draft_patch"
+          },
+          {
+            "$ref": "#/definitions/audio_reference_bind"
+          },
+          {
+            "$ref": "#/definitions/audio_track_upload"
+          },
+          {
+            "$ref": "#/definitions/audio_track_delete"
+          },
+          {
+            "$ref": "#/definitions/audio_dialogue_version_set"
+          },
+          {
+            "$ref": "#/definitions/audio_ttsReference_patch"
+          },
+          {
+            "$ref": "#/definitions/audio_voiceProject_patch"
+          },
+          {
+            "$ref": "#/definitions/music_generate"
+          },
+          {
+            "$ref": "#/definitions/sfx_generate"
+          },
+          {
+            "$ref": "#/definitions/files_save_original"
+          },
+          {
+            "$ref": "#/definitions/files_media_concat"
+          },
+          {
+            "$ref": "#/definitions/files_backup_story"
+          },
+          {
+            "$ref": "#/definitions/files_restore_story"
+          },
+          {
+            "$ref": "#/definitions/files_package_export"
+          },
+          {
+            "$ref": "#/definitions/files_package_import"
+          },
+          {
+            "$ref": "#/definitions/files_screenplay_export"
+          },
+          {
+            "$ref": "#/definitions/files_screenplay_import"
+          },
+          {
+            "$ref": "#/definitions/files_appDataRoot_migrate"
+          },
+          {
+            "$ref": "#/definitions/files_fcTemplate_export"
+          },
+          {
+            "$ref": "#/definitions/files_fcTemplate_import"
+          },
+          {
+            "$ref": "#/definitions/files_fcMedia_export"
+          },
+          {
+            "$ref": "#/definitions/runtime_sidecar_control"
+          },
+          {
+            "$ref": "#/definitions/asr_default_set"
+          },
+          {
+            "$ref": "#/definitions/asr_order_set"
+          },
+          {
+            "$ref": "#/definitions/asr_instance_control"
+          },
+          {
+            "$ref": "#/definitions/asr_module_uninstall"
+          },
+          {
+            "$ref": "#/definitions/runtime_model_download"
+          },
+          {
+            "$ref": "#/definitions/runtime_model_install"
+          },
+          {
+            "$ref": "#/definitions/content_run_pause"
+          },
+          {
+            "$ref": "#/definitions/fc_extract_videoAudio"
+          },
+          {
+            "$ref": "#/definitions/fc_text_segmentNodes"
+          },
+          {
+            "$ref": "#/definitions/fc_concat_planTextVideoClips"
+          },
+          {
+            "$ref": "#/definitions/story_role_portraitPrompt_generate"
+          },
+          {
+            "$ref": "#/definitions/story_role_portraitPrompt_batch_start"
+          },
+          {
+            "$ref": "#/definitions/story_role_portraitPrompt_batch_run"
+          },
+          {
+            "$ref": "#/definitions/story_prop_visualPrompt_batch_start"
+          },
+          {
+            "$ref": "#/definitions/story_prop_visualPrompt_batch_run"
+          }
+        ]
+      }
+    }
+  },
+  "x-toolTypes": {
+    "asr.preferences.change.prepare": [
+      "asr.default.set",
+      "asr.order.set"
+    ],
+    "asr.runtime.control.prepare": [
+      "asr.instance.control",
+      "asr.module.uninstall"
+    ],
+    "audio.change.prepare": [
+      "audio.draft.patch",
+      "audio.reference.bind",
+      "audio.track.upload",
+      "audio.track.delete",
+      "audio.dialogue.version.set",
+      "audio.ttsReference.patch",
+      "audio.voiceProject.patch",
+      "music.generate",
+      "sfx.generate"
+    ],
+    "files.change.prepare": [
+      "files.save.original",
+      "files.media.concat",
+      "files.backup.story",
+      "files.restore.story",
+      "files.package.export",
+      "files.package.import",
+      "files.screenplay.export",
+      "files.screenplay.import",
+      "files.appDataRoot.migrate",
+      "files.fcTemplate.export",
+      "files.fcTemplate.import",
+      "files.fcMedia.export"
+    ],
+    "runtime.change.prepare": [
+      "runtime.sidecar.control",
+      "runtime.model.download",
+      "runtime.model.install"
+    ],
+    "content.twin.prepare": [
+      "content.run.pause"
+    ],
+    "canvas.twin.prepare": [
+      "fc.extract.videoAudio",
+      "fc.text.segmentNodes",
+      "fc.concat.planTextVideoClips"
+    ]
+  },
+  "x-remoteGenerationKinds": [
+    "fc.extract.mediaText",
+    "story.role.portrait.generate",
+    "story.role.extractFromChapters",
+    "story.visualAsset.conceptImage.generate",
+    "story.prop.extractFromChapters",
+    "story.role.portraitPrompt.generate",
+    "story.role.portraitPrompt.batch.start",
+    "story.prop.visualPrompt.batch.start",
+    "story.role.portraitPrompt.batch.run",
+    "story.prop.visualPrompt.batch.run",
+    "audio.voiceDesign.create"
+  ],
+  "x-irreversible": [
+    "audio.track.delete",
+    "files.restore.story",
+    "files.package.import",
+    "files.appDataRoot.migrate",
+    "files.save.original"
+  ],
+  "x-runtimeEngines": [
+    "tts",
+    "music",
+    "sfx",
+    "clearvoice",
+    "singing",
+    "comfyui"
+  ],
+  "x-localTtsEngineTypes": [
+    "piper",
+    "sherpa",
+    "indextts",
+    "voxcpm",
+    "kokoro"
+  ],
+  "x-runtimeLifecycleProjection": {
+    "note": "phase is a verbatim projection of the existing runtime service. This is not a new process state machine. ready is true only when that service reports real L3 health.",
+    "comfyuiPhases": [
+      "stopped",
+      "starting",
+      "managedRunning",
+      "externalRunning"
+    ],
+    "ttsPhase": "verbatimExistingBootstrapPhase",
+    "readyMeans": "l3HealthOnly"
+  },
+  "x-runtimeStatusTool": {
+    "id": "runtime.status.get",
+    "effectClass": "read",
+    "startsProcess": false,
+    "inputDefinition": "runtime_status_get",
+    "resultDefinition": "runtime_status_result"
+  },
+  "definitions": {
+    "asr_default_set": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "actionId",
+        "request"
+      ],
+      "properties": {
+        "type": {
+          "const": "asr.default.set"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "request": {
+          "$ref": "asr.schema.json#/definitions/setDefaultRequestV1"
+        }
+      }
+    },
+    "asr_order_set": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "actionId",
+        "request"
+      ],
+      "properties": {
+        "type": {
+          "const": "asr.order.set"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "request": {
+          "$ref": "asr.schema.json#/definitions/setDisplayOrderRequestV1"
+        }
+      }
+    },
+    "asr_instance_control": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "actionId",
+        "request"
+      ],
+      "properties": {
+        "type": {
+          "const": "asr.instance.control"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "request": {
+          "$ref": "asr.schema.json#/definitions/runtimeControlRequestV1"
+        }
+      }
+    },
+    "asr_module_uninstall": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "actionId",
+        "request"
+      ],
+      "properties": {
+        "type": {
+          "const": "asr.module.uninstall"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "request": {
+          "$ref": "asr.schema.json#/definitions/uninstallPreviewV1"
+        }
+      }
+    },
+    "runtime_engine": {
+      "type": "string",
+      "enum": [
+        "tts",
+        "music",
+        "sfx",
+        "clearvoice",
+        "singing",
+        "comfyui"
+      ]
+    },
+    "local_tts_engine_type": {
+      "type": "string",
+      "enum": [
+        "piper",
+        "sherpa",
+        "indextts",
+        "voxcpm",
+        "kokoro"
+      ]
+    },
+    "runtime_status_get": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "engine"
+      ],
+      "properties": {
+        "engine": {
+          "type": "string",
+          "description": "Closed read engine set is generated from local-engine-state.json/readEngines by runtime_status_input_schema."
+        },
+        "engineType": {
+          "description": "Local TTS engine type when engine is tts. Omit the key for every other engine, including comfyui.",
+          "$ref": "#/definitions/local_tts_engine_type"
+        }
+      }
+    },
+    "runtime_status_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Existing service observation plus revisioned owner read model. State enums and event are defined in local-engine-state.json. ready is real L3, independent from installationState.",
+      "required": [
+        "engine",
+        "status",
+        "engineKey",
+        "hostEpoch",
+        "installationState",
+        "serviceStatus",
+        "activityPhase",
+        "operationId",
+        "taskRef",
+        "instanceEpoch",
+        "startedAtMs",
+        "ready",
+        "stale",
+        "revision",
+        "sampledAtMs",
+        "identity",
+        "health",
+        "diagnosis",
+        "requiredActions"
+      ],
+      "properties": {
+        "engine": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "engineKey": {
+          "type": "string"
+        },
+        "hostEpoch": {
+          "type": "string"
+        },
+        "installationState": {
+          "type": "string"
+        },
+        "serviceStatus": {
+          "type": "string"
+        },
+        "activityPhase": {
+          "type": "string"
+        },
+        "operationId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "taskRef": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "instanceEpoch": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "startedAtMs": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "ready": {
+          "type": "boolean"
+        },
+        "stale": {
+          "type": "boolean"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sampledAtMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "identity": {
+          "type": "object"
+        },
+        "health": {
+          "type": "object"
+        },
+        "engineType": {
+          "$ref": "#/definitions/local_tts_engine_type"
+        },
+        "failure": {
+          "type": "object"
+        },
+        "diagnosis": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "requiredActions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "audio_draft_patch": {
+      "type": "object",
+      "required": [
+        "type",
+        "actionId",
+        "input"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "audio.draft.patch"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "input": {
+          "type": "object",
+          "description": "IPC type PatchDialogueTrackInput (same camelCase JSON the UI command receives)"
+        }
+      }
+    },
+    "audio_reference_bind": {
+      "type": "object",
+      "required": [
+        "type",
+        "actionId",
+        "request"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "audio.reference.bind"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "request": {
+          "type": "object",
+          "description": "IPC type EnrollCanvasAudioRequest (same camelCase JSON the UI command receives)"
+        }
+      }
+    },
+    "audio_track_upload": {
+      "type": "object",
+      "required": [
+        "type",
+        "actionId",
+        "segmentNodeId",
+        "filePath",
+        "kind"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "audio.track.upload"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "segmentNodeId": {
+          "type": "string"
+        },
+        "filePath": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "textContent": {
+          "type": "string"
+        },
+        "speakerRoleId": {
+          "type": "string"
+        }
+      }
+    },
+    "audio_track_delete": {
+      "type": "object",
+      "required": [
+        "type",
+        "actionId",
+        "audioTrackId"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "audio.track.delete"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "audioTrackId": {
+          "type": "string"
+        },
+        "confirm": {
+          "type": "boolean"
+        }
+      },
+      "description": "Irreversible: confirm=true required; alone."
+    },
+    "audio_dialogue_version_set": {
+      "type": "object",
+      "required": [
+        "type",
+        "actionId",
+        "dialogueTrackId",
+        "versionId"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "audio.dialogue.version.set"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dialogueTrackId": {
+          "type": "string"
+        },
+        "versionId": {
+          "type": "string"
+        }
+      }
+    },
+    "audio_ttsReference_patch": {
+      "type": "object",
+      "required": [
+        "type",
+        "actionId",
+        "request"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "audio.ttsReference.patch"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "request": {
+          "type": "object",
+          "description": "IPC type TtsRefLibraryRenameRequest (same camelCase JSON the UI command receives)"
+        }
+      }
+    },
+    "audio_voiceProject_patch": {
+      "type": "object",
+      "required": [
+        "type",
+        "actionId",
+        "req"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "audio.voiceProject.patch"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "req": {
+          "type": "object",
+          "description": "IPC type VoiceProjectUpdateRequest (same camelCase JSON the UI command receives)"
+        }
+      }
+    },
+    "files_save_original": {
+      "type": "object",
+      "required": [
+        "type",
+        "actionId",
+        "sourceRelativePath",
+        "filePath"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "files.save.original"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceRelativePath": {
+          "type": "string"
+        },
+        "filePath": {
+          "type": "string"
+        },
+        "confirm": {
+          "type": "boolean"
+        }
+      },
+      "description": "Copy an app-data media file (original bytes) to a user-chosen absolute path (UI \"save original\"). Irreversible: confirm=true required; alone."
+    },
+    "files_media_concat": {
+      "type": "object",
+      "description": "Apply runs the UI flow: media_concat_sources, then the free-canvas finish (the joined clip becomes a new node of projectId through the fc_upload_media service, staging released). The receipt result names projectId + nodeId (canvasNode, created).",
+      "required": [
+        "type",
+        "actionId",
+        "projectId",
+        "request"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "files.media.concat"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "projectId": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Free-canvas project that receives the joined clip as a new node"
+        },
+        "request": {
+          "type": "object",
+          "description": "IPC type MediaConcatSourcesRequest (same camelCase JSON the MediaConcat workbench sends to media_concat_sources; the upper source count is media-concat-limits.json maxItems, enforced by the shared validator as MEDIA_CONCAT_LIMIT)",
+          "required": [
+            "kind",
+            "sourceRelativePaths"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "video",
+                "audio"
+              ]
+            },
+            "sourceRelativePaths": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "files_backup_story": {
+      "type": "object",
+      "required": [
+        "type",
+        "actionId",
+        "storyId",
+        "outputParentDir",
+        "options"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "files.backup.story"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "storyId": {
+          "type": "string"
+        },
+        "outputParentDir": {
+          "type": "string"
+        },
+        "options": {
+          "type": "object",
+          "description": "IPC type StoryBackupOptions (same camelCase JSON the UI command receives)"
+        }
+      }
+    },
+    "files_restore_story": {
+      "type": "object",
+      "required": [
+        "type",
+        "actionId",
+        "packagePath",
+        "strategy"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "files.restore.story"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "packagePath": {
+          "type": "string"
+        },
+        "strategy": {
+          "type": "string",
+          "enum": [
+            "skipExisting",
+            "overwriteExisting",
+            "duplicateWithNewId"
+          ],
+          "description": "IPC type StoryBackupImportStrategy (same camelCase JSON the UI command receives)"
+        },
+        "confirm": {
+          "type": "boolean"
+        }
+      },
+      "description": "Irreversible: confirm=true required; alone."
+    },
+    "files_package_export": {
+      "type": "object",
+      "required": [
+        "type",
+        "actionId",
+        "options",
+        "outputDir"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "files.package.export"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "options": {
+          "type": "object",
+          "description": "IPC type ExportOptions (same camelCase JSON the UI command receives)"
+        },
+        "outputDir": {
+          "type": "string"
+        }
+      }
+    },
+    "files_package_import": {
+      "type": "object",
+      "required": [
+        "type",
+        "actionId",
+        "packagePath",
+        "strategy"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "files.package.import"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "packagePath": {
+          "type": "string"
+        },
+        "strategy": {
+          "type": "string",
+          "enum": [
+            "skipExisting",
+            "overwriteExisting",
+            "merge",
+            "duplicateWithNewId"
+          ],
+          "description": "IPC type ImportStrategy (same camelCase JSON the UI command receives)"
+        },
+        "confirm": {
+          "type": "boolean"
+        }
+      },
+      "description": "Irreversible: confirm=true required; alone."
+    },
+    "files_screenplay_export": {
+      "type": "object",
+      "required": [
+        "type",
+        "actionId",
+        "req"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "files.screenplay.export"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "req": {
+          "type": "object",
+          "description": "IPC type ExportScreenplayRequest (same camelCase JSON the UI command receives)"
+        }
+      }
+    },
+    "files_screenplay_import": {
+      "type": "object",
+      "required": [
+        "type",
+        "actionId",
+        "req"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "files.screenplay.import"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "req": {
+          "type": "object",
+          "description": "Shared screenplay import request. Use sourceSha256/packageDigest from files.screenplay.preview. A changed source is refused. Optional clipGraph creates the supplied nodes and reference edges together with the script.",
+          "required": [
+            "targetMode",
+            "sourceText",
+            "sourceSha256",
+            "packageDigest",
+            "importId"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "targetMode": {
+              "type": "string",
+              "enum": [
+                "new",
+                "append"
+              ]
+            },
+            "storyId": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "sourceText": {
+              "type": "string"
+            },
+            "sourceSha256": {
+              "type": "string"
+            },
+            "packageDigest": {
+              "type": "string"
+            },
+            "importId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sourceIsStoryDesc": {
+              "type": "boolean"
+            },
+            "roleBriefResolution": {
+              "type": [
+                "object",
+                "null"
+              ]
+            },
+            "clipGraph": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["nodes"],
+              "properties": {
+                "nodes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["localId", "kind", "chapterIndex"],
+                    "properties": {
+                      "localId": { "type": "string", "minLength": 1 },
+                      "kind": { "type": "string", "enum": ["text", "image", "audio", "video", "group"] },
+                      "title": { "type": "string" },
+                      "promptText": { "type": "string" },
+                      "chapterIndex": { "type": "integer", "minimum": 0, "description": "Zero-based index into the chapters in this import. Required for every clip node kind." },
+                      "x": { "type": "number" },
+                      "y": { "type": "number" }
+                    }
+                  }
+                },
+                "references": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["sourceLocalId", "targetLocalId"],
+                    "properties": {
+                      "sourceLocalId": { "type": "string", "minLength": 1 },
+                      "targetLocalId": { "type": "string", "minLength": 1 }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "confirm": {
+          "type": "boolean"
+        }
+      },
+      "description": "D: explicit standalone screenplay package import in one IMMEDIATE transaction (new story or append chapters); no generation."
+    },
+    "files_appDataRoot_migrate": {
+      "type": "object",
+      "required": [
+        "type",
+        "actionId",
+        "newRoot"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "files.appDataRoot.migrate"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "newRoot": {
+          "type": "string"
+        },
+        "confirm": {
+          "type": "boolean"
+        }
+      },
+      "description": "Irreversible: confirm=true required; alone."
+    },
+    "files_fcTemplate_export": {
+      "type": "object",
+      "required": [
+        "type",
+        "actionId",
+        "projectId",
+        "outputParentDir"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "files.fcTemplate.export"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "projectId": {
+          "type": "string"
+        },
+        "outputParentDir": {
+          "type": "string"
+        }
+      }
+    },
+    "files_fcTemplate_import": {
+      "type": "object",
+      "required": [
+        "type",
+        "actionId",
+        "packagePath"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "files.fcTemplate.import"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "packagePath": {
+          "type": "string"
+        },
+        "titleOverride": {
+          "type": "string"
+        }
+      }
+    },
+    "files_fcMedia_export": {
+      "type": "object",
+      "required": [
+        "type",
+        "actionId",
+        "projectId",
+        "exportRoot",
+        "kinds",
+        "includeHistory"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "files.fcMedia.export"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "projectId": {
+          "type": "string"
+        },
+        "exportRoot": {
+          "type": "string"
+        },
+        "kinds": {
+          "type": "object",
+          "description": "IPC type FcMediaExportKinds (same camelCase JSON the UI command receives)"
+        },
+        "includeHistory": {
+          "type": "boolean"
+        }
+      }
+    },
+    "runtime_sidecar_control": {
+      "type": "object",
+      "required": [
+        "type",
+        "actionId",
+        "control"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "runtime.sidecar.control"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "control": {
+          "type": "object",
+          "required": [
+            "engine",
+            "op"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "engine": {
+              "description": "Same closed set as x-runtimeEngines. comfyui starts or stops the existing process manager only; it does not submit a workflow.",
+              "enum": [
+                "tts",
+                "music",
+                "sfx",
+                "clearvoice",
+                "singing",
+                "comfyui"
+              ]
+            },
+            "op": {
+              "enum": [
+                "start",
+                "stop"
+              ]
+            },
+            "engineType": {
+              "description": "Local TTS engine type when engine is tts. Omit the key for comfyui, music, sfx, and clearvoice.",
+              "$ref": "#/definitions/local_tts_engine_type"
+            }
+          }
+        }
+      }
+    },
+    "fc_extract_videoAudio": {
+      "type": "object",
+      "required": [
+        "type",
+        "actionId",
+        "req"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "fc.extract.videoAudio"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "req": {
+          "type": "object",
+          "description": "IPC type FcIngestVideoAsAudioRequest (same camelCase JSON the UI command receives)"
+        }
+      }
+    },
+    "fc_text_segmentNodes": {
+      "type": "object",
+      "required": [
+        "type",
+        "actionId",
+        "req"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "fc.text.segmentNodes"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "req": {
+          "type": "object",
+          "description": "IPC type FcSegmentTextRequest (same camelCase JSON the UI command receives)"
+        }
+      }
+    },
+    "fc_concat_planTextVideoClips": {
+      "type": "object",
+      "required": [
+        "type",
+        "actionId",
+        "req"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "fc.concat.planTextVideoClips"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "req": {
+          "type": "object",
+          "description": "IPC type FcTextVideoClipsRequest (same camelCase JSON the UI command receives)"
+        }
+      }
+    },
+    "fc_extract_mediaText": {
+      "type": "object",
+      "required": [
+        "req"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "req": {
+          "type": "object",
+          "description": "IPC type FcExtractMediaTextRequest (same camelCase JSON the UI command receives)"
+        }
+      },
+      "description": "generation.submit input (kind=fc.extract.mediaText); Cost Gate grant required."
+    },
+    "story_role_portrait_generate": {
+      "type": "object",
+      "required": [
+        "storyId",
+        "actorNodeId",
+        "extra",
+        "keyInfo",
+        "imagePrompt",
+        "imageProvider"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "storyId": {
+          "type": "string"
+        },
+        "actorNodeId": {
+          "type": "string"
+        },
+        "extra": {
+          "type": "object",
+          "description": "IPC type ImageGenerateExtraV1 (same camelCase JSON the UI command receives)"
+        },
+        "keyInfo": {
+          "type": "string"
+        },
+        "imagePrompt": {
+          "type": "string"
+        },
+        "imageProvider": {
+          "type": "string"
+        },
+        "imageServiceOverride": {
+          "type": "object",
+          "description": "IPC type AiServiceOverride (same camelCase JSON the UI command receives)"
+        },
+        "textServiceOverride": {
+          "type": "object",
+          "description": "IPC type AiServiceOverride (same camelCase JSON the UI command receives)"
+        }
+      },
+      "description": "generation.submit input (kind=story.role.portrait.generate); Cost Gate grant required."
+    },
+    "story_role_extractFromChapters": {
+      "type": "object",
+      "required": [
+        "storyId"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "storyId": {
+          "type": "string"
+        },
+        "storyName": {
+          "type": "string"
+        },
+        "serviceOverride": {
+          "type": "object",
+          "description": "IPC type AiServiceOverride (same camelCase JSON the UI command receives)"
+        }
+      },
+      "description": "generation.submit input (kind=story.role.extractFromChapters); Cost Gate grant required."
+    },
+    "story_visualAsset_conceptImage_generate": {
+      "type": "object",
+      "required": [
+        "sceneAssetId",
+        "contextWeight",
+        "extra",
+        "imageProvider"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sceneAssetId": {
+          "type": "string"
+        },
+        "contextChapterNodeId": {
+          "type": "string"
+        },
+        "contextWeight": {
+          "type": "number"
+        },
+        "extra": {
+          "type": "object",
+          "description": "IPC type ImageGenerateExtraV1 (same camelCase JSON the UI command receives)"
+        },
+        "chapterLogline": {
+          "type": "string"
+        },
+        "imageProvider": {
+          "type": "string"
+        },
+        "imageModel": {
+          "type": "string"
+        },
+        "imageServiceOverride": {
+          "type": "object",
+          "description": "IPC type AiServiceOverride (same camelCase JSON the UI command receives)"
+        },
+        "i2iImageProvider": {
+          "type": "string"
+        },
+        "i2iImageModel": {
+          "type": "string"
+        },
+        "i2iImageServiceOverride": {
+          "type": "object",
+          "description": "IPC type AiServiceOverride (same camelCase JSON the UI command receives)"
+        },
+        "textServiceOverride": {
+          "type": "object",
+          "description": "IPC type AiServiceOverride (same camelCase JSON the UI command receives)"
+        },
+        "editDirective": {
+          "type": "string"
+        },
+        "refineSource": {
+          "type": "object",
+          "description": "IPC type RefineSourceV1 (same camelCase JSON the UI command receives)"
+        },
+        "editMaskId": {
+          "type": "string"
+        },
+        "photographyStyle": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "stableId",
+                "packageDigest"
+              ],
+              "properties": {
+                "stableId": {
+                  "type": "string"
+                },
+                "packageDigest": {
+                  "type": "string"
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "description": "generation.submit input (kind=story.visualAsset.conceptImage.generate); Cost Gate grant required."
+    },
+    "story_scene_conceptImage_generate": {
+      "type": "object",
+      "required": [
+        "nodeId",
+        "nodeKind",
+        "contextWeight",
+        "extra",
+        "imageProvider"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nodeId": {
+          "type": "string"
+        },
+        "nodeKind": {
+          "type": "string"
+        },
+        "contextChapterNodeId": {
+          "type": "string"
+        },
+        "contextWeight": {
+          "type": "number"
+        },
+        "extra": {
+          "type": "object",
+          "description": "IPC type ImageGenerateExtraV1 (same camelCase JSON the UI command receives)"
+        },
+        "chapterLogline": {
+          "type": "string"
+        },
+        "imageProvider": {
+          "type": "string"
+        },
+        "imageModel": {
+          "type": "string"
+        },
+        "imageServiceOverride": {
+          "type": "object",
+          "description": "IPC type AiServiceOverride (same camelCase JSON the UI command receives)"
+        },
+        "i2iImageProvider": {
+          "type": "string"
+        },
+        "i2iImageModel": {
+          "type": "string"
+        },
+        "i2iImageServiceOverride": {
+          "type": "object",
+          "description": "IPC type AiServiceOverride (same camelCase JSON the UI command receives)"
+        },
+        "textServiceOverride": {
+          "type": "object",
+          "description": "IPC type AiServiceOverride (same camelCase JSON the UI command receives)"
+        }
+      },
+      "description": "generation.submit input (kind=story.scene.conceptImage.generate); Cost Gate grant required."
+    },
+    "story_prop_extractFromChapters": {
+      "type": "object",
+      "required": [
+        "storyId"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "storyId": {
+          "type": "string"
+        },
+        "storyName": {
+          "type": "string"
+        },
+        "serviceOverride": {
+          "type": "object",
+          "description": "IPC type AiServiceOverride (same camelCase JSON the UI command receives)"
+        },
+        "maxCorpusCharsPerBatch": {
+          "type": "integer"
+        },
+        "unifyStoryPropNamesInTexts": {
+          "type": "boolean"
+        }
+      },
+      "description": "generation.submit input (kind=story.prop.extractFromChapters); Cost Gate grant required."
+    },
+    "story_shot_image_generate": {
+      "type": "object",
+      "required": [
+        "segmentNodeId",
+        "extra",
+        "imageProvider"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "segmentNodeId": {
+          "type": "string"
+        },
+        "imagePromptOverride": {
+          "type": "string"
+        },
+        "extra": {
+          "type": "object",
+          "description": "IPC type ImageGenerateExtraV1 (same camelCase JSON the UI command receives)"
+        },
+        "stylePresetId": {
+          "type": "string"
+        },
+        "imageProvider": {
+          "type": "string"
+        },
+        "imageModel": {
+          "type": "string"
+        },
+        "imageServiceOverride": {
+          "type": "object",
+          "description": "IPC type AiServiceOverride (same camelCase JSON the UI command receives)"
+        },
+        "i2iImageProvider": {
+          "type": "string"
+        },
+        "i2iImageModel": {
+          "type": "string"
+        },
+        "i2iImageServiceOverride": {
+          "type": "object",
+          "description": "IPC type AiServiceOverride (same camelCase JSON the UI command receives)"
+        },
+        "textServiceOverride": {
+          "type": "object",
+          "description": "IPC type AiServiceOverride (same camelCase JSON the UI command receives)"
+        },
+        "mergePolicyJson": {
+          "type": "string"
+        },
+        "imageSubmitChannel": {
+          "type": "string"
+        },
+        "generationSkillId": {
+          "type": "string"
+        },
+        "generationPolicyHash": {
+          "type": "string"
+        },
+        "skillRef": {
+          "type": "string",
+          "description": "Standard skill id (source:name). Not a tool grant."
+        },
+        "packageDigest": {
+          "type": "string",
+          "description": "Host package digest. The client does not compute it."
+        }
+      },
+      "description": "generation.submit input (kind=story.shot.image.generate); Cost Gate grant required."
+    },
+    "story_shot_prompt_optimize": {
+      "type": "object",
+      "required": [
+        "segmentNodeId",
+        "currentPrompt",
+        "aspectRatio",
+        "expectedStaticFramePromptFingerprint"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "segmentNodeId": {
+          "type": "string"
+        },
+        "storyId": {
+          "type": "string"
+        },
+        "chapterNodeId": {
+          "type": "string"
+        },
+        "sceneNodeId": {
+          "type": "string"
+        },
+        "currentPrompt": {
+          "type": "string"
+        },
+        "aspectRatio": {
+          "type": "string"
+        },
+        "serviceOverride": {
+          "type": "object",
+          "description": "IPC type AiServiceOverride (same camelCase JSON the UI command receives)"
+        },
+        "bindingMode": {
+          "type": "string",
+          "enum": [
+            "textToImage",
+            "referenceImage"
+          ],
+          "description": "Exact camelCase BatchOptimizeBindingMode used by the frontend command and Creator action."
+        },
+        "expectedStaticFramePromptFingerprint": {
+          "type": "string"
+        },
+        "optimizeSkillId": {
+          "type": "string"
+        },
+        "optimizeSkillDigest": {
+          "type": "string",
+          "description": "Installed package digest of the selected optimize Skill (same field the UI command receives); the shared static-frame kernel freezes it into the C/D method digest."
+        }
+      },
+      "description": "generation.submit input (kind=story.shot.prompt.optimize); Cost Gate grant required. Result/errors are the same canonical optimize result as the UI command (saved content + fingerprints + review summary), passed through unchanged."
+    },
+    "clips_generate_video": {
+      "type": "object",
+      "required": [
+        "args"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "args": {
+          "type": "object",
+          "description": "IPC type ClipsGenerateVideoArgs (same camelCase JSON the UI command receives)"
+        }
+      },
+      "description": "generation.submit input (kind=clips.generate.video); Cost Gate grant required."
+    },
+    "audio_voiceDesign_create": {
+      "type": "object",
+      "required": [
+        "input"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "input": {
+          "type": "object",
+          "description": "IPC type SubmitDashscopeVoiceDesignCreateInput (same camelCase JSON the UI command receives)"
+        }
+      },
+      "description": "generation.submit input (kind=audio.voiceDesign.create); Cost Gate grant required."
+    },
+    "content_run_pause": {
+      "type": "object",
+      "required": [
+        "type",
+        "actionId",
+        "req"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "content.run.pause"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "req": {
+          "type": "object",
+          "description": "IPC type CancelContentProductionRequest (same camelCase JSON the UI command receives)"
+        }
+      },
+      "description": "UI pause = cancel of a legacy content run (legacy runs are read-only and never resumed)."
+    },
+    "runtime_model_download": {
+      "type": "object",
+      "required": [
+        "type",
+        "actionId",
+        "runtimeKey"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "runtime.model.download"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "runtimeKey": {
+          "type": "string"
+        },
+        "intent": {
+          "type": "string"
+        }
+      }
+    },
+    "runtime_model_install": {
+      "type": "object",
+      "required": [
+        "type",
+        "actionId",
+        "request"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "runtime.model.install"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "request": {
+          "type": "object",
+          "description": "IPC type InstallRequest (same camelCase JSON the UI command receives)"
+        }
+      }
+    },
+    "music_generate": {
+      "type": "object",
+      "required": [
+        "type",
+        "actionId",
+        "request"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "music.generate"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "request": {
+          "type": "object",
+          "required": [
+            "mode"
+          ],
+          "description": "MusicGenerationRequestV1 (camelCase, same payload as the music workbench music_generate IPC)",
+          "properties": {
+            "mode": {
+              "enum": [
+                "generate",
+                "cover",
+                "repaint",
+                "extract",
+                "lego",
+                "complete"
+              ]
+            },
+            "prompt": {
+              "type": "string"
+            },
+            "lyrics": {
+              "type": "string"
+            },
+            "durationSec": {
+              "type": "number"
+            },
+            "providerKind": {
+              "type": "string"
+            },
+            "engineType": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "description": "Local music sidecar; requires the Music GPU slot held by the UI (same gate as the button)."
+    },
+    "sfx_generate": {
+      "type": "object",
+      "required": [
+        "type",
+        "actionId",
+        "request"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "sfx.generate"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "request": {
+          "type": "object",
+          "required": [
+            "mode",
+            "prompt"
+          ],
+          "description": "SfxGenerationRequestV1 (camelCase, same payload as the SFX workbench sfx_generate IPC)",
+          "properties": {
+            "mode": {
+              "enum": [
+                "text2sfx",
+                "video2sfx"
+              ]
+            },
+            "prompt": {
+              "type": "string"
+            },
+            "durationSec": {
+              "type": "number"
+            },
+            "srcVideoRelPath": {
+              "type": "string"
+            },
+            "providerKind": {
+              "type": "string",
+              "description": "local providers only; Kling/vendor -> BILLING_CLASS_MISMATCH"
+            },
+            "engineType": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "description": "Local SFX sidecar; requires the SFX GPU slot held by the UI."
+    },
+    "story_role_portraitPrompt_generate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "actionId",
+        "args"
+      ],
+      "properties": {
+        "type": {
+          "const": "story.role.portraitPrompt.generate"
+        },
+        "actionId": {
+          "type": "string"
+        },
+        "args": {
+          "$ref": "creator-role-portrait-prompt.schema.json#/definitions/generateArgs"
+        }
+      }
+    },
+    "story_role_portraitPrompt_batch_start": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "actionId",
+        "args"
+      ],
+      "properties": {
+        "type": {
+          "const": "story.role.portraitPrompt.batch.start"
+        },
+        "actionId": {
+          "type": "string"
+        },
+        "args": {
+          "$ref": "creator-role-portrait-prompt.schema.json#/definitions/batchStartArgs"
+        }
+      }
+    },
+    "story_role_portraitPrompt_batch_run": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "actionId",
+        "args"
+      ],
+      "properties": {
+        "type": {
+          "const": "story.role.portraitPrompt.batch.run"
+        },
+        "actionId": {
+          "type": "string"
+        },
+        "args": {
+          "$ref": "creator-role-portrait-prompt.schema.json#/definitions/batchRunArgs"
+        }
+      }
+    },
+    "story_prop_visualPrompt_batch_start": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "actionId",
+        "args"
+      ],
+      "properties": {
+        "type": {
+          "const": "story.prop.visualPrompt.batch.start"
+        },
+        "actionId": {
+          "type": "string"
+        },
+        "args": {
+          "$ref": "creator-role-portrait-prompt.schema.json#/definitions/propBatchStartArgs"
+        }
+      }
+    },
+    "story_prop_visualPrompt_batch_run": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "actionId",
+        "args"
+      ],
+      "properties": {
+        "type": {
+          "const": "story.prop.visualPrompt.batch.run"
+        },
+        "actionId": {
+          "type": "string"
+        },
+        "args": {
+          "$ref": "creator-role-portrait-prompt.schema.json#/definitions/propBatchRunArgs"
+        }
+      }
+    }
+  }
+}

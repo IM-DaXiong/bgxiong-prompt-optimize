@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 2,
+  "countType": "u32",
+  "indexType": "u32",
+  "maxU32": 4294967295,
+  "spareSlots": 1,
+  "targets": {
+    "videoSpan": { "limit": { "kind": "unbounded" }, "semanticTarget": "videoSpan" },
+    "ordinary": { "limit": { "kind": "bounded", "maxPorts": 9 }, "semanticTarget": "ordinary" }
+  },
+  "geometry": {
+    "unit": "worldPx",
+    "distributionMode": "centerSpan",
+    "minimumGap": 16,
+    "topBottomMargin": 12,
+    "requiredMinHeightFormula": "2 * topBottomMargin + (visibleCount - 1) * minimumGap"
+  }
+}

@@ -1,0 +1,186 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-text-edit.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "sourceFactRef",
+    "replacementText",
+    "persistMode"
+  ],
+  "properties": {
+    "sourceFactRef": {
+      "type": "string",
+      "minLength": 1
+    },
+    "replacementText": {
+      "type": "string"
+    },
+    "persistMode": {
+      "enum": [
+        "persist",
+        "newVersion"
+      ]
+    }
+  },
+  "definitions": {
+    "outputData": {
+      "type": "object",
+      "required": [
+        "status",
+        "ref",
+        "fieldId",
+        "persistMode",
+        "revision",
+        "candidateFactRef",
+        "effect"
+      ],
+      "properties": {
+        "status": {
+          "const": "committed"
+        },
+        "ref": {
+          "$ref": "creator-resource-ref.schema.json"
+        },
+        "fieldId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "persistMode": {
+          "enum": [
+            "persist",
+            "newVersion"
+          ]
+        },
+        "revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "candidateFactRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "historyRef": {
+          "type": "string",
+          "pattern": "^hist:[1-9][0-9]*$"
+        },
+        "versionIndex": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "effect": {
+          "type": "object",
+          "required": [
+            "effectId"
+          ],
+          "properties": {
+            "effectId": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "persistMode": {
+                "const": "newVersion"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "historyRef",
+              "versionIndex"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "persistMode": {
+                "const": "persist"
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "historyRef"
+                  ]
+                },
+                {
+                  "required": [
+                    "versionIndex"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "conflictDetail": {
+      "type": "object",
+      "required": [
+        "candidateFactRef",
+        "sourceFactRef",
+        "ref",
+        "fieldId",
+        "expectedRevision",
+        "currentRevision"
+      ],
+      "properties": {
+        "candidateFactRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceFactRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ref": {
+          "$ref": "creator-resource-ref.schema.json"
+        },
+        "fieldId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "currentRevision": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "currentReadError": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "currentRevision": {
+                "type": "null"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "currentReadError"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

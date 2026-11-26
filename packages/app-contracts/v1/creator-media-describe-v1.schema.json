@@ -1,0 +1,523 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-media-describe-v1.schema.json",
+  "title": "CreatorMediaDescribeV1Definitions",
+  "description": "S13: media.describe request/result contract. Cap = creator-control-plane.json#mediaDescribeMaxRefs (12). Structured results never embed base64/original pixels — MCP image content is a separate preview channel. Batching by model max_images is an implementation detail of S35; this contract only names the logical call and per-item outcomes. Input = #/definitions/describeInput; Output = #/definitions/describeOutput.",
+  "definitions": {
+    "nonBlank": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "pattern": "\\S"
+    },
+    "purpose": {
+      "enum": [
+        "understandForEdit",
+        "understandForReview",
+        "captionForUser",
+        "verifyVisualContract"
+      ],
+      "description": "Why the host is reading pixels. Does not change the output schema."
+    },
+    "language": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 16,
+      "description": "BCP-47-ish tag for description language (e.g. zh-CN, en)."
+    },
+    "itemStatus": {
+      "enum": [
+        "ok",
+        "failed",
+        "skipped"
+      ],
+      "description": "Per-ref outcome. failed is structural (not image / missing / over budget / model item error); skipped is host policy."
+    },
+    "visualVerification": {
+      "enum": [
+        "verified",
+        "unverified",
+        "unavailable",
+        "notApplicable"
+      ],
+      "description": "Same closed set as creative-context-pack visualStatus. Distinct from itemStatus."
+    },
+    "modelBindingSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "providerKind",
+        "modelId"
+      ],
+      "properties": {
+        "providerKind": {
+          "$ref": "#/definitions/nonBlank"
+        },
+        "modelId": {
+          "$ref": "#/definitions/nonBlank"
+        },
+        "bindingId": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/nonBlank"
+            }
+          ]
+        },
+        "maxImagesPerBatch": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12
+        }
+      }
+    },
+    "describeInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "refs",
+        "purpose",
+        "language"
+      ],
+      "properties": {
+        "refs": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 12,
+          "items": {
+            "$ref": "creator-resource-ref.schema.json"
+          },
+          "description": "Logical call size 1..=mediaDescribeMaxRefs. Over-cap must fail before network."
+        },
+        "purpose": {
+          "$ref": "#/definitions/purpose"
+        },
+        "language": {
+          "$ref": "#/definitions/language"
+        },
+        "expectedModelBindingId": {
+          "$ref": "#/definitions/nonBlank",
+          "description": "F1 freezes the text/vision binding for the turn. Omit the key to use defaults.text only."
+        },
+        "promptInference": {
+          "$ref": "#/definitions/promptInference"
+        },
+        "frameSelections": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "refIndex",
+              "imageId"
+            ],
+            "properties": {
+              "refIndex": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "imageId": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "description": "Exact image within refs[refIndex] mediaVersion; missing/deleted image fails, never first/default fallback."
+        },
+        "videoFrameSamples": {
+          "type": "array",
+          "description": "P4: timestamped/range video frame sampling for Agent media.describe. Sampled frames never claim native full-clip understanding; unread timestamps require continue.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "refIndex"
+            ],
+            "properties": {
+              "refIndex": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "timestampsSec": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "range": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "startSec",
+                  "endSec",
+                  "intervalSec"
+                ],
+                "properties": {
+                  "startSec": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "endSec": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "intervalSec": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                }
+              },
+              "continueAfterSec": {
+                "type": "number",
+                "minimum": 0
+              },
+              "maxFrames": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 12
+              }
+            }
+          }
+        }
+      }
+    },
+    "describeItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "itemId",
+        "ref",
+        "status",
+        "visualVerification"
+      ],
+      "properties": {
+        "itemId": {
+          "$ref": "#/definitions/nonBlank"
+        },
+        "ref": {
+          "$ref": "creator-resource-ref.schema.json"
+        },
+        "status": {
+          "$ref": "#/definitions/itemStatus"
+        },
+        "visualVerification": {
+          "$ref": "#/definitions/visualVerification"
+        },
+        "description": {
+          "type": "string",
+          "description": "Present only when status=ok. Plain text; never base64."
+        },
+        "errorCode": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/nonBlank"
+            }
+          ],
+          "description": "Stable code when status=failed (e.g. MEDIA_DESCRIBE_ITEM_NOT_IMAGE)."
+        },
+        "errorMessage": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "sourceHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "RC66: sha256 of the original bytes the Host materialized for this item (binds the description to that exact image version). Required when status=ok; absent when skipped or never materialized."
+        },
+        "mediaVersion": {
+          "$ref": "#/definitions/nonBlank",
+          "description": "RC66: version id of the materialized media when its owner keeps versions; absent for an unversioned current file or an item never materialized."
+        },
+        "inference": {
+          "$ref": "#/definitions/inferenceEvidence"
+        },
+        "videoSample": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "sampledTimestampsSec",
+            "unreadTimestampsSec",
+            "claimsNativeUnderstanding",
+            "continueRequired"
+          ],
+          "properties": {
+            "sampledTimestampsSec": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            },
+            "unreadTimestampsSec": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            },
+            "claimsNativeUnderstanding": {
+              "type": "boolean"
+            },
+            "continueRequired": {
+              "type": "boolean"
+            },
+            "sourceDurationSec": {
+              "type": "number"
+            },
+            "sampleAtSec": {
+              "type": "number"
+            }
+          },
+          "description": "P4: evidence that this item is a sampled video frame, not native full-clip understanding."
+        }
+      }
+    },
+    "describeOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "callStatus",
+        "modelBinding",
+        "items",
+        "okCount",
+        "failedCount",
+        "skippedCount",
+        "visionCalls"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "callStatus": {
+          "enum": [
+            "ok",
+            "partial",
+            "failed"
+          ],
+          "description": "ok=all items ok; partial=mix; failed=model-level or all items failed / pre-network reject."
+        },
+        "modelBinding": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/modelBindingSummary"
+            }
+          ]
+        },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 12,
+          "items": {
+            "$ref": "#/definitions/describeItem"
+          }
+        },
+        "okCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failedCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "skippedCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "errorCode": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/nonBlank"
+            }
+          ]
+        },
+        "errorMessage": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "batchesPlanned": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12,
+          "description": "How many model max_images batches the host planned. Informational."
+        },
+        "visionCalls": {
+          "type": "array",
+          "maxItems": 12,
+          "items": {
+            "$ref": "#/definitions/visionCall"
+          },
+          "description": "RC66: one entry per vision batch call of this logical call; empty when no call was made (pre-network reject / no vision model)."
+        }
+      }
+    },
+    "visionCall": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "itemIds",
+        "model",
+        "usage",
+        "durationMs",
+        "schemaAccepted"
+      ],
+      "properties": {
+        "itemIds": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/nonBlank"
+          }
+        },
+        "model": {
+          "$ref": "#/definitions/nonBlank"
+        },
+        "usage": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "inputTokens",
+                "outputTokens"
+              ],
+              "properties": {
+                "inputTokens": {
+                  "oneOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "outputTokens": {
+                  "oneOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "description": "Vendor-reported usage of this call; null when the vendor reported none (never estimated)."
+        },
+        "durationMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "schemaAccepted": {
+          "type": "boolean",
+          "description": "The call returned a structured result the Host accepted (false = the call failed or its output was refused)."
+        }
+      }
+    },
+    "promptInference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "objective",
+        "fields"
+      ],
+      "properties": {
+        "objective": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "fieldId",
+              "hint"
+            ],
+            "properties": {
+              "fieldId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "hint": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "inferenceEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "fields"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "available",
+            "unavailable",
+            "partial"
+          ]
+        },
+        "diagnostic": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "fieldId",
+              "value"
+            ],
+            "properties": {
+              "fieldId": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              },
+              "certainty": {
+                "enum": [
+                  "observed",
+                  "estimated"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {},
+  "x-taskRecord": {
+    "prefix": "media_describe_",
+    "batchSeparator": "__",
+    "firstBatchIndex": 0,
+    "kindSchema": "creator-llm-chat.schema.json#x-aiTaskKind"
+  }
+}

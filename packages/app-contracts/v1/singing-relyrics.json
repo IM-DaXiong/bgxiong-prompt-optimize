@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 1,
+  "moduleId": "singing-relyrics",
+  "runtimeKey": "singing/yingmusic-plus",
+  "workbenchKind": "singingRelyrics",
+  "timeUnit": "ms",
+  "taskKinds": [
+    "singing_relyrics_alignment",
+    "singing_relyrics_preflight",
+    "singing_relyrics_synthesis",
+    "singing_relyrics_mix"
+  ],
+  "events": [
+    "singing-relyrics://plan-changed",
+    "singing-relyrics://execution-progress"
+  ],
+  "commandTypes": [
+    "targetCue.move",
+    "targetCue.resize",
+    "targetCue.setRange",
+    "targetCue.split",
+    "targetCue.setText",
+    "targetCue.merge",
+    "sourceRows.setRanges",
+    "alignment.applyCandidate",
+    "timeline.undo",
+    "timeline.redo",
+    "confirmAlignment"
+  ],
+  "errorCodes": [
+    "SINGING_RUNTIME_NOT_INSTALLED",
+    "SINGING_ENVIRONMENT_NOT_READY",
+    "SINGING_HEALTH_TIMEOUT",
+    "SINGING_HEALTH_REJECTED",
+    "SINGING_START_CANCELLED",
+    "SINGING_STOP_FAILED",
+    "SINGING_PORT_IN_USE",
+    "SINGING_MODEL_NOT_READY",
+    "SINGING_GPU_BUSY",
+    "SINGING_LYRICS_EMPTY",
+    "SINGING_LYRICS_BLANK_LINE",
+    "SINGING_LYRICS_ROW_COUNT_MISMATCH",
+    "SINGING_LYRICS_RESOURCE_CONFLICT",
+    "SINGING_VOICE_LYRICS_REQUIRED",
+    "SINGING_ALIGNMENT_REQUIRED",
+    "SINGING_ALIGNMENT_INCOMPLETE",
+    "SINGING_TIMELINE_INVALID",
+    "SINGING_PLAN_STALE",
+    "SINGING_ENGINE_CAPACITY_EXCEEDED",
+    "SINGING_PHRASE_OVERFLOW",
+    "SINGING_INFERENCE_FAILED",
+    "SINGING_INVALID_INPUT",
+    "SINGING_ASSET_FAILED",
+    "SINGING_STORAGE_FAILED",
+    "SINGING_OUTPUT_INVALID",
+    "SINGING_JOB_CONFLICT"
+  ],
+  "availabilityStates": [
+    "notInstalled",
+    "offlinePresent",
+    "environmentReady",
+    "modelReady",
+    "busy",
+    "unhealthy"
+  ],
+  "planStates": [
+    "alignmentRequired",
+    "alignmentDraft",
+    "ready",
+    "confirmed",
+    "stale"
+  ],
+  "executionStates": [
+    "queued",
+    "running",
+    "succeeded",
+    "partiallySucceeded",
+    "failed",
+    "cancelled"
+  ],
+  "analyzeModes": [
+    "visualOnly",
+    "full"
+  ],
+  "timbreModes": [
+    "source",
+    "external"
+  ],
+  "progressStages": [
+    "resolvingInputs",
+    "aligning",
+    "needsManualEdit",
+    "loadingModel",
+    "singing",
+    "assembling",
+    "finalizing"
+  ],
+  "tools": [
+    {
+      "id": "singing.relyrics.catalog.get",
+      "inputDefinition": "catalogGetInput",
+      "outputDefinition": "catalogGetResult"
+    },
+    {
+      "id": "singing.relyrics.plan.prepare",
+      "inputDefinition": "planPrepareInput",
+      "outputDefinition": "planPrepareResult"
+    },
+    {
+      "id": "singing.relyrics.plan.get",
+      "inputDefinition": "planGetInput",
+      "outputDefinition": "planGetResult"
+    },
+    {
+      "id": "singing.relyrics.plan.lookupBySource",
+      "inputDefinition": "planLookupBySourceInput",
+      "outputDefinition": "planLookupBySourceResult"
+    },
+    {
+      "id": "singing.relyrics.plan.revise",
+      "inputDefinition": "planReviseInput",
+      "outputDefinition": "planReviseResult"
+    },
+    {
+      "id": "singing.relyrics.alignment.start",
+      "inputDefinition": "alignmentStartInput",
+      "outputDefinition": "alignmentStartResult"
+    },
+    {
+      "id": "singing.relyrics.preflight.run",
+      "inputDefinition": "preflightRunInput",
+      "outputDefinition": "preflightRunResult"
+    },
+    {
+      "id": "singing.relyrics.execution.start",
+      "inputDefinition": "executionStartInput",
+      "outputDefinition": "executionStartResult"
+    },
+    {
+      "id": "singing.relyrics.execution.get",
+      "inputDefinition": "executionGetInput",
+      "outputDefinition": "executionGetResult"
+    },
+    {
+      "id": "singing.relyrics.source.separate",
+      "inputDefinition": "sourceSeparateInput",
+      "outputDefinition": "sourceSeparateResult"
+    },
+    {
+      "id": "singing.relyrics.mix.start",
+      "inputDefinition": "mixStartInput",
+      "outputDefinition": "mixStartResult"
+    }
+  ]
+}

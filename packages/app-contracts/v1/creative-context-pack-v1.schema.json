@@ -1,0 +1,202 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creative-context-pack-v1.schema.json",
+  "title": "CreativeContextPackV1",
+  "description": "S11: one-shot creative context pack for F1/MCP. Assembled by the host from the creation target (S09) and existing read ports (S64). Large sections are ref+cursor pages so user body text is never truncated. Missing required fields and unverified visual evidence are named separately (never collapsed into one 'unknown'). Page budgets come from creator-control-plane.json#creativeContextPack (must equal maxPageBytes). packKind sceneReplan is the scene-scoped freeze (source units, derived scripts, neighbors, old hosts). It does not replace summary.",
+  "definitions": {
+    "nonBlank": { "type": "string", "minLength": 1, "maxLength": 512, "pattern": "\\S" },
+    "cursor": { "type": ["string", "null"], "description": "Opaque page cursor; null = no more pages. Sort order = creator-control-plane.json#cursorSort." },
+    "pageMeta": {
+      "type": "object", "additionalProperties": false,
+      "required": ["nextCursor", "hasMore", "pageBytes", "maxPageBytes"],
+      "properties": {
+        "nextCursor": { "$ref": "#/definitions/cursor" },
+        "hasMore": { "type": "boolean" },
+        "pageBytes": { "type": "integer", "minimum": 0 },
+        "maxPageBytes": { "type": "integer", "minimum": 1, "description": "Must equal creator-control-plane.json maxPageBytes / creativeContextPack.maxPackBytes." }
+      }
+    },
+    "presence": {
+      "description": "Field presence. 'missing' = host has no value; 'present' = value is in this pack; 'truncated' = value exists but lives on another page/ref (never truncated here).",
+      "enum": ["missing", "present", "truncated"]
+    },
+    "visualStatus": {
+      "description": "Visual verification of a media/role asset. Distinct from presence: a present visualAsset can still be unverified.",
+      "enum": ["verified", "unverified", "unavailable", "notApplicable"]
+    },
+    "textField": {
+      "type": "object", "additionalProperties": false,
+      "required": ["presence"],
+      "properties": {
+        "presence": { "$ref": "#/definitions/presence" },
+        "value": { "type": "string", "description": "Full text when presence=present. Never truncated; if too long for pageBytes the host must set presence=truncated and put the body behind a section page." },
+        "fieldId": { "$ref": "#/definitions/nonBlank" },
+        "draftRevision": { "type": ["string", "null"] },
+        "resourceRevision": { "type": ["string", "null"] }
+      }
+    },
+    "unitRef": {
+      "type": "object", "additionalProperties": false,
+      "required": ["ref", "role"],
+      "properties": {
+        "ref": { "$ref": "creator-resource-ref.schema.json" },
+        "role": { "enum": ["source", "previous", "next", "selected", "related"] },
+        "label": { "type": "string" }
+      }
+    },
+    "roleVisual": {
+      "type": "object", "additionalProperties": false,
+      "required": ["roleRef", "presence", "visualStatus"],
+      "properties": {
+        "roleRef": { "$ref": "creator-resource-ref.schema.json" },
+        "presence": { "$ref": "#/definitions/presence" },
+        "visualStatus": { "$ref": "#/definitions/visualStatus" },
+        "contractRevision": { "type": ["string", "null"] },
+        "padRef": { "oneOf": [{ "type": "null" }, { "$ref": "creator-resource-ref.schema.json" }] },
+        "notes": { "type": "string" }
+      }
+    },
+    "mediaItem": {
+      "type": "object", "additionalProperties": false,
+      "required": ["ref", "presence", "visualStatus"],
+      "properties": {
+        "ref": { "$ref": "creator-resource-ref.schema.json" },
+        "presence": { "$ref": "#/definitions/presence" },
+        "visualStatus": { "$ref": "#/definitions/visualStatus" },
+        "mimeHint": { "type": ["string", "null"] },
+        "versionId": { "type": ["string", "null"] }
+      }
+    },
+    "historyItem": {
+      "type": "object", "additionalProperties": false,
+      "required": ["revision", "source", "createdAtMs"],
+      "properties": {
+        "revision": { "$ref": "#/definitions/nonBlank" },
+        "source": { "enum": ["manual", "ai", "import", "writeback", "system"] },
+        "createdAtMs": { "type": "integer", "minimum": 0 },
+        "title": { "type": "string" },
+        "changeContext": { "type": "string" }
+      }
+    },
+    "skillBinding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["skillId", "scope"],
+      "properties": {
+        "skillId": { "$ref": "#/definitions/nonBlank" },
+        "scope": { "type": "object", "additionalProperties": true },
+        "activationId": { "type": ["string", "null"] }
+      }
+    },
+    "sectionPage": {
+      "description": "One page of a large section. Body text is never truncated: if the next character would exceed maxPageBytes the host stops and sets hasMore.",
+      "type": "object", "additionalProperties": false,
+      "required": ["section", "page", "items"],
+      "properties": {
+        "section": { "enum": ["draft", "canonical", "units", "roleVisuals", "media", "history", "skills", "params"] },
+        "page": { "$ref": "#/definitions/pageMeta" },
+        "items": { "type": "array" },
+        "text": { "type": "string", "description": "Full contiguous slice of a text field when section is draft/canonical; never a mid-grapheme cut." }
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "title": "CreativeContextPackV1.summary",
+      "type": "object", "additionalProperties": false,
+      "required": ["schemaVersion", "packKind", "target", "draft", "canonical", "sourceUnits", "adjacentUnits", "roleVisuals", "media", "caps", "params", "skills", "history", "versions", "missingFields", "unverifiedVisuals", "page"],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "packKind": { "const": "summary" },
+        "target": {
+          "description": "S09 creationTarget (or explicit read target). Must not invent from navigation alone.",
+          "type": "object", "additionalProperties": false,
+          "required": ["ref"],
+          "properties": {
+            "ref": { "$ref": "creator-resource-ref.schema.json" },
+            "ownerWindowLabel": { "type": ["string", "null"] },
+            "workbenchKind": { "oneOf": [{ "type": "null" }, { "$ref": "creator-editable-surface.schema.json#/definitions/workbenchKind" }] },
+            "draftRevision": { "type": ["string", "null"] },
+            "resourceRevision": { "type": ["string", "null"] }
+          }
+        },
+        "draft": { "$ref": "#/definitions/textField" },
+        "canonical": { "$ref": "#/definitions/textField" },
+        "sourceUnits": { "type": "array", "items": { "$ref": "#/definitions/unitRef" } },
+        "adjacentUnits": { "type": "array", "items": { "$ref": "#/definitions/unitRef" } },
+        "roleVisuals": { "type": "array", "items": { "$ref": "#/definitions/roleVisual" } },
+        "media": { "type": "array", "items": { "$ref": "#/definitions/mediaItem" } },
+        "caps": {
+          "type": "object", "additionalProperties": false,
+          "required": ["fieldCaps"],
+          "properties": {
+            "fieldCaps": { "type": "object", "additionalProperties": { "$ref": "creator-workbench-patch-v1.schema.json#/definitions/fieldCap" } },
+            "notes": { "type": "string" }
+          }
+        },
+        "params": {
+          "description": "Closed-set workbench params when the target sits in a patchable workbench; otherwise empty object.",
+          "oneOf": [
+            { "type": "object", "maxProperties": 0, "additionalProperties": false },
+            { "$ref": "creator-workbench-patch-v1.schema.json#/definitions/patch" }
+          ]
+        },
+        "skills": { "type": "array", "items": { "$ref": "#/definitions/skillBinding" } },
+        "history": { "type": "array", "items": { "$ref": "#/definitions/historyItem" } },
+        "versions": {
+          "type": "object", "additionalProperties": false,
+          "properties": {
+            "draftRevision": { "type": ["string", "null"] },
+            "resourceRevision": { "type": ["string", "null"] },
+            "contextSnapshotRevision": { "type": ["string", "null"] }
+          }
+        },
+        "missingFields": {
+          "description": "Required fields the host looked for and did not find. Distinct from unverifiedVisuals.",
+          "type": "array", "items": { "$ref": "#/definitions/nonBlank" }, "uniqueItems": true
+        },
+        "unverifiedVisuals": {
+          "description": "Media/role visuals present in the pack whose visualStatus is unverified or unavailable. Never collapsed into missingFields.",
+          "type": "array", "items": { "$ref": "#/definitions/nonBlank" }, "uniqueItems": true
+        },
+        "page": { "$ref": "#/definitions/pageMeta" }
+      }
+    },
+    {
+      "title": "CreativeContextPackV1.sectionPage",
+      "type": "object", "additionalProperties": false,
+      "required": ["schemaVersion", "packKind", "targetRef", "sectionPage"],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "packKind": { "const": "sectionPage" },
+        "targetRef": { "$ref": "creator-resource-ref.schema.json" },
+        "sectionPage": { "$ref": "#/definitions/sectionPage" }
+      }
+    },
+    {
+      "title": "CreativeContextPackV1.sceneReplan",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "packKind", "target", "snapshotId", "contextFingerprint", "sourceStatus", "sourceMode", "derived", "sceneScript", "chapterScript", "page", "sourcePageText"],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "packKind": { "const": "sceneReplan" },
+        "target": { "$ref": "creator-resource-ref.schema.json" },
+        "snapshotId": { "$ref": "#/definitions/nonBlank" },
+        "contextFingerprint": { "$ref": "#/definitions/nonBlank" },
+        "sourceStatus": { "enum": ["linked", "missingLink"] },
+        "sourceMode": { "enum": ["novel", "sceneScript", "none"] },
+        "derived": { "type": "boolean" },
+        "sourceVersionId": { "type": ["string", "null"] },
+        "sourceDigest": { "type": ["string", "null"] },
+        "sceneScript": { "type": "string" },
+        "chapterScript": { "type": "string" },
+        "previousSceneId": { "type": ["string", "null"] },
+        "nextSceneId": { "type": ["string", "null"] },
+        "roleContractRevision": { "type": ["string", "null"] },
+        "oldHostIds": { "type": "array", "items": { "$ref": "#/definitions/nonBlank" } },
+        "page": { "$ref": "#/definitions/pageMeta" },
+        "sourcePageText": { "type": "string", "description": "One UTF-8 page of the frozen source body. Concatenating every page equals the body. Never a shortened stand-in for the whole text." }
+      }
+    }
+  ]
+}

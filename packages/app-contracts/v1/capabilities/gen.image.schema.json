@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["prompt", "provider"],
+  "properties": {
+    "prompt": { "type": "string", "minLength": 1 },
+    "provider": { "type": "string", "minLength": 1 },
+    "modelId": { "type": "string" },
+    "size": { "type": "string" },
+    "sdkImage": {
+      "type": "object",
+      "required": ["sourceMode", "selection", "input"],
+      "properties": {
+        "sourceMode": { "const": "installed" },
+        "selection": {
+          "type": "object",
+          "required": ["pluginId", "version", "modelId", "capabilityKey", "operationId", "operationVersion", "inputSchemaDigest"],
+          "properties": {
+            "pluginId": { "type": "string" },
+            "version": { "type": "string" },
+            "modelId": { "type": "string" },
+            "capabilityKey": { "const": "image.generate" },
+            "operationId": { "type": "string" },
+            "operationVersion": { "type": "integer" },
+            "inputSchemaDigest": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "input": { "type": "object" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "if": { "required": ["sdkImage"] },
+  "then": {
+    "required": ["modelId"],
+    "properties": { "provider": { "const": "image_vendor_adapter" } },
+    "not": { "required": ["size"] }
+  },
+  "additionalProperties": false
+}

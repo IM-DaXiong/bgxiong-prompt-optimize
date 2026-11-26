@@ -1,0 +1,1527 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-runtime-intake-tools.schema.json",
+  "title": "CreatorRuntimeIntakeToolsV1",
+  "description": "RI005. The 12 public runtime-intake tools; closed inputs/outputs; callContext is the single outer envelope.",
+  "schemaVersion": 1,
+  "definitions": {
+    "receiptStatus": {
+      "enum": [
+        "received",
+        "accepted",
+        "ready",
+        "rejected",
+        "needsExternalAction"
+      ]
+    },
+    "progress": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "phase",
+        "checkedFiles",
+        "totalFiles"
+      ],
+      "properties": {
+        "phase": {
+          "enum": [
+            "queued",
+            "hashing",
+            "checking",
+            "done"
+          ]
+        },
+        "checkedFiles": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "totalFiles": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "nullableNonEmptyString": {
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "callContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [],
+      "properties": {
+        "requestRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "hostIdempotencyKey": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "description": "Shared outer call context; omit every unbound key and never send JSON null. Never duplicated inside business input."
+    },
+    "inspectOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "checkRef",
+        "receiptRef",
+        "status",
+        "progress",
+        "issues",
+        "nextAction"
+      ],
+      "properties": {
+        "checkRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "receiptRef": {
+          "$ref": "#/definitions/nullableNonEmptyString"
+        },
+        "status": {
+          "$ref": "#/definitions/receiptStatus"
+        },
+        "progress": {
+          "$ref": "#/definitions/progress"
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "runtime-intake-receipt.schema.json#/definitions/issue"
+          },
+          "minItems": 0
+        },
+        "nextAction": {
+          "$ref": "runtime-intake-receipt.schema.json#/definitions/nextAction"
+        }
+      }
+    },
+    "resubmitOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "checkRef",
+        "receiptRef",
+        "status",
+        "progress",
+        "issues",
+        "nextAction",
+        "reusedEvidenceRefs"
+      ],
+      "properties": {
+        "checkRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "receiptRef": {
+          "$ref": "#/definitions/nullableNonEmptyString"
+        },
+        "status": {
+          "$ref": "#/definitions/receiptStatus"
+        },
+        "progress": {
+          "$ref": "#/definitions/progress"
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "runtime-intake-receipt.schema.json#/definitions/issue"
+          },
+          "minItems": 0
+        },
+        "nextAction": {
+          "$ref": "runtime-intake-receipt.schema.json#/definitions/nextAction"
+        },
+        "reusedEvidenceRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        }
+      }
+    },
+    "requirementsListInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "moduleKinds"
+      ],
+      "properties": {
+        "purpose": {
+          "type": "string",
+          "minLength": 1
+        },
+        "moduleKinds": {
+          "type": "array",
+          "items": {
+            "$ref": "runtime-requirements.schema.json#/definitions/moduleKind"
+          },
+          "minItems": 0
+        },
+        "platform": {
+          "type": "string",
+          "minLength": 1
+        },
+        "cursor": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "requirementsListOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "bundleRef",
+        "revision",
+        "items",
+        "nextCursor",
+        "snapshotRef"
+      ],
+      "properties": {
+        "bundleRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "moduleRef",
+              "kind",
+              "displayName",
+              "optional",
+              "support"
+            ],
+            "properties": {
+              "moduleRef": {
+                "$ref": "runtime-requirements.schema.json#/definitions/id"
+              },
+              "kind": {
+                "$ref": "runtime-requirements.schema.json#/definitions/moduleKind"
+              },
+              "displayName": {
+                "type": "string",
+                "minLength": 1
+              },
+              "optional": {
+                "type": "boolean"
+              },
+              "support": {
+                "enum": [
+                  "supported",
+                  "unsupported",
+                  "unknown"
+                ]
+              }
+            }
+          },
+          "minItems": 0
+        },
+        "nextCursor": {
+          "$ref": "#/definitions/nullableNonEmptyString"
+        },
+        "snapshotRef": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "requirementsGetInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "bundleRef",
+        "expectedRevision",
+        "moduleRefs"
+      ],
+      "properties": {
+        "bundleRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "moduleRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "runtime-requirements.schema.json#/definitions/id"
+          },
+          "minItems": 1
+        },
+        "sectionCursor": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "requirementsGetOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirementSections",
+        "nextCursor",
+        "contentDigest",
+        "documentationRefs"
+      ],
+      "properties": {
+        "requirementSections": {
+          "type": "array",
+          "items": {
+            "$ref": "runtime-requirements.schema.json#/definitions/module"
+          },
+          "minItems": 0
+        },
+        "nextCursor": {
+          "$ref": "#/definitions/nullableNonEmptyString"
+        },
+        "contentDigest": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64
+        },
+        "documentationRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        }
+      }
+    },
+    "inventoryGetInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "moduleRefs",
+        "refresh"
+      ],
+      "properties": {
+        "moduleRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "runtime-requirements.schema.json#/definitions/id"
+          },
+          "minItems": 0
+        },
+        "instanceRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "refresh": {
+          "type": "boolean"
+        },
+        "cursor": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "inventoryGetOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "observations",
+        "missingRequirementRefs",
+        "optionalModuleRefs",
+        "evidenceRefs",
+        "nextCursor",
+        "observedAt",
+        "hostProfile",
+        "volumes",
+        "selectionState",
+        "requirementDrift",
+        "orphanCandidates"
+      ],
+      "properties": {
+        "observations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "moduleRef",
+              "state",
+              "evidenceRefs"
+            ],
+            "properties": {
+              "moduleRef": {
+                "$ref": "runtime-requirements.schema.json#/definitions/id"
+              },
+              "state": {
+                "enum": [
+                  "missing",
+                  "partial",
+                  "incompatible",
+                  "unbound",
+                  "stopped",
+                  "ready",
+                  "unknown",
+                  "optional"
+                ]
+              },
+              "evidenceRefs": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 0
+              }
+            }
+          },
+          "minItems": 0
+        },
+        "missingRequirementRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "optionalModuleRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "runtime-requirements.schema.json#/definitions/id"
+          },
+          "minItems": 0
+        },
+        "evidenceRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "nextCursor": {
+          "$ref": "#/definitions/nullableNonEmptyString"
+        },
+        "observedAt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "hostProfile": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "hardwareEvidenceRef",
+            "gpuProbeFailed"
+          ],
+          "properties": {
+            "hardwareEvidenceRef": {
+              "type": "string",
+              "minLength": 1
+            },
+            "gpuProbeFailed": {
+              "type": "boolean"
+            }
+          }
+        },
+        "volumes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "volumeId",
+              "freeBytes",
+              "totalBytes",
+              "fit"
+            ],
+            "properties": {
+              "volumeId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "freeBytes": {
+                "$ref": "runtime-requirements.schema.json#/definitions/need"
+              },
+              "totalBytes": {
+                "$ref": "runtime-requirements.schema.json#/definitions/need"
+              },
+              "fit": {
+                "enum": [
+                  "recommended",
+                  "trial",
+                  "unsupported",
+                  "unknown"
+                ]
+              }
+            }
+          },
+          "minItems": 0
+        },
+        "selectionState": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "moduleRef",
+              "state"
+            ],
+            "properties": {
+              "moduleRef": {
+                "$ref": "runtime-requirements.schema.json#/definitions/id"
+              },
+              "state": {
+                "enum": [
+                  "selected",
+                  "declinedByUser",
+                  "notSelected"
+                ]
+              }
+            }
+          },
+          "minItems": 0
+        },
+        "requirementDrift": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "moduleRef",
+              "fromRevision",
+              "toRevision",
+              "changes"
+            ],
+            "properties": {
+              "moduleRef": {
+                "$ref": "runtime-requirements.schema.json#/definitions/id"
+              },
+              "fromRevision": {
+                "type": "string",
+                "minLength": 1
+              },
+              "toRevision": {
+                "type": "string",
+                "minLength": 1
+              },
+              "changes": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 1
+              }
+            }
+          },
+          "minItems": 0
+        },
+        "orphanCandidates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "bytes",
+              "ticketRef",
+              "lastActivityAt"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "ticketRef": {
+                "$ref": "#/definitions/nullableNonEmptyString"
+              },
+              "lastActivityAt": {
+                "$ref": "#/definitions/nullableNonEmptyString"
+              }
+            }
+          },
+          "minItems": 0
+        }
+      }
+    },
+    "targetsPrepareInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "bundleRef",
+        "expectedRevision",
+        "moduleRefs",
+        "intent",
+        "expectedInventoryRef",
+        "selection"
+      ],
+      "properties": {
+        "bundleRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "moduleRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "runtime-requirements.schema.json#/definitions/id"
+          },
+          "minItems": 1
+        },
+        "instanceRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "intent": {
+          "enum": [
+            "install",
+            "repair",
+            "upgrade"
+          ]
+        },
+        "expectedInventoryRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "selection": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "selectedModuleRefs",
+            "declinedModuleRefs",
+            "acquisitionChoices"
+          ],
+          "properties": {
+            "selectedModuleRefs": {
+              "type": "array",
+              "items": {
+                "$ref": "runtime-requirements.schema.json#/definitions/id"
+              },
+              "minItems": 0
+            },
+            "declinedModuleRefs": {
+              "type": "array",
+              "items": {
+                "$ref": "runtime-requirements.schema.json#/definitions/id"
+              },
+              "minItems": 0
+            },
+            "acquisitionChoices": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "moduleRef",
+                  "choice"
+                ],
+                "properties": {
+                  "moduleRef": {
+                    "$ref": "runtime-requirements.schema.json#/definitions/id"
+                  },
+                  "choice": {
+                    "enum": [
+                      "externalPrepare",
+                      "hostRoute"
+                    ]
+                  },
+                  "hostRouteId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              "minItems": 0
+            },
+            "dataRootConfirmation": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "volumeId",
+                "rootPath",
+                "confirmedByUser"
+              ],
+              "properties": {
+                "volumeId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "rootPath": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "confirmedByUser": {
+                  "const": true
+                }
+              }
+            },
+            "requestedCapabilities": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 0
+            }
+          }
+        }
+      }
+    },
+    "targetsPrepareOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ticket",
+        "blockedRequirements",
+        "maintenanceProposal",
+        "needsInput"
+      ],
+      "properties": {
+        "ticket": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "runtime-intake-target.schema.json#/definitions/targetTicket"
+            }
+          ]
+        },
+        "blockedRequirements": {
+          "type": "array",
+          "items": {
+            "$ref": "runtime-intake-receipt.schema.json#/definitions/issue"
+          },
+          "minItems": 0
+        },
+        "maintenanceProposal": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "maintenanceProposalRef",
+                "reason"
+              ],
+              "properties": {
+                "maintenanceProposalRef": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          ]
+        },
+        "needsInput": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "reason",
+                "recommendedVolumeId",
+                "requiredBytes"
+              ],
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "recommendedVolumeId": {
+                  "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "requiredBytes": {
+                  "$ref": "runtime-requirements.schema.json#/definitions/need"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "evidenceReadInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidenceRef"
+      ],
+      "properties": {
+        "evidenceRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "cursor": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "evidenceReadOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "redactedContent",
+        "nextCursor",
+        "observedAt",
+        "sourceIdentity",
+        "truncatedByBudget"
+      ],
+      "properties": {
+        "redactedContent": {
+          "type": "string"
+        },
+        "nextCursor": {
+          "$ref": "#/definitions/nullableNonEmptyString"
+        },
+        "observedAt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceIdentity": {
+          "type": "string",
+          "minLength": 1
+        },
+        "truncatedByBudget": {
+          "type": "boolean"
+        }
+      }
+    },
+    "intakeInspectInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ticketRef",
+        "expectedTicketRevision",
+        "deliveryManifest"
+      ],
+      "properties": {
+        "ticketRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedTicketRevision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "deliveryManifest": {
+          "$ref": "runtime-intake-receipt.schema.json#/definitions/deliveryManifest"
+        }
+      }
+    },
+    "intakeInspectOutput": {
+      "$ref": "#/definitions/inspectOutput"
+    },
+    "intakeAcceptInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ticketRef",
+        "expectedTicketRevision",
+        "checkRef",
+        "expectedCandidateFingerprint",
+        "expectedBindingFingerprint"
+      ],
+      "properties": {
+        "ticketRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedTicketRevision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "checkRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedCandidateFingerprint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedBindingFingerprint": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "intakeAcceptOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "receiptRef",
+        "status",
+        "bindingEffects",
+        "verification",
+        "issues",
+        "nextAction"
+      ],
+      "properties": {
+        "receiptRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "$ref": "#/definitions/receiptStatus"
+        },
+        "bindingEffects": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "effectRef",
+              "kind"
+            ],
+            "properties": {
+              "effectRef": {
+                "type": "string",
+                "minLength": 1
+              },
+              "kind": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "minItems": 0
+        },
+        "verification": {
+          "type": "array",
+          "items": {
+            "$ref": "runtime-intake-receipt.schema.json#/definitions/evidence"
+          },
+          "minItems": 0
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "runtime-intake-receipt.schema.json#/definitions/issue"
+          },
+          "minItems": 0
+        },
+        "nextAction": {
+          "$ref": "runtime-intake-receipt.schema.json#/definitions/nextAction"
+        }
+      }
+    },
+    "intakeGetInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [],
+      "properties": {
+        "receiptRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "checkRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "eventCursor": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "receiptRef"
+          ]
+        },
+        {
+          "required": [
+            "checkRef"
+          ]
+        }
+      ]
+    },
+    "intakeGetOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "receipt",
+        "checkProgress",
+        "events",
+        "nextCursor",
+        "nextAction"
+      ],
+      "properties": {
+        "receipt": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "runtime-intake-receipt.schema.json#/definitions/receipt"
+            }
+          ]
+        },
+        "checkProgress": {
+          "$ref": "#/definitions/progress"
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "at",
+              "kind",
+              "detail"
+            ],
+            "properties": {
+              "at": {
+                "type": "string",
+                "minLength": 1
+              },
+              "kind": {
+                "type": "string",
+                "minLength": 1
+              },
+              "detail": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "minItems": 0
+        },
+        "nextCursor": {
+          "$ref": "#/definitions/nullableNonEmptyString"
+        },
+        "nextAction": {
+          "$ref": "runtime-intake-receipt.schema.json#/definitions/nextAction"
+        }
+      }
+    },
+    "validationRunInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ticketRef",
+        "candidateRef",
+        "requestedLevels",
+        "existingEvidenceRefs"
+      ],
+      "properties": {
+        "ticketRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "candidateRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requestedLevels": {
+          "type": "array",
+          "items": {
+            "$ref": "runtime-requirements.schema.json#/definitions/verifyLevel"
+          },
+          "minItems": 1
+        },
+        "existingEvidenceRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        }
+      }
+    },
+    "validationRunOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "checkRef",
+        "verification",
+        "issues",
+        "status",
+        "nextAction",
+        "taskRef"
+      ],
+      "properties": {
+        "checkRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "verification": {
+          "type": "array",
+          "items": {
+            "$ref": "runtime-intake-receipt.schema.json#/definitions/evidence"
+          },
+          "minItems": 0
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "runtime-intake-receipt.schema.json#/definitions/issue"
+          },
+          "minItems": 0
+        },
+        "status": {
+          "$ref": "#/definitions/receiptStatus"
+        },
+        "nextAction": {
+          "$ref": "runtime-intake-receipt.schema.json#/definitions/nextAction"
+        },
+        "taskRef": {
+          "$ref": "#/definitions/nullableNonEmptyString"
+        }
+      }
+    },
+    "intakeResubmitInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "previousReceiptRef",
+        "ticketRef",
+        "expectedTicketRevision",
+        "deliveryManifest"
+      ],
+      "properties": {
+        "previousReceiptRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ticketRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedTicketRevision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "deliveryManifest": {
+          "$ref": "runtime-intake-receipt.schema.json#/definitions/deliveryManifest"
+        }
+      }
+    },
+    "intakeResubmitOutput": {
+      "$ref": "#/definitions/resubmitOutput"
+    },
+    "maintenancePrepareInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ticketRef",
+        "expectedTicketRevision",
+        "instanceRef",
+        "expectedServiceFingerprint"
+      ],
+      "properties": {
+        "ticketRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedTicketRevision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "instanceRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedServiceFingerprint": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "maintenancePrepareOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "maintenanceProposalRef",
+        "changeSetId",
+        "requiredExternalActions",
+        "needsInput"
+      ],
+      "properties": {
+        "maintenanceProposalRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "changeSetId": {
+          "$ref": "#/definitions/nullableNonEmptyString"
+        },
+        "requiredExternalActions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "needsInput": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "reason"
+              ],
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "maintenanceFinishInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "maintenanceRef",
+        "expectedRevision"
+      ],
+      "properties": {
+        "maintenanceRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedRevision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "latestReceiptRef": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "maintenanceFinishOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "released",
+        "serviceState",
+        "issues",
+        "nextAction"
+      ],
+      "properties": {
+        "released": {
+          "type": "boolean"
+        },
+        "serviceState": {
+          "enum": [
+            "running",
+            "stopped",
+            "unknown"
+          ]
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "runtime-intake-receipt.schema.json#/definitions/issue"
+          },
+          "minItems": 0
+        },
+        "nextAction": {
+          "$ref": "runtime-intake-receipt.schema.json#/definitions/nextAction"
+        }
+      }
+    },
+    "toolIds": {
+      "enum": [
+        "runtime.requirements.list",
+        "runtime.requirements.get",
+        "runtime.inventory.get",
+        "runtime.targets.prepare",
+        "runtime.evidence.read",
+        "runtime.intake.inspect",
+        "runtime.intake.accept",
+        "runtime.intake.get",
+        "runtime.validation.run",
+        "runtime.intake.resubmit",
+        "runtime.maintenance.prepare",
+        "runtime.maintenance.finish"
+      ]
+    },
+    "toolCall": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "tool",
+            "callContext",
+            "input"
+          ],
+          "properties": {
+            "tool": {
+              "const": "runtime.requirements.list"
+            },
+            "callContext": {
+              "$ref": "#/definitions/callContext"
+            },
+            "input": {
+              "$ref": "#/definitions/requirementsListInput"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "tool",
+            "callContext",
+            "input"
+          ],
+          "properties": {
+            "tool": {
+              "const": "runtime.requirements.get"
+            },
+            "callContext": {
+              "$ref": "#/definitions/callContext"
+            },
+            "input": {
+              "$ref": "#/definitions/requirementsGetInput"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "tool",
+            "callContext",
+            "input"
+          ],
+          "properties": {
+            "tool": {
+              "const": "runtime.inventory.get"
+            },
+            "callContext": {
+              "$ref": "#/definitions/callContext"
+            },
+            "input": {
+              "$ref": "#/definitions/inventoryGetInput"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "tool",
+            "callContext",
+            "input"
+          ],
+          "properties": {
+            "tool": {
+              "const": "runtime.targets.prepare"
+            },
+            "callContext": {
+              "$ref": "#/definitions/callContext"
+            },
+            "input": {
+              "$ref": "#/definitions/targetsPrepareInput"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "tool",
+            "callContext",
+            "input"
+          ],
+          "properties": {
+            "tool": {
+              "const": "runtime.evidence.read"
+            },
+            "callContext": {
+              "$ref": "#/definitions/callContext"
+            },
+            "input": {
+              "$ref": "#/definitions/evidenceReadInput"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "tool",
+            "callContext",
+            "input"
+          ],
+          "properties": {
+            "tool": {
+              "const": "runtime.intake.inspect"
+            },
+            "callContext": {
+              "$ref": "#/definitions/callContext"
+            },
+            "input": {
+              "$ref": "#/definitions/intakeInspectInput"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "tool",
+            "callContext",
+            "input"
+          ],
+          "properties": {
+            "tool": {
+              "const": "runtime.intake.accept"
+            },
+            "callContext": {
+              "$ref": "#/definitions/callContext"
+            },
+            "input": {
+              "$ref": "#/definitions/intakeAcceptInput"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "tool",
+            "callContext",
+            "input"
+          ],
+          "properties": {
+            "tool": {
+              "const": "runtime.intake.get"
+            },
+            "callContext": {
+              "$ref": "#/definitions/callContext"
+            },
+            "input": {
+              "$ref": "#/definitions/intakeGetInput"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "tool",
+            "callContext",
+            "input"
+          ],
+          "properties": {
+            "tool": {
+              "const": "runtime.validation.run"
+            },
+            "callContext": {
+              "$ref": "#/definitions/callContext"
+            },
+            "input": {
+              "$ref": "#/definitions/validationRunInput"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "tool",
+            "callContext",
+            "input"
+          ],
+          "properties": {
+            "tool": {
+              "const": "runtime.intake.resubmit"
+            },
+            "callContext": {
+              "$ref": "#/definitions/callContext"
+            },
+            "input": {
+              "$ref": "#/definitions/intakeResubmitInput"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "tool",
+            "callContext",
+            "input"
+          ],
+          "properties": {
+            "tool": {
+              "const": "runtime.maintenance.prepare"
+            },
+            "callContext": {
+              "$ref": "#/definitions/callContext"
+            },
+            "input": {
+              "$ref": "#/definitions/maintenancePrepareInput"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "tool",
+            "callContext",
+            "input"
+          ],
+          "properties": {
+            "tool": {
+              "const": "runtime.maintenance.finish"
+            },
+            "callContext": {
+              "$ref": "#/definitions/callContext"
+            },
+            "input": {
+              "$ref": "#/definitions/maintenanceFinishInput"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "$ref": "#/definitions/toolCall"
+}

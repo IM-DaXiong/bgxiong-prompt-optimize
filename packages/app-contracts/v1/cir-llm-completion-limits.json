@@ -1,0 +1,5 @@
+{
+  "schemaVersion": 1,
+  "defaultMaxTokens": 8192,
+  "phaseMaxTokens": 16384
+}

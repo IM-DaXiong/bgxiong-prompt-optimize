@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "hierarchy-publication-v1.schema.json",
+  "$ref": "#/definitions/PublicationReceipt",
+  "definitions": {
+    "ItemNodeMapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "itemId",
+        "nodeId"
+      ],
+      "properties": {
+        "itemId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "PublicationReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "publicationId",
+        "runId",
+        "draftRevision",
+        "itemNodeMappings",
+        "beforeTargetRevision",
+        "afterTargetRevision",
+        "previousReceiptId"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "publicationId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "runId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "draftRevision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "itemNodeMappings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ItemNodeMapping"
+          },
+          "minItems": 1
+        },
+        "beforeTargetRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "afterTargetRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "previousReceiptId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

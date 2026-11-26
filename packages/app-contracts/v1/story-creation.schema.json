@@ -1,0 +1,5251 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Story creation public contract",
+  "schemaVersion": 1,
+  "definitions": {
+    "Stage": {
+      "type": "string",
+      "enum": [
+        "chapters",
+        "scenes",
+        "storyboard",
+        "roles",
+        "props",
+        "integration",
+        "clipPlan",
+        "environmentPrompt",
+        "clipDraft",
+        "framePlan",
+        "framePrompt"
+      ]
+    },
+    "EntityKind": {
+      "type": "string",
+      "enum": [
+        "role",
+        "prop"
+      ]
+    },
+    "WorkStage": {
+      "type": "string",
+      "enum": [
+        "chapters",
+        "scenes",
+        "storyboard",
+        "roles",
+        "props",
+        "integration",
+        "save",
+        "optimize",
+        "clipPlan",
+        "environmentPrompt",
+        "clipDraft",
+        "framePlan",
+        "framePrompt"
+      ]
+    },
+    "WriteMode": {
+      "type": "string",
+      "enum": [
+        "append",
+        "replace"
+      ]
+    },
+    "SourceDecision": {
+      "type": "string",
+      "enum": [
+        "requireCurrent",
+        "continueFrozen"
+      ]
+    },
+    "OptimizeField": {
+      "type": "string",
+      "enum": [
+        "script",
+        "scenePrompt",
+        "storyboardHint",
+        "staticFramePrompt",
+        "videoPrompt",
+        "title"
+      ]
+    },
+    "TargetKind": {
+      "type": "string",
+      "enum": [
+        "story",
+        "chapter",
+        "scene",
+        "shot",
+        "canvasVideo"
+      ]
+    },
+    "Phase": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "frozen",
+        "requesting",
+        "responseStored",
+        "committed",
+        "retryWait",
+        "failed",
+        "cancelled",
+        "outcomeUnknown",
+        "interrupted"
+      ]
+    },
+    "ErrorCode": {
+      "type": "string",
+      "enum": [
+        "SC_SOURCE_CONFLICT",
+        "SC_TARGET_CONFLICT",
+        "SC_REGISTRY_CONFLICT",
+        "SC_SCOPE_BUSY",
+        "SC_REFERENCE_PROTECTED",
+        "SC_INPUT_TOO_LARGE",
+        "SC_MODEL_UNAVAILABLE",
+        "SC_SKILL_INCOMPATIBLE",
+        "SC_RESPONSE_JSON",
+        "SC_RESPONSE_SCHEMA",
+        "SC_OUTPUT_TRUNCATED",
+        "SC_IDENTITY_REFERENCE",
+        "SC_STORAGE_FAILED",
+        "SC_CANCELLED",
+        "SC_OUTCOME_UNKNOWN",
+        "SC_PROTOCOL_RETIRED",
+        "SC_IDEMPOTENCY_CONFLICT",
+        "SC_RUN_REVISION_STALE",
+        "SC_RUN_READ_ONLY"
+      ]
+    },
+    "RetryDisposition": {
+      "type": "string",
+      "enum": [
+        "retrySameRequest",
+        "outcomeUnknown",
+        "notRetryable"
+      ]
+    },
+    "FinishReason": {
+      "type": "string",
+      "enum": [
+        "completed",
+        "truncated",
+        "filtered",
+        "other"
+      ]
+    },
+    "ModelOutputKind": {
+      "type": "string",
+      "enum": [
+        "chapters",
+        "scenes",
+        "storyboard",
+        "extraction",
+        "integration",
+        "optimize",
+        "clipPlan",
+        "environmentPrompt",
+        "clipDraft",
+        "framePlan",
+        "framePrompt"
+      ]
+    },
+    "RunEventKind": {
+      "type": "string",
+      "enum": [
+        "itemCommitted",
+        "itemFailed",
+        "runFinished",
+        "runCancelled",
+        "sourceStale"
+      ]
+    },
+    "Id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "Revision": {
+      "type": "string",
+      "minLength": 1
+    },
+    "Digest": {
+      "type": "string",
+      "minLength": 1
+    },
+    "StoryTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "storyId"
+      ],
+      "properties": {
+        "kind": {
+          "const": "story"
+        },
+        "storyId": {
+          "$ref": "#/definitions/Id"
+        }
+      }
+    },
+    "ChapterTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "storyId",
+        "chapterId"
+      ],
+      "properties": {
+        "kind": {
+          "const": "chapter"
+        },
+        "storyId": {
+          "$ref": "#/definitions/Id"
+        },
+        "chapterId": {
+          "$ref": "#/definitions/Id"
+        }
+      }
+    },
+    "SceneTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "storyId",
+        "chapterId",
+        "sceneId"
+      ],
+      "properties": {
+        "kind": {
+          "const": "scene"
+        },
+        "storyId": {
+          "$ref": "#/definitions/Id"
+        },
+        "chapterId": {
+          "$ref": "#/definitions/Id"
+        },
+        "sceneId": {
+          "$ref": "#/definitions/Id"
+        }
+      }
+    },
+    "ShotTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "storyId",
+        "chapterId",
+        "sceneId",
+        "shotId"
+      ],
+      "properties": {
+        "kind": {
+          "const": "shot"
+        },
+        "storyId": {
+          "$ref": "#/definitions/Id"
+        },
+        "chapterId": {
+          "$ref": "#/definitions/Id"
+        },
+        "sceneId": {
+          "$ref": "#/definitions/Id"
+        },
+        "shotId": {
+          "$ref": "#/definitions/Id"
+        }
+      }
+    },
+    "SourceTarget": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "storyId"
+          ],
+          "properties": {
+            "kind": {
+              "const": "story"
+            },
+            "storyId": {
+              "$ref": "#/definitions/Id"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "storyId",
+            "chapterId"
+          ],
+          "properties": {
+            "kind": {
+              "const": "chapter"
+            },
+            "storyId": {
+              "$ref": "#/definitions/Id"
+            },
+            "chapterId": {
+              "$ref": "#/definitions/Id"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "storyId",
+            "chapterId",
+            "sceneId"
+          ],
+          "properties": {
+            "kind": {
+              "const": "scene"
+            },
+            "storyId": {
+              "$ref": "#/definitions/Id"
+            },
+            "chapterId": {
+              "$ref": "#/definitions/Id"
+            },
+            "sceneId": {
+              "$ref": "#/definitions/Id"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "storyId",
+            "chapterId",
+            "sceneId",
+            "shotId"
+          ],
+          "properties": {
+            "kind": {
+              "const": "shot"
+            },
+            "storyId": {
+              "$ref": "#/definitions/Id"
+            },
+            "chapterId": {
+              "$ref": "#/definitions/Id"
+            },
+            "sceneId": {
+              "$ref": "#/definitions/Id"
+            },
+            "shotId": {
+              "$ref": "#/definitions/Id"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "storyId",
+            "workspaceId",
+            "nodeId"
+          ],
+          "properties": {
+            "kind": {
+              "const": "canvasVideo"
+            },
+            "storyId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "workspaceId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "nodeId": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "OptimizeTarget": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "storyId",
+            "chapterId"
+          ],
+          "properties": {
+            "kind": {
+              "const": "chapter"
+            },
+            "storyId": {
+              "$ref": "#/definitions/Id"
+            },
+            "chapterId": {
+              "$ref": "#/definitions/Id"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "storyId",
+            "chapterId",
+            "sceneId"
+          ],
+          "properties": {
+            "kind": {
+              "const": "scene"
+            },
+            "storyId": {
+              "$ref": "#/definitions/Id"
+            },
+            "chapterId": {
+              "$ref": "#/definitions/Id"
+            },
+            "sceneId": {
+              "$ref": "#/definitions/Id"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "storyId",
+            "chapterId",
+            "sceneId",
+            "shotId"
+          ],
+          "properties": {
+            "kind": {
+              "const": "shot"
+            },
+            "storyId": {
+              "$ref": "#/definitions/Id"
+            },
+            "chapterId": {
+              "$ref": "#/definitions/Id"
+            },
+            "sceneId": {
+              "$ref": "#/definitions/Id"
+            },
+            "shotId": {
+              "$ref": "#/definitions/Id"
+            }
+          }
+        }
+      ]
+    },
+    "StoryFields": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "text"
+      ],
+      "properties": {
+        "kind": {
+          "const": "story"
+        },
+        "text": {
+          "type": "string"
+        }
+      }
+    },
+    "ChapterFields": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "script"
+      ],
+      "properties": {
+        "kind": {
+          "const": "chapter"
+        },
+        "script": {
+          "type": "string"
+        }
+      }
+    },
+    "SceneFields": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "script",
+        "scenePrompt",
+        "storyboardHint"
+      ],
+      "properties": {
+        "kind": {
+          "const": "scene"
+        },
+        "script": {
+          "type": "string"
+        },
+        "scenePrompt": {
+          "type": "string"
+        },
+        "storyboardHint": {
+          "type": "string"
+        }
+      }
+    },
+    "ShotFields": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "staticFramePrompt",
+        "videoPrompt"
+      ],
+      "properties": {
+        "kind": {
+          "const": "shot"
+        },
+        "staticFramePrompt": {
+          "type": "string"
+        },
+        "videoPrompt": {
+          "type": "string"
+        }
+      }
+    },
+    "SourceFields": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "text"
+          ],
+          "properties": {
+            "kind": {
+              "const": "story"
+            },
+            "text": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "script"
+          ],
+          "properties": {
+            "kind": {
+              "const": "chapter"
+            },
+            "script": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "script",
+            "scenePrompt",
+            "storyboardHint"
+          ],
+          "properties": {
+            "kind": {
+              "const": "scene"
+            },
+            "script": {
+              "type": "string"
+            },
+            "scenePrompt": {
+              "type": "string"
+            },
+            "storyboardHint": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "staticFramePrompt",
+            "videoPrompt"
+          ],
+          "properties": {
+            "kind": {
+              "const": "shot"
+            },
+            "staticFramePrompt": {
+              "type": "string"
+            },
+            "videoPrompt": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "promptText"
+          ],
+          "properties": {
+            "kind": {
+              "const": "canvasVideo"
+            },
+            "promptText": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "ModelSelection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "bindingId",
+        "modelId"
+      ],
+      "properties": {
+        "bindingId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "modelId": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "SkillSelection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stableId",
+        "packageDigest",
+        "resourceRefs"
+      ],
+      "properties": {
+        "stableId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "packageDigest": {
+          "$ref": "#/definitions/Digest"
+        },
+        "resourceRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "StageSettings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "modelSelection",
+        "extraConstraints"
+      ],
+      "properties": {
+        "modelSelection": {
+          "$ref": "#/definitions/ModelSelection"
+        },
+        "skill": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/SkillSelection"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "extraConstraints": {
+          "type": "string"
+        }
+      }
+    },
+    "WriteScope": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "expectedCollectionRevision"
+          ],
+          "properties": {
+            "mode": {
+              "const": "append"
+            },
+            "expectedCollectionRevision": {
+              "$ref": "#/definitions/Revision"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "expectedCollectionRevision",
+            "replaceIds"
+          ],
+          "properties": {
+            "mode": {
+              "const": "replace"
+            },
+            "expectedCollectionRevision": {
+              "$ref": "#/definitions/Revision"
+            },
+            "replaceIds": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Id"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          }
+        }
+      ]
+    },
+    "ChaptersOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [],
+      "properties": {
+        "chapterCountReference": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "episodeDurationSecondsReference": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "ScenesOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [],
+      "properties": {
+        "sceneCountReference": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "EmptyOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [],
+      "properties": {}
+    },
+    "SourceGetArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target"
+      ],
+      "properties": {
+        "target": {
+          "$ref": "#/definitions/SourceTarget"
+        }
+      }
+    },
+    "SourceSaveArgs": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "operation",
+            "title",
+            "text"
+          ],
+          "properties": {
+            "operation": {
+              "const": "createStory"
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1
+            },
+            "text": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "operation",
+            "target",
+            "expectedRevision",
+            "title",
+            "fields"
+          ],
+          "properties": {
+            "operation": {
+              "const": "update"
+            },
+            "target": {
+              "$ref": "#/definitions/SourceTarget"
+            },
+            "expectedRevision": {
+              "$ref": "#/definitions/Revision"
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1
+            },
+            "fields": {
+              "$ref": "#/definitions/SourceFields"
+            },
+            "snapshot": {
+              "type": "boolean",
+              "description": "Explicitly request a new history snapshot even when the canonical body is unchanged. Omitted or false preserves ordinary save no-op behavior. Snapshot-only saves do not change the body, its updated time or body revision; historyVersionId identifies the committed snapshot."
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "target": {
+                    "properties": {
+                      "kind": {
+                        "const": "story"
+                      }
+                    },
+                    "required": [
+                      "kind"
+                    ]
+                  }
+                },
+                "required": [
+                  "target"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "fields": {
+                    "properties": {
+                      "kind": {
+                        "const": "story"
+                      }
+                    },
+                    "required": [
+                      "kind"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "target": {
+                    "properties": {
+                      "kind": {
+                        "const": "chapter"
+                      }
+                    },
+                    "required": [
+                      "kind"
+                    ]
+                  }
+                },
+                "required": [
+                  "target"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "fields": {
+                    "properties": {
+                      "kind": {
+                        "const": "chapter"
+                      }
+                    },
+                    "required": [
+                      "kind"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "target": {
+                    "properties": {
+                      "kind": {
+                        "const": "scene"
+                      }
+                    },
+                    "required": [
+                      "kind"
+                    ]
+                  }
+                },
+                "required": [
+                  "target"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "fields": {
+                    "properties": {
+                      "kind": {
+                        "const": "scene"
+                      }
+                    },
+                    "required": [
+                      "kind"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "target": {
+                    "properties": {
+                      "kind": {
+                        "const": "shot"
+                      }
+                    },
+                    "required": [
+                      "kind"
+                    ]
+                  }
+                },
+                "required": [
+                  "target"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "fields": {
+                    "properties": {
+                      "kind": {
+                        "const": "shot"
+                      }
+                    },
+                    "required": [
+                      "kind"
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "SourceSaveUpdate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operation",
+        "target",
+        "expectedRevision",
+        "title",
+        "fields"
+      ],
+      "properties": {
+        "operation": {
+          "const": "update"
+        },
+        "target": {
+          "$ref": "#/definitions/SourceTarget"
+        },
+        "expectedRevision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fields": {
+          "$ref": "#/definitions/SourceFields"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "kind": {
+                    "const": "story"
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              }
+            },
+            "required": [
+              "target"
+            ]
+          },
+          "then": {
+            "properties": {
+              "fields": {
+                "properties": {
+                  "kind": {
+                    "const": "story"
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "kind": {
+                    "const": "chapter"
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              }
+            },
+            "required": [
+              "target"
+            ]
+          },
+          "then": {
+            "properties": {
+              "fields": {
+                "properties": {
+                  "kind": {
+                    "const": "chapter"
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "kind": {
+                    "const": "scene"
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              }
+            },
+            "required": [
+              "target"
+            ]
+          },
+          "then": {
+            "properties": {
+              "fields": {
+                "properties": {
+                  "kind": {
+                    "const": "scene"
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "kind": {
+                    "const": "shot"
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              }
+            },
+            "required": [
+              "target"
+            ]
+          },
+          "then": {
+            "properties": {
+              "fields": {
+                "properties": {
+                  "kind": {
+                    "const": "shot"
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "LineageEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "usedRevision",
+        "currentRevision",
+        "stale"
+      ],
+      "properties": {
+        "source": {
+          "$ref": "#/definitions/SourceTarget"
+        },
+        "usedRevision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "currentRevision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "stale": {
+          "type": "boolean"
+        }
+      }
+    },
+    "SourceView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "revision",
+        "title",
+        "fields",
+        "collectionRevision",
+        "lineage"
+      ],
+      "properties": {
+        "target": {
+          "$ref": "#/definitions/SourceTarget"
+        },
+        "revision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "title": {
+          "type": "string"
+        },
+        "fields": {
+          "$ref": "#/definitions/SourceFields"
+        },
+        "collectionRevision": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Revision"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lineage": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/LineageEntry"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "kind": {
+                    "const": "story"
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              }
+            },
+            "required": [
+              "target"
+            ]
+          },
+          "then": {
+            "properties": {
+              "fields": {
+                "properties": {
+                  "kind": {
+                    "const": "story"
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "kind": {
+                    "const": "chapter"
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              }
+            },
+            "required": [
+              "target"
+            ]
+          },
+          "then": {
+            "properties": {
+              "fields": {
+                "properties": {
+                  "kind": {
+                    "const": "chapter"
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "kind": {
+                    "const": "scene"
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              }
+            },
+            "required": [
+              "target"
+            ]
+          },
+          "then": {
+            "properties": {
+              "fields": {
+                "properties": {
+                  "kind": {
+                    "const": "scene"
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "kind": {
+                    "const": "shot"
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              }
+            },
+            "required": [
+              "target"
+            ]
+          },
+          "then": {
+            "properties": {
+              "fields": {
+                "properties": {
+                  "kind": {
+                    "const": "shot"
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "kind": {
+                    "const": "canvasVideo"
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              }
+            },
+            "required": [
+              "target"
+            ]
+          },
+          "then": {
+            "properties": {
+              "fields": {
+                "properties": {
+                  "kind": {
+                    "const": "canvasVideo"
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "SourceReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "revision",
+        "commitId",
+        "changed",
+        "historyVersionId"
+      ],
+      "properties": {
+        "target": {
+          "$ref": "#/definitions/SourceTarget"
+        },
+        "revision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "commitId": {
+          "$ref": "#/definitions/Id"
+        },
+        "changed": {
+          "type": "boolean"
+        },
+        "historyVersionId": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "StageDefault": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "extraConstraints",
+        "modelSelection",
+        "skill"
+      ],
+      "properties": {
+        "extraConstraints": {
+          "type": "string"
+        },
+        "modelSelection": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ModelSelection"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "skill": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/SkillSelection"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "DefaultStages": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "chapters",
+        "scenes",
+        "storyboard",
+        "roles",
+        "props",
+        "integration",
+        "clipPlan",
+        "clipDraft",
+        "environmentPrompt",
+        "framePlan",
+        "framePrompt"
+      ],
+      "properties": {
+        "chapters": {
+          "$ref": "#/definitions/StageDefault"
+        },
+        "scenes": {
+          "$ref": "#/definitions/StageDefault"
+        },
+        "storyboard": {
+          "$ref": "#/definitions/StageDefault"
+        },
+        "roles": {
+          "$ref": "#/definitions/StageDefault"
+        },
+        "props": {
+          "$ref": "#/definitions/StageDefault"
+        },
+        "integration": {
+          "$ref": "#/definitions/StageDefault"
+        },
+        "clipPlan": {
+          "$ref": "#/definitions/StageDefault"
+        },
+        "clipDraft": {
+          "$ref": "#/definitions/StageDefault"
+        },
+        "environmentPrompt": {
+          "$ref": "#/definitions/StageDefault"
+        },
+        "framePlan": {
+          "$ref": "#/definitions/StageDefault"
+        },
+        "framePrompt": {
+          "$ref": "#/definitions/StageDefault"
+        }
+      }
+    },
+    "DefaultsGetArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "storyId"
+      ],
+      "properties": {
+        "storyId": {
+          "$ref": "#/definitions/Id"
+        }
+      }
+    },
+    "DefaultsView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "revision",
+        "stages"
+      ],
+      "properties": {
+        "revision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "stages": {
+          "$ref": "#/definitions/DefaultStages"
+        }
+      }
+    },
+    "DefaultsSetArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "storyId",
+        "expectedRevision",
+        "stage",
+        "extraConstraints"
+      ],
+      "properties": {
+        "storyId": {
+          "$ref": "#/definitions/Id"
+        },
+        "expectedRevision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "stage": {
+          "$ref": "#/definitions/Stage"
+        },
+        "extraConstraints": {
+          "type": "string"
+        },
+        "modelSelection": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ModelSelection"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "skill": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/SkillSelection"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "DefaultsSetReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "revision",
+        "stage",
+        "value"
+      ],
+      "properties": {
+        "revision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "stage": {
+          "$ref": "#/definitions/Stage"
+        },
+        "value": {
+          "$ref": "#/definitions/StageDefault"
+        }
+      }
+    },
+    "ChaptersGenerateArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "expectedSourceRevision",
+        "settings",
+        "options",
+        "write"
+      ],
+      "properties": {
+        "target": {
+          "$ref": "#/definitions/StoryTarget"
+        },
+        "expectedSourceRevision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "settings": {
+          "$ref": "#/definitions/StageSettings"
+        },
+        "options": {
+          "$ref": "#/definitions/ChaptersOptions"
+        },
+        "write": {
+          "$ref": "#/definitions/WriteScope"
+        }
+      }
+    },
+    "ScenesGenerateArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "expectedSourceRevision",
+        "settings",
+        "integrationSettings",
+        "options",
+        "write"
+      ],
+      "properties": {
+        "target": {
+          "$ref": "#/definitions/ChapterTarget"
+        },
+        "expectedSourceRevision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "settings": {
+          "$ref": "#/definitions/StageSettings"
+        },
+        "integrationSettings": {
+          "$ref": "#/definitions/StageSettings"
+        },
+        "options": {
+          "$ref": "#/definitions/ScenesOptions"
+        },
+        "write": {
+          "$ref": "#/definitions/WriteScope"
+        }
+      }
+    },
+    "StoryboardGenerateArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "expectedSourceRevision",
+        "settings",
+        "integrationSettings",
+        "options",
+        "write"
+      ],
+      "properties": {
+        "target": {
+          "$ref": "#/definitions/SceneTarget"
+        },
+        "expectedSourceRevision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "settings": {
+          "$ref": "#/definitions/StageSettings"
+        },
+        "integrationSettings": {
+          "$ref": "#/definitions/StageSettings"
+        },
+        "options": {
+          "$ref": "#/definitions/EmptyOptions"
+        },
+        "write": {
+          "$ref": "#/definitions/WriteScope"
+        },
+        "sourceDecision": {
+          "$ref": "#/definitions/SourceDecision"
+        }
+      }
+    },
+    "ExtractArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "expectedSourceRevision",
+        "settings"
+      ],
+      "properties": {
+        "target": {
+          "$ref": "#/definitions/ChapterTarget"
+        },
+        "expectedSourceRevision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "settings": {
+          "$ref": "#/definitions/StageSettings"
+        }
+      }
+    },
+    "IntegrateInput": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "artifactId"
+          ],
+          "properties": {
+            "mode": {
+              "const": "candidates"
+            },
+            "artifactId": {
+              "$ref": "#/definitions/Id"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "entityIds"
+          ],
+          "properties": {
+            "mode": {
+              "const": "auditExisting"
+            },
+            "entityIds": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Id"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          }
+        }
+      ]
+    },
+    "IntegrateArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "storyId",
+        "entityKind",
+        "expectedRegistryRevision",
+        "sourceDecision",
+        "input",
+        "settings"
+      ],
+      "properties": {
+        "storyId": {
+          "$ref": "#/definitions/Id"
+        },
+        "entityKind": {
+          "$ref": "#/definitions/EntityKind"
+        },
+        "expectedRegistryRevision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "sourceDecision": {
+          "$ref": "#/definitions/SourceDecision"
+        },
+        "input": {
+          "$ref": "#/definitions/IntegrateInput"
+        },
+        "settings": {
+          "$ref": "#/definitions/StageSettings"
+        }
+      }
+    },
+    "OptimizeArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "expectedSourceRevision",
+        "fields",
+        "settings",
+        "changeRequest"
+      ],
+      "properties": {
+        "target": {
+          "$ref": "#/definitions/OptimizeTarget"
+        },
+        "expectedSourceRevision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/OptimizeField"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "settings": {
+          "$ref": "#/definitions/StageSettings"
+        },
+        "changeRequest": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "kind": {
+                    "const": "chapter"
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              }
+            },
+            "required": [
+              "target"
+            ]
+          },
+          "then": {
+            "properties": {
+              "fields": {
+                "items": {
+                  "enum": [
+                    "script"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "kind": {
+                    "const": "scene"
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              }
+            },
+            "required": [
+              "target"
+            ]
+          },
+          "then": {
+            "properties": {
+              "fields": {
+                "items": {
+                  "enum": [
+                    "script",
+                    "scenePrompt",
+                    "storyboardHint"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "kind": {
+                    "const": "shot"
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              }
+            },
+            "required": [
+              "target"
+            ]
+          },
+          "then": {
+            "properties": {
+              "fields": {
+                "items": {
+                  "enum": [
+                    "staticFramePrompt",
+                    "videoPrompt",
+                    "title"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "SubmitReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runId",
+        "itemId",
+        "taskId",
+        "status"
+      ],
+      "properties": {
+        "runId": {
+          "$ref": "#/definitions/Id"
+        },
+        "itemId": {
+          "$ref": "#/definitions/Id"
+        },
+        "taskId": {
+          "$ref": "#/definitions/Id"
+        },
+        "status": {
+          "const": "accepted"
+        }
+      }
+    },
+    "StoryGenerationTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "expectedSourceRevision",
+        "write"
+      ],
+      "properties": {
+        "target": {
+          "$ref": "#/definitions/StoryTarget"
+        },
+        "expectedSourceRevision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "write": {
+          "$ref": "#/definitions/WriteScope"
+        }
+      }
+    },
+    "ChapterGenerationTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "expectedSourceRevision",
+        "write"
+      ],
+      "properties": {
+        "target": {
+          "$ref": "#/definitions/ChapterTarget"
+        },
+        "expectedSourceRevision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "write": {
+          "$ref": "#/definitions/WriteScope"
+        }
+      }
+    },
+    "SceneGenerationTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "expectedSourceRevision",
+        "write"
+      ],
+      "properties": {
+        "target": {
+          "$ref": "#/definitions/SceneTarget"
+        },
+        "expectedSourceRevision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "write": {
+          "$ref": "#/definitions/WriteScope"
+        },
+        "sourceDecision": {
+          "$ref": "#/definitions/SourceDecision"
+        }
+      }
+    },
+    "ChapterExtractionTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "expectedSourceRevision"
+      ],
+      "properties": {
+        "target": {
+          "$ref": "#/definitions/ChapterTarget"
+        },
+        "expectedSourceRevision": {
+          "$ref": "#/definitions/Revision"
+        }
+      }
+    },
+    "IntegrateFollowup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "settings"
+      ],
+      "properties": {
+        "settings": {
+          "$ref": "#/definitions/StageSettings"
+        }
+      }
+    },
+    "ContinueStoryboard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "settings",
+        "integrationSettings",
+        "mode"
+      ],
+      "properties": {
+        "settings": {
+          "$ref": "#/definitions/StageSettings"
+        },
+        "integrationSettings": {
+          "$ref": "#/definitions/StageSettings"
+        },
+        "mode": {
+          "$ref": "#/definitions/WriteMode"
+        }
+      }
+    },
+    "BatchRequest": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "saves"
+          ],
+          "properties": {
+            "kind": {
+              "const": "save"
+            },
+            "saves": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/SourceSaveArgs"
+              },
+              "minItems": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "targets",
+            "settings",
+            "options"
+          ],
+          "properties": {
+            "kind": {
+              "const": "chapters"
+            },
+            "targets": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/StoryGenerationTarget"
+              },
+              "minItems": 1
+            },
+            "settings": {
+              "$ref": "#/definitions/StageSettings"
+            },
+            "options": {
+              "$ref": "#/definitions/ChaptersOptions"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "targets",
+            "settings",
+            "integrationSettings",
+            "options"
+          ],
+          "properties": {
+            "kind": {
+              "const": "scenes"
+            },
+            "targets": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ChapterGenerationTarget"
+              },
+              "minItems": 1
+            },
+            "settings": {
+              "$ref": "#/definitions/StageSettings"
+            },
+            "integrationSettings": {
+              "$ref": "#/definitions/StageSettings"
+            },
+            "options": {
+              "$ref": "#/definitions/ScenesOptions"
+            },
+            "continueStoryboard": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/ContinueStoryboard"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "targets",
+            "settings",
+            "integrationSettings"
+          ],
+          "properties": {
+            "kind": {
+              "const": "storyboard"
+            },
+            "targets": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/SceneGenerationTarget"
+              },
+              "minItems": 1
+            },
+            "settings": {
+              "$ref": "#/definitions/StageSettings"
+            },
+            "integrationSettings": {
+              "$ref": "#/definitions/StageSettings"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "targets",
+            "settings"
+          ],
+          "properties": {
+            "kind": {
+              "const": "roles"
+            },
+            "targets": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ChapterExtractionTarget"
+              },
+              "minItems": 1
+            },
+            "settings": {
+              "$ref": "#/definitions/StageSettings"
+            },
+            "integrate": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/IntegrateFollowup"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "targets",
+            "settings"
+          ],
+          "properties": {
+            "kind": {
+              "const": "props"
+            },
+            "targets": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ChapterExtractionTarget"
+              },
+              "minItems": 1
+            },
+            "settings": {
+              "$ref": "#/definitions/StageSettings"
+            },
+            "integrate": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/IntegrateFollowup"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "requests"
+          ],
+          "properties": {
+            "kind": {
+              "const": "integration"
+            },
+            "requests": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/IntegrateArgs"
+              },
+              "minItems": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "targets",
+            "settings",
+            "draftSettings",
+            "environmentSettings",
+            "options"
+          ],
+          "properties": {
+            "kind": {
+              "const": "clips"
+            },
+            "targets": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ChapterExtractionTarget"
+              },
+              "minItems": 1
+            },
+            "settings": {
+              "$ref": "#/definitions/StageSettings"
+            },
+            "draftSettings": {
+              "$ref": "#/definitions/StageSettings"
+            },
+            "environmentSettings": {
+              "$ref": "#/definitions/StageSettings"
+            },
+            "options": {
+              "$ref": "clip-workflow.schema.json#/definitions/ClipGenerationOptions"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "targets",
+            "settings",
+            "options"
+          ],
+          "properties": {
+            "kind": {
+              "const": "clipDrafts"
+            },
+            "targets": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ClipDraftGenerationTarget"
+              },
+              "minItems": 1
+            },
+            "settings": {
+              "$ref": "#/definitions/StageSettings"
+            },
+            "options": {
+              "$ref": "clip-workflow.schema.json#/definitions/ClipGenerationOptions"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "targets",
+            "settings",
+            "promptSettings",
+            "options"
+          ],
+          "properties": {
+            "kind": {
+              "const": "clipFrames"
+            },
+            "targets": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CanvasVideoGenerationTarget"
+              },
+              "minItems": 1
+            },
+            "settings": {
+              "$ref": "#/definitions/StageSettings"
+            },
+            "promptSettings": {
+              "$ref": "#/definitions/StageSettings"
+            },
+            "options": {
+              "$ref": "clip-workflow.schema.json#/definitions/ClipFrameOptions"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "targets",
+            "settings",
+            "options"
+          ],
+          "properties": {
+            "kind": {
+              "const": "clipFramePrompts"
+            },
+            "targets": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/definitions/ClipFramePromptGenerationTarget"
+              }
+            },
+            "settings": {
+              "$ref": "#/definitions/StageSettings"
+            },
+            "options": {
+              "$ref": "clip-workflow.schema.json#/definitions/ClipFrameOptions"
+            }
+          }
+        }
+      ]
+    },
+    "FlowChaptersStage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "settings",
+        "options",
+        "write"
+      ],
+      "properties": {
+        "settings": {
+          "$ref": "#/definitions/StageSettings"
+        },
+        "options": {
+          "$ref": "#/definitions/ChaptersOptions"
+        },
+        "write": {
+          "$ref": "#/definitions/WriteScope"
+        }
+      }
+    },
+    "FlowExtractStage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "settings"
+      ],
+      "properties": {
+        "settings": {
+          "$ref": "#/definitions/StageSettings"
+        }
+      }
+    },
+    "FlowScenesStage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "settings",
+        "options",
+        "mode"
+      ],
+      "properties": {
+        "settings": {
+          "$ref": "#/definitions/StageSettings"
+        },
+        "options": {
+          "$ref": "#/definitions/ScenesOptions"
+        },
+        "mode": {
+          "$ref": "#/definitions/WriteMode"
+        }
+      }
+    },
+    "FlowStoryboardStage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "settings",
+        "mode"
+      ],
+      "properties": {
+        "settings": {
+          "$ref": "#/definitions/StageSettings"
+        },
+        "mode": {
+          "$ref": "#/definitions/WriteMode"
+        }
+      }
+    },
+    "FlowStages": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "chapters",
+        "roles",
+        "props",
+        "integration"
+      ],
+      "properties": {
+        "chapters": {
+          "$ref": "#/definitions/FlowChaptersStage"
+        },
+        "roles": {
+          "$ref": "#/definitions/FlowExtractStage"
+        },
+        "props": {
+          "$ref": "#/definitions/FlowExtractStage"
+        },
+        "integration": {
+          "$ref": "#/definitions/FlowExtractStage"
+        },
+        "clipPlan": {
+          "$ref": "#/definitions/FlowClipPlanStage"
+        },
+        "environmentPrompts": {
+          "$ref": "#/definitions/FlowExtractStage"
+        },
+        "clipDrafts": {
+          "$ref": "#/definitions/FlowExtractStage"
+        }
+      }
+    },
+    "FlowStartArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "storyId",
+        "expectedSourceRevision",
+        "stages",
+        "outputTarget"
+      ],
+      "properties": {
+        "storyId": {
+          "$ref": "#/definitions/Id"
+        },
+        "expectedSourceRevision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "saveFirst": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/SourceSaveUpdate"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "stages": {
+          "$ref": "#/definitions/FlowStages"
+        },
+        "outputTarget": {
+          "type": "string",
+          "enum": [
+            "episodes",
+            "clips"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "outputTarget": {
+                "const": "clips"
+              }
+            },
+            "required": [
+              "outputTarget"
+            ]
+          },
+          "then": {
+            "properties": {
+              "stages": {
+                "properties": {
+                  "clipPlan": {
+                    "$ref": "#/definitions/FlowClipPlanStage"
+                  },
+                  "clipDrafts": {
+                    "$ref": "#/definitions/FlowExtractStage"
+                  },
+                  "environmentPrompts": {
+                    "$ref": "#/definitions/FlowExtractStage"
+                  }
+                },
+                "required": [
+                  "clipPlan",
+                  "clipDrafts",
+                  "environmentPrompts"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "RunStartReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runId",
+        "taskId",
+        "revision",
+        "initialItemIds"
+      ],
+      "properties": {
+        "runId": {
+          "$ref": "#/definitions/Id"
+        },
+        "taskId": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "revision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "initialItemIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Id"
+          }
+        }
+      }
+    },
+    "ErrorView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "userSpeech",
+        "logCode",
+        "detail"
+      ],
+      "properties": {
+        "code": {
+          "$ref": "#/definitions/ErrorCode"
+        },
+        "userSpeech": {
+          "type": "string"
+        },
+        "logCode": {
+          "type": "string",
+          "minLength": 1
+        },
+        "detail": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "SourceCheck": {
+      "type": "string",
+      "enum": [
+        "unchanged",
+        "changed",
+        "unavailable",
+        "notChecked"
+      ]
+    },
+    "RecoveryAction": {
+      "type": "string",
+      "enum": [
+        "resume",
+        "continueFrozen",
+        "regenerateFromLatest"
+      ]
+    },
+    "ItemRecovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceCheck",
+        "expectedSourceRevision",
+        "currentSourceRevision",
+        "hasSnapshot",
+        "actions"
+      ],
+      "properties": {
+        "sourceCheck": {
+          "$ref": "#/definitions/SourceCheck"
+        },
+        "expectedSourceRevision": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Revision"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "currentSourceRevision": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Revision"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "hasSnapshot": {
+          "type": "boolean"
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RecoveryAction"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "RunRequestKind": {
+      "type": "string",
+      "enum": [
+        "flow",
+        "batch",
+        "single",
+        "optimize"
+      ]
+    },
+    "RunRecoveryContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requestKind",
+        "request",
+        "flowStages"
+      ],
+      "properties": {
+        "requestKind": {
+          "$ref": "#/definitions/RunRequestKind"
+        },
+        "request": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/BatchRequest"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "flowStages": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FlowStages"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "ItemView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "itemId",
+        "stage",
+        "target",
+        "taskId",
+        "phase",
+        "sourceRevision",
+        "attemptCount",
+        "automaticRetriesUsed",
+        "commitId",
+        "artifactIds",
+        "dependencyIds",
+        "error"
+      ],
+      "properties": {
+        "targetTitle": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "committedAtMs": {
+          "description": "Durable commit receipt timestamp in Unix milliseconds; null before commit.",
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "itemId": {
+          "$ref": "#/definitions/Id"
+        },
+        "stage": {
+          "$ref": "#/definitions/WorkStage"
+        },
+        "target": {
+          "$ref": "#/definitions/SourceTarget"
+        },
+        "taskId": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "phase": {
+          "$ref": "#/definitions/Phase"
+        },
+        "sourceRevision": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Revision"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "attemptCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "automaticRetriesUsed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "commitId": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "artifactIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Id"
+          }
+        },
+        "dependencyIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Id"
+          }
+        },
+        "error": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ErrorView"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "recovery": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ItemRecovery"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "CompletedCounts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "chaptersSaved",
+        "scenesSaved",
+        "shotsSaved",
+        "integrationsDone",
+        "integrationsPending",
+        "itemsCommitted",
+        "chaptersCreated",
+        "chaptersUpdated",
+        "chaptersRetained"
+      ],
+      "properties": {
+        "chaptersSaved": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "scenesSaved": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "shotsSaved": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "integrationsDone": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "integrationsPending": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "itemsCommitted": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "chaptersCreated": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "chaptersUpdated": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "chaptersRetained": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "RunGetArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runId"
+      ],
+      "properties": {
+        "runId": {
+          "$ref": "#/definitions/Id"
+        },
+        "cursor": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pageSize": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200
+        }
+      }
+    },
+    "RunView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runId",
+        "taskId",
+        "taskState",
+        "revision",
+        "completedCounts",
+        "hasSourceUpdates",
+        "items",
+        "nextCursor"
+      ],
+      "properties": {
+        "requestKind": {
+          "$ref": "#/definitions/RunRequestKind"
+        },
+        "storyIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Id"
+          }
+        },
+        "stages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/WorkStage"
+          }
+        },
+        "runId": {
+          "$ref": "#/definitions/Id"
+        },
+        "taskId": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "taskState": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "revision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "completedCounts": {
+          "$ref": "#/definitions/CompletedCounts"
+        },
+        "hasSourceUpdates": {
+          "type": "boolean"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ItemView"
+          }
+        },
+        "nextCursor": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "archiveInfo": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RunArchiveInfo"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "recoveryContext": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RunRecoveryContext"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "readOnlyReason": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RunReadOnlyReason"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "ResumeSelection": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "const": "unfinished"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "itemIds"
+          ],
+          "properties": {
+            "kind": {
+              "const": "items"
+            },
+            "itemIds": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Id"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          }
+        }
+      ]
+    },
+    "ResubmitUnknownOutcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "authorizationRef"
+      ],
+      "properties": {
+        "authorizationRef": {
+          "$ref": "#/definitions/Id"
+        }
+      }
+    },
+    "RunResumeArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runId",
+        "expectedRunRevision",
+        "selection",
+        "sourceDecision"
+      ],
+      "properties": {
+        "runId": {
+          "$ref": "#/definitions/Id"
+        },
+        "expectedRunRevision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "selection": {
+          "$ref": "#/definitions/ResumeSelection"
+        },
+        "sourceDecision": {
+          "$ref": "#/definitions/SourceDecision"
+        },
+        "resubmitUnknownOutcome": {
+          "$ref": "#/definitions/ResubmitUnknownOutcome"
+        }
+      }
+    },
+    "RunResumeReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runId",
+        "revision",
+        "taskId",
+        "resumedItemIds",
+        "alreadyCommittedItemIds"
+      ],
+      "properties": {
+        "runId": {
+          "$ref": "#/definitions/Id"
+        },
+        "revision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "taskId": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "resumedItemIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Id"
+          }
+        },
+        "alreadyCommittedItemIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Id"
+          }
+        }
+      }
+    },
+    "RunCancelArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runId"
+      ],
+      "properties": {
+        "runId": {
+          "$ref": "#/definitions/Id"
+        },
+        "itemIds": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Id"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "RunCancelReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runId",
+        "revision",
+        "cancelRequestedItemIds",
+        "alreadyCommittedItemIds"
+      ],
+      "properties": {
+        "runId": {
+          "$ref": "#/definitions/Id"
+        },
+        "revision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "cancelRequestedItemIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Id"
+          }
+        },
+        "alreadyCommittedItemIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Id"
+          }
+        }
+      }
+    },
+    "RunEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runId",
+        "revision",
+        "kind",
+        "itemId"
+      ],
+      "properties": {
+        "runId": {
+          "$ref": "#/definitions/Id"
+        },
+        "revision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "kind": {
+          "$ref": "#/definitions/RunEventKind"
+        },
+        "itemId": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "RegistryEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "description"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/Id"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "OccurrenceView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "occurrenceId",
+        "chapterId",
+        "sceneId",
+        "shotId"
+      ],
+      "properties": {
+        "occurrenceId": {
+          "$ref": "#/definitions/Id"
+        },
+        "chapterId": {
+          "$ref": "#/definitions/Id"
+        },
+        "sceneId": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "shotId": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "EntityListItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "description",
+        "occurrences"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/Id"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string"
+        },
+        "occurrences": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/OccurrenceView"
+          }
+        }
+      }
+    },
+    "OccurrenceScope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "chapterId"
+      ],
+      "properties": {
+        "chapterId": {
+          "$ref": "#/definitions/Id"
+        },
+        "sceneId": {
+          "$ref": "#/definitions/Id"
+        }
+      }
+    },
+    "EntitiesListArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "storyId",
+        "entityKind"
+      ],
+      "properties": {
+        "storyId": {
+          "$ref": "#/definitions/Id"
+        },
+        "entityKind": {
+          "$ref": "#/definitions/EntityKind"
+        },
+        "cursor": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pageSize": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200
+        },
+        "occurrenceScope": {
+          "$ref": "#/definitions/OccurrenceScope"
+        }
+      }
+    },
+    "EntitiesListData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "registryRevision",
+        "items",
+        "nextCursor"
+      ],
+      "properties": {
+        "registryRevision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EntityListItem"
+          }
+        },
+        "nextCursor": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "EntityOperation": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "op",
+            "name",
+            "description"
+          ],
+          "properties": {
+            "op": {
+              "const": "create"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "op",
+            "id",
+            "name",
+            "description"
+          ],
+          "properties": {
+            "op": {
+              "const": "update"
+            },
+            "id": {
+              "$ref": "#/definitions/Id"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "op",
+            "id"
+          ],
+          "properties": {
+            "op": {
+              "const": "delete"
+            },
+            "id": {
+              "$ref": "#/definitions/Id"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "op",
+            "sourceIds",
+            "targetId"
+          ],
+          "properties": {
+            "op": {
+              "const": "merge"
+            },
+            "sourceIds": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Id"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            },
+            "targetId": {
+              "$ref": "#/definitions/Id"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "op",
+            "id",
+            "chapterId"
+          ],
+          "properties": {
+            "op": {
+              "const": "addOccurrence"
+            },
+            "id": {
+              "$ref": "#/definitions/Id"
+            },
+            "chapterId": {
+              "$ref": "#/definitions/Id"
+            },
+            "sceneId": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "shotId": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "op",
+            "occurrenceId"
+          ],
+          "properties": {
+            "op": {
+              "const": "removeOccurrence"
+            },
+            "occurrenceId": {
+              "$ref": "#/definitions/Id"
+            }
+          }
+        }
+      ]
+    },
+    "EntitiesChangeArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "storyId",
+        "entityKind",
+        "expectedRegistryRevision",
+        "operations"
+      ],
+      "properties": {
+        "storyId": {
+          "$ref": "#/definitions/Id"
+        },
+        "entityKind": {
+          "$ref": "#/definitions/EntityKind"
+        },
+        "expectedRegistryRevision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "operations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EntityOperation"
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "EntitiesChangeReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "commitId",
+        "registryRevision",
+        "createdIds",
+        "updatedIds",
+        "removedIds",
+        "occurrenceIds"
+      ],
+      "properties": {
+        "commitId": {
+          "$ref": "#/definitions/Id"
+        },
+        "registryRevision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "createdIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Id"
+          }
+        },
+        "updatedIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Id"
+          }
+        },
+        "removedIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Id"
+          }
+        },
+        "occurrenceIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Id"
+          }
+        }
+      }
+    },
+    "CandidateArtifactResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifactId",
+        "entityKind",
+        "target",
+        "sourceRevision",
+        "candidateCount"
+      ],
+      "properties": {
+        "artifactId": {
+          "$ref": "#/definitions/Id"
+        },
+        "entityKind": {
+          "$ref": "#/definitions/EntityKind"
+        },
+        "target": {
+          "$ref": "#/definitions/ChapterTarget"
+        },
+        "sourceRevision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "candidateCount": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "CommitCounts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "created",
+        "updated",
+        "removed",
+        "followupItems"
+      ],
+      "properties": {
+        "created": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "updated": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "removed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "followupItems": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "LocalIdMapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "localId",
+        "id"
+      ],
+      "properties": {
+        "localId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "id": {
+          "$ref": "#/definitions/Id"
+        }
+      }
+    },
+    "CommitReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "commitId",
+        "itemId",
+        "target",
+        "sourceRevision",
+        "beforeTargetRevision",
+        "afterTargetRevision",
+        "createdIds",
+        "updatedIds",
+        "removedIds",
+        "historyVersionIds",
+        "localIdMappings",
+        "followupItemIds",
+        "counts",
+        "retainedIds"
+      ],
+      "properties": {
+        "commitId": {
+          "$ref": "#/definitions/Id"
+        },
+        "itemId": {
+          "$ref": "#/definitions/Id"
+        },
+        "target": {
+          "$ref": "#/definitions/SourceTarget"
+        },
+        "sourceRevision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "beforeTargetRevision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "afterTargetRevision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "createdIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Id"
+          }
+        },
+        "updatedIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Id"
+          }
+        },
+        "removedIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Id"
+          }
+        },
+        "historyVersionIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Id"
+          }
+        },
+        "localIdMappings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/LocalIdMapping"
+          }
+        },
+        "followupItemIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Id"
+          }
+        },
+        "counts": {
+          "$ref": "#/definitions/CommitCounts"
+        },
+        "retainedIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Id"
+          }
+        }
+      }
+    },
+    "FrozenStageMethod": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "host",
+        "stableId",
+        "packageDigest",
+        "activationId",
+        "bodySha256",
+        "resourceDigests",
+        "methodArtifactId"
+      ],
+      "properties": {
+        "host": {
+          "type": "string",
+          "minLength": 1
+        },
+        "stableId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "packageDigest": {
+          "$ref": "#/definitions/Digest"
+        },
+        "activationId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bodySha256": {
+          "$ref": "#/definitions/Digest"
+        },
+        "resourceDigests": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Digest"
+          }
+        },
+        "methodArtifactId": {
+          "$ref": "#/definitions/Id"
+        }
+      }
+    },
+    "ExecutionBindingSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "bindingId",
+        "modelId",
+        "runtimeConfigDigest",
+        "generationParams"
+      ],
+      "properties": {
+        "bindingId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "modelId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "runtimeConfigDigest": {
+          "$ref": "#/definitions/Digest"
+        },
+        "generationParams": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "FrozenStageSettings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "settings",
+        "executionBinding",
+        "profileDigest",
+        "schemaDigest",
+        "method"
+      ],
+      "properties": {
+        "settings": {
+          "$ref": "#/definitions/StageSettings"
+        },
+        "executionBinding": {
+          "$ref": "#/definitions/ExecutionBindingSnapshot"
+        },
+        "profileDigest": {
+          "$ref": "#/definitions/Digest"
+        },
+        "schemaDigest": {
+          "$ref": "#/definitions/Digest"
+        },
+        "method": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FrozenStageMethod"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "internalPrompt": {
+          "$ref": "#/definitions/InternalPromptSnapshot"
+        }
+      }
+    },
+    "RunSettingsArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stages",
+        "storageContractDigest"
+      ],
+      "properties": {
+        "stages": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "chapters",
+            "scenes",
+            "storyboard",
+            "roles",
+            "props",
+            "integration",
+            "clipPlan",
+            "environmentPrompt",
+            "clipDraft",
+            "framePlan",
+            "framePrompt"
+          ],
+          "properties": {
+            "chapters": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/FrozenStageSettings"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "scenes": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/FrozenStageSettings"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "storyboard": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/FrozenStageSettings"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "roles": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/FrozenStageSettings"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "props": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/FrozenStageSettings"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "integration": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/FrozenStageSettings"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "clipPlan": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/FrozenStageSettings"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "environmentPrompt": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/FrozenStageSettings"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "clipDraft": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/FrozenStageSettings"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "framePlan": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/FrozenStageSettings"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "framePrompt": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/FrozenStageSettings"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        "storageContractDigest": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "FreezeSourceRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "expectedSourceRevision",
+        "replacementChapterIds",
+        "sourceDecision"
+      ],
+      "properties": {
+        "target": {
+          "$ref": "#/definitions/SourceTarget"
+        },
+        "expectedSourceRevision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "replacementChapterIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Id"
+          }
+        },
+        "sourceDecision": {
+          "$ref": "#/definitions/SourceDecision"
+        }
+      }
+    },
+    "SourceSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "revision",
+        "title",
+        "fields",
+        "relatedEntities",
+        "collectionRevision",
+        "replacementChapters",
+        "lineage"
+      ],
+      "properties": {
+        "target": {
+          "$ref": "#/definitions/SourceTarget"
+        },
+        "revision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "title": {
+          "type": "string"
+        },
+        "fields": {
+          "$ref": "#/definitions/SourceFields"
+        },
+        "relatedEntities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RegistryEntry"
+          }
+        },
+        "collectionRevision": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Revision"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "replacementChapters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FrozenChapterTarget"
+          }
+        },
+        "lineage": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/LineageEntry"
+          }
+        }
+      }
+    },
+    "ModelMessage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "content"
+      ],
+      "properties": {
+        "role": {
+          "type": "string",
+          "enum": [
+            "system",
+            "user"
+          ]
+        },
+        "content": {
+          "type": "string",
+          "minLength": 1
+        },
+        "images": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/FrozenImageRef"
+              },
+              "minItems": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "FrozenImageRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "relPath",
+        "sha256"
+      ],
+      "properties": {
+        "relPath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64
+        }
+      }
+    },
+    "ModelRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "messages",
+        "outputKind"
+      ],
+      "properties": {
+        "messages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ModelMessage"
+          },
+          "minItems": 1
+        },
+        "outputKind": {
+          "$ref": "#/definitions/ModelOutputKind"
+        },
+        "taskContext": {}
+      }
+    },
+    "FrozenStageInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "snapshotId",
+        "stage",
+        "target",
+        "sourceRevision",
+        "entityKind",
+        "optimizeFields",
+        "modelRequest",
+        "executionBindingSnapshot",
+        "writeScope",
+        "schemaDigest",
+        "profileDigest",
+        "skillDigest"
+      ],
+      "properties": {
+        "snapshotId": {
+          "$ref": "#/definitions/Id"
+        },
+        "stage": {
+          "$ref": "#/definitions/WorkStage"
+        },
+        "target": {
+          "$ref": "#/definitions/SourceTarget"
+        },
+        "sourceRevision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "entityKind": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/EntityKind"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "optimizeFields": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/OptimizeField"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "modelRequest": {
+          "$ref": "#/definitions/ModelRequest"
+        },
+        "executionBindingSnapshot": {
+          "$ref": "#/definitions/ExecutionBindingSnapshot"
+        },
+        "writeScope": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/WriteScope"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "schemaDigest": {
+          "$ref": "#/definitions/Digest"
+        },
+        "profileDigest": {
+          "$ref": "#/definitions/Digest"
+        },
+        "skillDigest": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Digest"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "RawModelResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "attemptId",
+        "rawText",
+        "finishReason",
+        "vendorRequestId",
+        "usageArtifactRef"
+      ],
+      "properties": {
+        "attemptId": {
+          "$ref": "#/definitions/Id"
+        },
+        "rawText": {
+          "type": "string"
+        },
+        "finishReason": {
+          "$ref": "#/definitions/FinishReason"
+        },
+        "vendorRequestId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "usageArtifactRef": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "AttemptIds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runId",
+        "itemId",
+        "taskId",
+        "cycle",
+        "attemptIndex",
+        "traceId"
+      ],
+      "properties": {
+        "runId": {
+          "$ref": "#/definitions/Id"
+        },
+        "itemId": {
+          "$ref": "#/definitions/Id"
+        },
+        "taskId": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "cycle": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "attemptIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "traceId": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "ClaimedItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "itemId",
+        "runId",
+        "ordinal",
+        "stage",
+        "target",
+        "phase",
+        "attemptCycle",
+        "automaticRetriesUsed",
+        "revision"
+      ],
+      "properties": {
+        "itemId": {
+          "$ref": "#/definitions/Id"
+        },
+        "runId": {
+          "$ref": "#/definitions/Id"
+        },
+        "ordinal": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "stage": {
+          "$ref": "#/definitions/WorkStage"
+        },
+        "target": {
+          "$ref": "#/definitions/SourceTarget"
+        },
+        "phase": {
+          "$ref": "#/definitions/Phase"
+        },
+        "attemptCycle": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "automaticRetriesUsed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "ItemTransition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "itemId",
+        "expectedRevision",
+        "to",
+        "error",
+        "snapshotArtifactId",
+        "responseArtifactId",
+        "retryAfterMs"
+      ],
+      "properties": {
+        "itemId": {
+          "$ref": "#/definitions/Id"
+        },
+        "expectedRevision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "to": {
+          "$ref": "#/definitions/Phase"
+        },
+        "error": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ErrorView"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "snapshotArtifactId": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "responseArtifactId": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "retryAfterMs": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "PlannedChapter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nodeId",
+        "title",
+        "script",
+        "sourceChapterId",
+        "expectedSourceRevision"
+      ],
+      "properties": {
+        "nodeId": {
+          "$ref": "#/definitions/Id"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "script": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceChapterId": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "expectedSourceRevision": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Revision"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "referenceImages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FrozenImageRef"
+          }
+        }
+      }
+    },
+    "PlannedScene": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nodeId",
+        "localId",
+        "title",
+        "script",
+        "scenePrompt",
+        "storyboardHint",
+        "mentions"
+      ],
+      "properties": {
+        "nodeId": {
+          "$ref": "#/definitions/Id"
+        },
+        "localId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "script": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scenePrompt": {
+          "type": "string"
+        },
+        "storyboardHint": {
+          "type": "string"
+        },
+        "mentions": {
+          "$ref": "story-creation-model.schema.json#/definitions/Mentions"
+        }
+      }
+    },
+    "PlannedShot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nodeId",
+        "localId",
+        "title",
+        "staticFramePrompt",
+        "videoPrompt",
+        "mentions"
+      ],
+      "properties": {
+        "nodeId": {
+          "$ref": "#/definitions/Id"
+        },
+        "localId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "staticFramePrompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "videoPrompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mentions": {
+          "$ref": "story-creation-model.schema.json#/definitions/Mentions"
+        },
+        "dialogue": {
+          "$ref": "story-creation-model.schema.json#/definitions/ShotDialogue"
+        }
+      }
+    },
+    "CommitContent": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "chapters"
+          ],
+          "properties": {
+            "kind": {
+              "const": "chapters"
+            },
+            "chapters": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PlannedChapter"
+              },
+              "minItems": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "scenes",
+            "candidates"
+          ],
+          "properties": {
+            "kind": {
+              "const": "scenes"
+            },
+            "scenes": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PlannedScene"
+              },
+              "minItems": 1
+            },
+            "candidates": {
+              "$ref": "story-creation-model.schema.json#/definitions/CandidateLists"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "shots",
+            "candidates"
+          ],
+          "properties": {
+            "kind": {
+              "const": "storyboard"
+            },
+            "shots": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PlannedShot"
+              },
+              "minItems": 1
+            },
+            "candidates": {
+              "$ref": "story-creation-model.schema.json#/definitions/CandidateLists"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "entityKind",
+            "candidates"
+          ],
+          "properties": {
+            "kind": {
+              "const": "extraction"
+            },
+            "entityKind": {
+              "$ref": "#/definitions/EntityKind"
+            },
+            "candidates": {
+              "type": "array",
+              "items": {
+                "$ref": "story-creation-model.schema.json#/definitions/Candidate"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "changes"
+          ],
+          "properties": {
+            "kind": {
+              "const": "textPatch"
+            },
+            "changes": {
+              "type": "array",
+              "items": {
+                "$ref": "story-creation-model.schema.json#/definitions/FieldChange"
+              },
+              "minItems": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "artifact"
+          ],
+          "properties": {
+            "kind": {
+              "const": "clipArtifact"
+            },
+            "artifact": {
+              "$ref": "clip-workflow.schema.json#/definitions/ClipArtifact"
+            }
+          }
+        }
+      ]
+    },
+    "FollowupSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stage",
+        "entityKind"
+      ],
+      "properties": {
+        "stage": {
+          "const": "integration"
+        },
+        "entityKind": {
+          "$ref": "#/definitions/EntityKind"
+        }
+      }
+    },
+    "CommitPlanData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "itemId",
+        "target",
+        "sourceRevision",
+        "collectionRevision",
+        "sourceDecision",
+        "write",
+        "content",
+        "localIdMappings",
+        "candidateArtifactId",
+        "followups",
+        "sourceLineage"
+      ],
+      "properties": {
+        "itemId": {
+          "$ref": "#/definitions/Id"
+        },
+        "target": {
+          "$ref": "#/definitions/SourceTarget"
+        },
+        "sourceRevision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "collectionRevision": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Revision"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sourceDecision": {
+          "$ref": "#/definitions/SourceDecision"
+        },
+        "write": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/WriteScope"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "content": {
+          "$ref": "#/definitions/CommitContent"
+        },
+        "localIdMappings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/LocalIdMapping"
+          }
+        },
+        "candidateArtifactId": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "followups": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FollowupSpec"
+          }
+        },
+        "sourceLineage": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/LineageEntry"
+          }
+        }
+      }
+    },
+    "EntityChangeSource": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "operations"
+          ],
+          "properties": {
+            "kind": {
+              "const": "manual"
+            },
+            "operations": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/EntityOperation"
+              },
+              "minItems": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "artifactId",
+            "decisions",
+            "occurrences"
+          ],
+          "properties": {
+            "kind": {
+              "const": "integration"
+            },
+            "artifactId": {
+              "$ref": "#/definitions/Id"
+            },
+            "decisions": {
+              "type": "array",
+              "items": {
+                "$ref": "story-creation-model.schema.json#/definitions/EntityDecision"
+              },
+              "minItems": 1
+            },
+            "occurrences": {
+              "type": "array",
+              "items": {
+                "$ref": "story-creation-model.schema.json#/definitions/CandidateOccurrence"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "EntityChangeData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "storyId",
+        "entityKind",
+        "expectedRegistryRevision",
+        "itemId",
+        "source"
+      ],
+      "properties": {
+        "storyId": {
+          "$ref": "#/definitions/Id"
+        },
+        "entityKind": {
+          "$ref": "#/definitions/EntityKind"
+        },
+        "expectedRegistryRevision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "itemId": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source": {
+          "$ref": "#/definitions/EntityChangeSource"
+        }
+      }
+    },
+    "RegistrySnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "storyId",
+        "entityKind",
+        "registryRevision",
+        "entries",
+        "occurrences"
+      ],
+      "properties": {
+        "storyId": {
+          "$ref": "#/definitions/Id"
+        },
+        "entityKind": {
+          "$ref": "#/definitions/EntityKind"
+        },
+        "registryRevision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RegistryEntry"
+          }
+        },
+        "occurrences": {
+          "type": "array",
+          "items": {
+            "$ref": "story-creation-model.schema.json#/definitions/ExistingOccurrence"
+          }
+        }
+      }
+    },
+    "RunArchiveInfo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "storyId",
+        "originRunId"
+      ],
+      "properties": {
+        "storyId": {
+          "$ref": "#/definitions/Id"
+        },
+        "originRunId": {
+          "$ref": "#/definitions/Id"
+        }
+      }
+    },
+    "ProvenanceArtifactBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceId",
+        "copiedId"
+      ],
+      "properties": {
+        "sourceId": {
+          "$ref": "#/definitions/Id"
+        },
+        "copiedId": {
+          "$ref": "#/definitions/Id"
+        }
+      }
+    },
+    "CopyProvenanceV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format",
+        "originRunId",
+        "sourceStoryId",
+        "sourceRequestJson",
+        "artifactIdMappings"
+      ],
+      "properties": {
+        "format": {
+          "type": "string",
+          "const": "storyCreationCopyProvenanceV1"
+        },
+        "originRunId": {
+          "$ref": "#/definitions/Id"
+        },
+        "sourceStoryId": {
+          "$ref": "#/definitions/Id"
+        },
+        "sourceRequestJson": {
+          "type": "string"
+        },
+        "artifactIdMappings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ProvenanceArtifactBinding"
+          }
+        }
+      }
+    },
+    "FrozenChapterTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "title",
+        "script",
+        "revision"
+      ],
+      "properties": {
+        "target": {
+          "$ref": "#/definitions/ChapterTarget"
+        },
+        "title": {
+          "type": "string"
+        },
+        "script": {
+          "type": "string"
+        },
+        "revision": {
+          "$ref": "#/definitions/Revision"
+        }
+      }
+    },
+    "RunReadOnlyReason": {
+      "type": "string",
+      "enum": [
+        "contractChanged"
+      ]
+    },
+    "ClipsGenerateArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "targets",
+        "settings",
+        "draftSettings",
+        "environmentSettings",
+        "options"
+      ],
+      "properties": {
+        "kind": {
+          "const": "clips"
+        },
+        "targets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ChapterExtractionTarget"
+          },
+          "minItems": 1
+        },
+        "settings": {
+          "$ref": "#/definitions/StageSettings"
+        },
+        "draftSettings": {
+          "$ref": "#/definitions/StageSettings"
+        },
+        "environmentSettings": {
+          "$ref": "#/definitions/StageSettings"
+        },
+        "options": {
+          "$ref": "clip-workflow.schema.json#/definitions/ClipGenerationOptions"
+        }
+      }
+    },
+    "FlowClipPlanStage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "settings",
+        "options"
+      ],
+      "properties": {
+        "settings": {
+          "$ref": "#/definitions/StageSettings"
+        },
+        "options": {
+          "$ref": "clip-workflow.schema.json#/definitions/ClipGenerationOptions"
+        }
+      }
+    },
+    "ClipDraftGenerationTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "expectedSourceRevision",
+        "planArtifactId",
+        "localId"
+      ],
+      "properties": {
+        "target": {
+          "$ref": "#/definitions/ChapterTarget"
+        },
+        "expectedSourceRevision": {
+          "$ref": "#/definitions/Revision"
+        },
+        "planArtifactId": {
+          "$ref": "#/definitions/Id"
+        },
+        "localId": {
+          "$ref": "#/definitions/Id"
+        }
+      }
+    },
+    "CanvasVideoGenerationTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "storyId",
+        "workspaceId",
+        "nodeId",
+        "expectedPromptDigest"
+      ],
+      "properties": {
+        "storyId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "workspaceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedPromptDigest": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        }
+      }
+    },
+    "ClipFramePromptGenerationTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "planArtifactId",
+        "localId"
+      ],
+      "properties": {
+        "target": {
+          "$ref": "#/definitions/CanvasVideoGenerationTarget"
+        },
+        "planArtifactId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "localId": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "InternalPromptSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "formatVersion",
+        "language",
+        "tasks",
+        "files",
+        "digest"
+      ],
+      "properties": {
+        "formatVersion": {
+          "const": 2
+        },
+        "language": {
+          "type": "string",
+          "enum": [
+            "zh",
+            "en"
+          ]
+        },
+        "tasks": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "string",
+            "enum": [
+              "request",
+              "material"
+            ]
+          }
+        },
+        "files": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "digest": {
+          "$ref": "#/definitions/Digest"
+        }
+      }
+    }
+  }
+}

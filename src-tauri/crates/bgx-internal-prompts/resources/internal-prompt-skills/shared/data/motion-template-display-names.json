@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "names": {
+    "bgx.official/comparison": {
+      "zh-CN": "双栏对比",
+      "en": "Two-column comparison"
+    },
+    "bgx.official/image-annotation": {
+      "zh-CN": "图片定点标注",
+      "en": "Image callout annotation"
+    },
+    "bgx.official/keyword": {
+      "zh-CN": "关键词强调",
+      "en": "Keyword emphasis"
+    },
+    "bgx.official/list": {
+      "zh-CN": "清单逐项出现",
+      "en": "List item reveal"
+    },
+    "bgx.official/number": {
+      "zh-CN": "数字与单位展示",
+      "en": "Number and unit display"
+    },
+    "bgx.studio/count-lock": {
+      "zh-CN": "数字递增到目标",
+      "en": "Count up to target"
+    },
+    "bgx.studio/impact-keyword": {
+      "zh-CN": "关键词动效入场",
+      "en": "Keyword motion entrance"
+    },
+    "bgx.studio/signal-callout": {
+      "zh-CN": "引线标注物体",
+      "en": "Leader-line object callout"
+    },
+    "community.atlas/route-map": {
+      "zh-CN": "路线逐段绘制",
+      "en": "Route drawn in stages"
+    }
+  }
+}

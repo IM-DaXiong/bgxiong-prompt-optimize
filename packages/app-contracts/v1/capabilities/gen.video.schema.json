@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["prompt"],
+  "properties": {
+    "prompt": { "type": "string", "minLength": 1 },
+    "modelId": { "type": "string" },
+    "durationSec": { "type": "integer" },
+    "profileId": { "type": "string" },
+    "sdkVideo": {
+      "type": "object",
+      "required": ["selection", "input"],
+      "properties": {
+        "selection": {
+          "type": "object",
+          "required": ["pluginId", "version", "modelId", "capabilityKey", "operationId", "operationVersion", "inputSchemaDigest", "source"],
+          "properties": {
+            "pluginId": { "type": "string", "minLength": 1 },
+            "version": { "type": "string", "minLength": 1 },
+            "modelId": { "type": "string", "minLength": 1 },
+            "capabilityKey": { "const": "video.generate" },
+            "operationId": { "type": "string", "minLength": 1 },
+            "operationVersion": { "type": "integer", "minimum": 1 },
+            "inputSchemaDigest": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "source": {
+              "type": "object",
+              "required": ["kind"],
+              "properties": { "kind": { "const": "installed" } },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "input": { "type": "object" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "allOf": [
+    {
+      "if": { "required": ["sdkVideo"] },
+      "then": {
+        "required": ["modelId"],
+        "not": { "anyOf": [ { "required": ["durationSec"] }, { "required": ["profileId"] } ] }
+      }
+    }
+  ],
+  "additionalProperties": false
+}

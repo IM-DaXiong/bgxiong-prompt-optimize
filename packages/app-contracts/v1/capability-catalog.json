@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "capabilities": [
+    {"name": "catalog.capabilities", "version": "1.0.0", "mode": "sync", "summary": "List mounted public capabilities"},
+    {"name": "catalog.models", "version": "1.0.0", "mode": "sync", "summary": "List models projected from settings"},
+    {"name": "catalog.probe", "version": "1.0.0", "mode": "sync", "summary": "Probe runtimes with L1 L2 L3 layers"},
+    {"name": "media.probe", "version": "1.0.0", "mode": "either", "summary": "ffprobe media info"},
+    {"name": "media.transcode", "version": "1.0.0", "mode": "async", "summary": "Transcode via MediaRuntimeService"},
+    {"name": "media.extract_frames", "version": "1.0.0", "mode": "async", "summary": "Extract frames at timestamps"},
+    {"name": "media.concat", "version": "1.0.0", "mode": "async", "summary": "Concat media clips"},
+    {"name": "media.master_mux", "version": "1.0.0", "mode": "async", "summary": "Mux audio and video"},
+    {"name": "media.export", "version": "1.0.0", "mode": "async", "summary": "Generic media export"},
+    {"name": "media.av_align", "version": "1.0.0", "mode": "async", "summary": "Multi-camera audio offset"},
+    {"name": "media.silence_detect", "version": "1.0.0", "mode": "either", "summary": "Detect silence intervals"},
+    {"name": "analysis.shot_cut", "version": "1.0.0", "mode": "async", "summary": "ffmpeg scene shot table"},
+    {"name": "analysis.scene_detect", "version": "1.0.0", "mode": "async", "summary": "Alias of shot_cut ffmpeg scene"},
+    {"name": "understanding.vision", "version": "1.0.0", "mode": "async", "summary": "VL structured understand"},
+    {"name": "audio.vocal_separate", "version": "1.0.0", "mode": "async", "summary": "Vocal separate engine slot"},
+    {"name": "speech.transcribe", "version": "1.0.0", "mode": "async", "summary": "STT transcribe"},
+    {"name": "speech.diarize", "version": "1.0.0", "mode": "async", "summary": "Speaker diarize engine slot"},
+    {"name": "speech.synthesize", "version": "1.0.0", "mode": "async", "summary": "TTS synthesize"},
+    {"name": "speech.trim", "version": "1.0.0", "mode": "async", "summary": "Trim audio ranges"},
+    {"name": "llm.structured", "version": "1.0.0", "mode": "async", "summary": "LLM JSON schema complete"},
+    {"name": "llm.chat", "version": "1.0.0", "mode": "async", "summary": "Local stateless text chat using the configured default model; no client API key"},
+    {"name": "gen.image", "version": "1.0.0", "mode": "async", "summary": "Image generation executor"},
+    {"name": "gen.portrait_multi_view", "version": "1.0.0", "mode": "async", "summary": "Multi-view stills via image executor"},
+    {"name": "gen.video", "version": "1.0.0", "mode": "async", "summary": "Video generation submit"},
+    {"name": "lipsync.generate", "version": "1.0.0", "mode": "async", "summary": "Lipsync provider"},
+    {"name": "skill.optimize.storyboard_shot", "version": "1.0.0", "mode": "async", "summary": "Installed skill optimize shot"},
+    {"name": "skill.optimize.segment", "version": "1.0.0", "mode": "async", "summary": "Installed skill optimize segment"}
+  ]
+}

@@ -1,0 +1,9 @@
+[package]
+name = "prompt-optimize-example"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+bgx-prompt-optimize = { path = "../../src-tauri/crates/bgx-prompt-optimize" }
+prompt-optimize-runtime = { path = "../../crates/prompt-optimize-runtime" }

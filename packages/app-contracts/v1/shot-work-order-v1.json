@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "sourceMode": ["shotScript", "material", "mixed"],
+  "cutPurpose": ["establish", "advanceAction", "reaction", "reveal", "dialogue", "insertDetail", "transition", "povShift"],
+  "pacingDriver": ["story", "action", "performance", "povSwitch"],
+  "durationIntent": ["brief", "standard", "linger"]
+}

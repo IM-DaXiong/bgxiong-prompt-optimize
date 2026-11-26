@@ -1,0 +1,20 @@
+[package]
+name = "bgx-agent-skills-core"
+version = "0.1.0"
+edition = "2021"
+publish = false
+description = "Pure core for standard Agent Skills packages: SKILL.md frontmatter, name/field validation, resource manifest, packageDigest, stableId, SKILL worker stdio protocol (W00). Bytes in, values out; no fs/net/process/tauri/db/wasmtime."
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+# W00 worker protocol blobs (agent-skill-worker.json `blob.encoding`).
+base64 = "0.22"
+unicode-normalization = "0.1"
+# YAML library pinned in SPEC section 4.4 (P00). Event API only; default "encoding" feature off.
+yaml-rust2 = { version = "=0.13.0", default-features = false }
+
+[build-dependencies]
+serde_json = "1"
+bgx-contract-gen = { path = "../bgx-contract-gen" }

@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "scaleMilliMin": 0,
+  "scaleMilliMax": 1000,
+  "scaleMilliDefault": 0,
+  "scaleMilliStep": 1
+}

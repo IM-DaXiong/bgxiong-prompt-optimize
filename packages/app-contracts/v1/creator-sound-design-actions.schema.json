@@ -1,0 +1,617 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bgxiong.com/app-contracts/v1/creator-sound-design-actions.schema.json",
+  "title": "CreatorSoundDesignActions",
+  "description": "Args for sound design Creator tools (sound design PLAN 20261020). Same SoundDesignState as the workbench IPC.",
+  "definitions": {
+    "soundDesignNoArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {}
+    },
+    "soundDesignPathArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        }
+      }
+    },
+    "soundDesignStrokeArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "points"
+      ],
+      "properties": {
+        "lane": {
+          "type": "string",
+          "enum": [
+            "intensity",
+            "tone"
+          ]
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "draw",
+            "brush"
+          ]
+        },
+        "points": {
+          "type": "array",
+          "maxItems": 100000,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "frame",
+              "level"
+            ],
+            "properties": {
+              "frame": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "level": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            }
+          }
+        },
+        "expectedVersion": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "soundDesignOpenProjectArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "sourcePath": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 1024
+        },
+        "confirmChangedSource": {
+          "type": "boolean"
+        }
+      }
+    },
+    "soundDesignPlayArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "fromFrame": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "soundDesignMonitorArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "original"
+      ],
+      "properties": {
+        "original": {
+          "type": "boolean"
+        }
+      }
+    },
+    "soundDesignSetKeysArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "keys"
+      ],
+      "properties": {
+        "lane": {
+          "type": "string",
+          "enum": [
+            "intensity",
+            "tone"
+          ]
+        },
+        "expectedVersion": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "keys": {
+          "type": "array",
+          "maxItems": 100000,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "frame",
+              "level"
+            ],
+            "properties": {
+              "frame": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "level": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "interpOut": {
+                "type": "string",
+                "enum": [
+                  "linear",
+                  "hold",
+                  "ease"
+                ]
+              },
+              "easeIn": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "easeOut": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "soundDesignEditKeysArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ops"
+      ],
+      "properties": {
+        "lane": {
+          "type": "string",
+          "enum": [
+            "intensity",
+            "tone"
+          ]
+        },
+        "expectedVersion": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ops": {
+          "type": "array",
+          "maxItems": 100000,
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "op",
+                  "id",
+                  "frame",
+                  "level"
+                ],
+                "properties": {
+                  "op": {
+                    "const": "move"
+                  },
+                  "id": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "frame": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "level": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "op",
+                  "frame",
+                  "level"
+                ],
+                "properties": {
+                  "op": {
+                    "const": "add"
+                  },
+                  "frame": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "level": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "interpOut": {
+                    "type": "string",
+                    "enum": [
+                      "linear",
+                      "hold",
+                      "ease"
+                    ]
+                  },
+                  "easeIn": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "easeOut": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "op",
+                  "id"
+                ],
+                "properties": {
+                  "op": {
+                    "const": "delete"
+                  },
+                  "id": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "op",
+                  "id"
+                ],
+                "properties": {
+                  "op": {
+                    "const": "setEase"
+                  },
+                  "id": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "interpOut": {
+                    "type": "string",
+                    "enum": [
+                      "linear",
+                      "hold",
+                      "ease"
+                    ]
+                  },
+                  "easeIn": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "easeOut": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "soundDesignDefaultEaseArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "interp"
+      ],
+      "properties": {
+        "lane": {
+          "type": "string",
+          "enum": [
+            "intensity",
+            "tone"
+          ]
+        },
+        "interp": {
+          "type": "string",
+          "enum": [
+            "linear",
+            "hold",
+            "ease"
+          ]
+        },
+        "applyToAll": {
+          "type": "boolean"
+        },
+        "expectedVersion": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "soundDesignGesturePreviewArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "gestureId",
+        "seq",
+        "edit"
+      ],
+      "properties": {
+        "gestureId": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "edit": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "kind",
+                "points"
+              ],
+              "properties": {
+                "kind": {
+                  "const": "stroke"
+                },
+                "lane": {
+                  "type": "string",
+                  "enum": [
+                    "intensity",
+                    "tone"
+                  ]
+                },
+                "mode": {
+                  "type": "string",
+                  "enum": [
+                    "draw",
+                    "brush"
+                  ]
+                },
+                "points": {
+                  "type": "array",
+                  "maxItems": 100000,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "frame",
+                      "level"
+                    ],
+                    "properties": {
+                      "frame": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "level": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "kind",
+                "ops"
+              ],
+              "properties": {
+                "kind": {
+                  "const": "keys"
+                },
+                "lane": {
+                  "type": "string",
+                  "enum": [
+                    "intensity",
+                    "tone"
+                  ]
+                },
+                "ops": {
+                  "type": "array",
+                  "maxItems": 100000,
+                  "items": {
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "op",
+                          "id",
+                          "frame",
+                          "level"
+                        ],
+                        "properties": {
+                          "op": {
+                            "const": "move"
+                          },
+                          "id": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "frame": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "level": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "op",
+                          "frame",
+                          "level"
+                        ],
+                        "properties": {
+                          "op": {
+                            "const": "add"
+                          },
+                          "frame": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "level": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1
+                          },
+                          "interpOut": {
+                            "type": "string",
+                            "enum": [
+                              "linear",
+                              "hold",
+                              "ease"
+                            ]
+                          },
+                          "easeIn": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1
+                          },
+                          "easeOut": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "op",
+                          "id"
+                        ],
+                        "properties": {
+                          "op": {
+                            "const": "delete"
+                          },
+                          "id": {
+                            "type": "integer",
+                            "minimum": 0
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "op",
+                          "id"
+                        ],
+                        "properties": {
+                          "op": {
+                            "const": "setEase"
+                          },
+                          "id": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "interpOut": {
+                            "type": "string",
+                            "enum": [
+                              "linear",
+                              "hold",
+                              "ease"
+                            ]
+                          },
+                          "easeIn": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1
+                          },
+                          "easeOut": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "soundDesignGestureCommitArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "gestureId",
+        "seq"
+      ],
+      "properties": {
+        "gestureId": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "soundDesignGestureCancelArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "gestureId"
+      ],
+      "properties": {
+        "gestureId": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

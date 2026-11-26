@@ -1,0 +1,293 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-generative-video-edit-tools.schema.json",
+  "description": "Creator video.edit.* tool inputs. Same Rust entry and submission/selection contract as the GUI (generative_video_edit::service). A10: analyze + selection freeze + preview read stay in video.edit.* (no F1-private face-refine family).",
+  "definitions": {
+    "video.edit.capabilities.list": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {}
+    },
+    "video.edit.analyze": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "submission"
+      ],
+      "properties": {
+        "submission": {
+          "$ref": "generative-video-edit-v1.schema.json#/definitions/submission"
+        },
+        "cursor": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Optional analysis page cursor for continuation."
+        }
+      }
+    },
+    "video.edit.selection.freeze": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mediaTargetSelection"
+      ],
+      "properties": {
+        "mediaTargetSelection": {
+          "$ref": "generative-video-edit-v1.schema.json#/definitions/mediaTargetSelection"
+        }
+      }
+    },
+    "video.edit.preview.get": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "analysisId",
+        "analysisRevision",
+        "mediaTargetSelection"
+      ],
+      "properties": {
+        "analysisId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "analysisRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mediaTargetSelection": {
+          "$ref": "generative-video-edit-v1.schema.json#/definitions/mediaTargetSelection"
+        },
+        "cursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "video.edit.submit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "submission"
+      ],
+      "properties": {
+        "submission": {
+          "$ref": "generative-video-edit-v1.schema.json#/definitions/submission"
+        }
+      }
+    },
+    "video.edit.task.get": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "taskId"
+      ],
+      "properties": {
+        "taskId": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "video.edit.status.read": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "submission": {
+          "$ref": "generative-video-edit-v1.schema.json#/definitions/submission"
+        },
+        "taskId": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "submission"
+          ]
+        },
+        {
+          "required": [
+            "taskId"
+          ]
+        }
+      ]
+    },
+    "video.edit.reconcile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "taskId",
+        "expectedRevision"
+      ],
+      "properties": {
+        "taskId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedRevision": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "video.edit.tracking.submit": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "selection": {},
+        "direction": {
+          "type": "string"
+        },
+        "anchorKeyframeId": {
+          "type": "string"
+        },
+        "range": {
+          "type": "object",
+          "required": [
+            "startMs",
+            "endMs"
+          ],
+          "properties": {
+            "startMs": {
+              "type": "integer"
+            },
+            "endMs": {
+              "type": "integer"
+            }
+          }
+        },
+        "requestedCoverage": {
+          "type": "object",
+          "required": [
+            "startMs",
+            "endMs"
+          ],
+          "properties": {
+            "startMs": {
+              "type": "integer"
+            },
+            "endMs": {
+              "type": "integer"
+            }
+          }
+        },
+        "requestDigest": {
+          "type": "string"
+        },
+        "source": {},
+        "capability": {},
+        "writeBack": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "hostKind",
+            "projectId",
+            "targetId"
+          ],
+          "properties": {
+            "hostKind": {
+              "enum": [
+                "freeCanvas",
+                "segmentCanvas",
+                "clipCanvas"
+              ]
+            },
+            "projectId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "targetId": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "description": "Real host write-back media canvas node; not freeze.targetId person id."
+        }
+      },
+      "required": [
+        "selection",
+        "direction",
+        "anchorKeyframeId",
+        "range",
+        "requestedCoverage",
+        "requestDigest",
+        "source",
+        "capability",
+        "writeBack"
+      ]
+    },
+    "video.edit.tracking.frames.read": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "requestId": {
+          "type": "string"
+        },
+        "selectionDigest": {
+          "type": "string"
+        },
+        "timeMs": {
+          "type": "integer"
+        },
+        "cursor": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "requestId",
+        "selectionDigest"
+      ]
+    },
+    "video.edit.source.frames.read": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source"
+      ],
+      "properties": {
+        "source": {
+          "$ref": "generative-video-edit-v1.schema.json#/definitions/sourceRange"
+        },
+        "expectedSourceDigest": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "aroundTimeMs": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "cursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "not": {
+        "required": [
+          "aroundTimeMs",
+          "cursor"
+        ],
+        "properties": {
+          "aroundTimeMs": {
+            "type": "integer"
+          },
+          "cursor": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Read arguments; result is generative-video-edit-v1.schema.json#/definitions/sourceFramePage, including mandatory signed presentationOriginUs. Same read owner as GUI/F1."
+    }
+  }
+}

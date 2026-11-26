@@ -1,0 +1,77 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "hierarchy-detail-v1.schema.json",
+  "$ref": "#/definitions/Detail",
+  "definitions": {
+    "Detail": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "itemId",
+        "script",
+        "sourceRefs",
+        "observedState",
+        "dependencyDigests"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "itemId": {
+          "type": "string",
+          "minLength": 1,
+          "x-closedSet": "itemIds"
+        },
+        "script": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "hierarchy-source-index-v1.schema.json#/definitions/SourceRange"
+          },
+          "minItems": 0
+        },
+        "observedState": {
+          "type": "array",
+          "items": {
+            "$ref": "hierarchy-continuity-v1.schema.json#/definitions/Fact"
+          },
+          "minItems": 0
+        },
+        "dependencyDigests": {
+          "type": "array",
+          "items": {
+            "$ref": "hierarchy-continuity-v1.schema.json#/definitions/DependencyDigest"
+          },
+          "minItems": 0
+        }
+      }
+    },
+    "DerivedPrompt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scope",
+        "itemId",
+        "prompt"
+      ],
+      "properties": {
+        "scope": {
+          "$ref": "hierarchy-authoring-request-v1.schema.json#/definitions/Scope"
+        },
+        "itemId": {
+          "type": "string",
+          "minLength": 1,
+          "x-closedSet": "itemIds"
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

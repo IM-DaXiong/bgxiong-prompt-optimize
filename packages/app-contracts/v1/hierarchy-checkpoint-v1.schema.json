@@ -1,0 +1,677 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "hierarchy-checkpoint-v1.schema.json",
+  "$ref": "#/definitions/Draft",
+  "definitions": {
+    "RunStatus": {
+      "type": "string",
+      "enum": [
+        "running",
+        "needs_input",
+        "partial",
+        "interrupted",
+        "done",
+        "failed",
+        "cancelled",
+        "cancelling"
+      ]
+    },
+    "CallState": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "submitted",
+        "outcome_unknown",
+        "completed",
+        "failed",
+        "cancelled"
+      ]
+    },
+    "Owner": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runId",
+        "attempt",
+        "ownerToken",
+        "aiTaskId"
+      ],
+      "properties": {
+        "runId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "attempt": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "ownerToken": {
+          "type": "string",
+          "minLength": 1
+        },
+        "aiTaskId": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "RunCheckpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "runId",
+        "storyId",
+        "scopeKey",
+        "attempt",
+        "ownerToken",
+        "aiTaskId",
+        "sourceDigest",
+        "targetBaselineRevision",
+        "publicationCursorRevision",
+        "lastReceiptId",
+        "draftRevision",
+        "status",
+        "sourceRunRef"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "runId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "storyId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scopeKey": {
+          "type": "string",
+          "minLength": 1
+        },
+        "attempt": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ownerToken": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "aiTaskId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceDigest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "targetBaselineRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "publicationCursorRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "lastReceiptId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "draftRevision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "status": {
+          "$ref": "#/definitions/RunStatus"
+        },
+        "sourceRunRef": {
+          "anyOf": [
+            {
+              "$ref": "hierarchy-authoring-request-v1.schema.json#/definitions/DraftRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "CallRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "callId",
+        "itemId",
+        "phase",
+        "inputDigest",
+        "attempt",
+        "childTaskId",
+        "state",
+        "resultRef",
+        "errorKind"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "callId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "itemId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "phase": {
+          "type": "string",
+          "x-policyEnum": "phases"
+        },
+        "inputDigest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "attempt": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "childTaskId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "state": {
+          "$ref": "#/definitions/CallState"
+        },
+        "resultRef": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "errorKind": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "x-policyEnum": "errors"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "StoredArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "artifactKey",
+        "digest",
+        "byteLength",
+        "chunkKeys"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "artifactKey": {
+          "type": "string",
+          "minLength": 1
+        },
+        "digest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "byteLength": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "chunkKeys": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        }
+      }
+    },
+    "Draft": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "runId",
+        "draftRevision",
+        "outline",
+        "quality",
+        "sourceRunRef",
+        "itemStates"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "runId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "draftRevision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "outline": {
+          "$ref": "hierarchy-outline-v1.schema.json#/definitions/Outline"
+        },
+        "quality": {
+          "$ref": "hierarchy-authoring-request-v1.schema.json#/definitions/Quality"
+        },
+        "sourceRunRef": {
+          "anyOf": [
+            {
+              "$ref": "hierarchy-authoring-request-v1.schema.json#/definitions/DraftRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "itemStates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DraftItemState"
+          }
+        }
+      }
+    },
+    "DraftEdit": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "itemId",
+            "metadata"
+          ],
+          "properties": {
+            "type": {
+              "const": "replaceMetadata"
+            },
+            "itemId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "metadata": {
+              "$ref": "hierarchy-outline-v1.schema.json#/definitions/ItemMetadata"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "itemId",
+            "sourceRanges"
+          ],
+          "properties": {
+            "type": {
+              "const": "setRanges"
+            },
+            "itemId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sourceRanges": {
+              "type": "array",
+              "items": {
+                "$ref": "hierarchy-source-index-v1.schema.json#/definitions/SourceRange"
+              },
+              "minItems": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "itemId",
+            "beforeItemId"
+          ],
+          "properties": {
+            "type": {
+              "const": "move"
+            },
+            "itemId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "beforeItemId": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "itemId",
+            "note"
+          ],
+          "properties": {
+            "type": {
+              "const": "setDisplayNote"
+            },
+            "itemId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "note": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "itemId",
+            "boundaryId",
+            "firstMetadata",
+            "secondMetadata"
+          ],
+          "properties": {
+            "type": {
+              "const": "split"
+            },
+            "itemId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "boundaryId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "firstMetadata": {
+              "$ref": "hierarchy-outline-v1.schema.json#/definitions/ItemMetadata"
+            },
+            "secondMetadata": {
+              "$ref": "hierarchy-outline-v1.schema.json#/definitions/ItemMetadata"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "itemIds",
+            "metadata"
+          ],
+          "properties": {
+            "type": {
+              "const": "merge"
+            },
+            "itemIds": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1
+            },
+            "metadata": {
+              "$ref": "hierarchy-outline-v1.schema.json#/definitions/ItemMetadata"
+            }
+          }
+        }
+      ]
+    },
+    "DraftEditRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runId",
+        "expectedDraftRevision",
+        "edits"
+      ],
+      "properties": {
+        "runId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedDraftRevision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "edits": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DraftEdit"
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "AuthoringSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runId",
+        "draftRevision",
+        "sourceDigest",
+        "targetRevision",
+        "sourcePolicy",
+        "quality",
+        "counts",
+        "nextCursor"
+      ],
+      "properties": {
+        "runId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "draftRevision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sourceDigest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "targetRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourcePolicy": {
+          "$ref": "hierarchy-authoring-request-v1.schema.json#/definitions/SourcePolicy"
+        },
+        "quality": {
+          "$ref": "hierarchy-authoring-request-v1.schema.json#/definitions/Quality"
+        },
+        "counts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "planned",
+            "reviewed",
+            "expanded",
+            "published",
+            "failed"
+          ],
+          "properties": {
+            "planned": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "reviewed": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "expanded": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "published": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "failed": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "nextCursor": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "OutlinePage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "summary",
+        "items",
+        "nextCursor",
+        "sourcePreviews"
+      ],
+      "properties": {
+        "summary": {
+          "$ref": "#/definitions/AuthoringSummary"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "hierarchy-outline-v1.schema.json#/definitions/OutlineItem"
+          }
+        },
+        "nextCursor": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sourcePreviews": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SourcePreview"
+          }
+        }
+      }
+    },
+    "SourcePreview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "itemId",
+        "text",
+        "sourceStartByteOffset",
+        "boundaries",
+        "nextCursor"
+      ],
+      "properties": {
+        "itemId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "text": {
+          "type": "string"
+        },
+        "sourceStartByteOffset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "boundaries": {
+          "type": "array",
+          "items": {
+            "$ref": "hierarchy-source-index-v1.schema.json#/definitions/SourceBoundary"
+          }
+        },
+        "nextCursor": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "DraftItemState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "itemId",
+        "quality",
+        "invalidatedPhases"
+      ],
+      "properties": {
+        "itemId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "quality": {
+          "$ref": "hierarchy-authoring-request-v1.schema.json#/definitions/Quality"
+        },
+        "invalidatedPhases": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "x-policyEnum": "phases"
+          }
+        }
+      }
+    }
+  }
+}

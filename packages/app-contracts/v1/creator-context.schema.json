@@ -1,0 +1,259 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-context.schema.json",
+  "title": "CreatorContextAlias",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "snapshotRevision",
+    "capturedAtMs",
+    "activeWindow",
+    "navigation",
+    "selections",
+    "focusedSurface",
+    "openSurfaces",
+    "attachments",
+    "windowEpoch",
+    "publishSeq"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "snapshotRevision": {
+      "type": "string",
+      "minLength": 1,
+      "description": "sha256 over the canonical payload EXCLUDING snapshotRevision and capturedAtMs: identical UI state yields the identical revision regardless of capture time."
+    },
+    "capturedAtMs": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Capture wall-clock (ms). Informational only; not part of snapshotRevision."
+    },
+    "windowEpoch": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Increments when this window is reopened. Participates in snapshotRevision. Not a wall clock."
+    },
+    "publishSeq": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Increments on each publish of the current windowEpoch. Participates in snapshotRevision. Not a wall clock."
+    },
+    "activeWindow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "label",
+        "kind"
+      ],
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "main",
+            "assistant",
+            "workbench",
+            "popout"
+          ]
+        }
+      }
+    },
+    "navigation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mainTab",
+        "subTabs",
+        "activeStoryId",
+        "activeChapterId",
+        "activeSceneId",
+        "activeCanvasProjectId"
+      ],
+      "properties": {
+        "mainTab": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "subTabs": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Per-mainTab sub view (e.g. {\"scene\":\"text\"}). mainTab is the top-level tab; subTabs is the view inside it; neither implies a selection or creation target."
+        },
+        "activeStoryId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "activeChapterId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "activeSceneId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "activeCanvasProjectId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "selections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "surfaceId",
+          "refs",
+          "primaryRef",
+          "selectionRevision"
+        ],
+        "properties": {
+          "surfaceId": {
+            "type": "string"
+          },
+          "refs": {
+            "type": "array",
+            "items": {
+              "$ref": "creator-resource-ref.schema.json"
+            }
+          },
+          "primaryRef": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "creator-resource-ref.schema.json"
+              }
+            ]
+          },
+          "selectionRevision": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "focusedSurface": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "creator-editable-surface.schema.json"
+        }
+      ],
+      "description": "Surface holding keyboard focus; when none holds focus, the topmost open workbench surface (most recently opened)."
+    },
+    "creationTarget": {
+      "description": "S09: the creative target the user is working on (active creation owner). Separate from focusedSurface so that focusing the F1/assistant input never retargets it. The assistant window can never own it. null/absent when no creation target exists; never invented from navigation.",
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "ownerWindowLabel",
+            "ownerWindowKind",
+            "ref"
+          ],
+          "properties": {
+            "ownerWindowLabel": {
+              "type": "string",
+              "minLength": 1
+            },
+            "ownerWindowKind": {
+              "enum": [
+                "main",
+                "workbench",
+                "popout"
+              ]
+            },
+            "surfaceId": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "ref": {
+              "$ref": "creator-resource-ref.schema.json"
+            },
+            "workbenchKind": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "$ref": "creator-editable-surface.schema.json#/definitions/workbenchKind"
+                }
+              ]
+            },
+            "draftRevision": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "resourceRevision": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "openSurfaces": {
+      "type": "array",
+      "items": {
+        "$ref": "creator-editable-surface.schema.json"
+      }
+    },
+    "attachments": {
+      "type": "array",
+      "items": {
+        "$ref": "creator-resource-ref.schema.json"
+      }
+    },
+    "sceneReplanPointer": {
+      "description": "Optional pointer only. Source identity, unit ids, and pagination live in creator-scene-replan.schema.json. Omitting this field does not mean a novel was read.",
+      "$ref": "creator-scene-replan.schema.json#/definitions/sceneContextPointer"
+    }
+  },
+  "description": "Alias of creator-ui-context.schema.json (PLAN §3.5 naming)."
+}

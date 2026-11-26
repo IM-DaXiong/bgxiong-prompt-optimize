@@ -1,0 +1,635 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "ReadArgs": {
+      "$ref": "#/definitions/Scope"
+    },
+    "Scope": {
+      "type": "object",
+      "properties": {
+        "workspaceId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "chapterId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        }
+      },
+      "required": [
+        "workspaceId",
+        "chapterId"
+      ],
+      "additionalProperties": false
+    },
+    "Binding": {
+      "type": "object",
+      "properties": {
+        "bindingId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "modelId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "expectedBindingDigest": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        }
+      },
+      "required": [
+        "bindingId",
+        "modelId",
+        "expectedBindingDigest"
+      ],
+      "additionalProperties": false
+    },
+    "Skill": {
+      "type": "object",
+      "properties": {
+        "stableId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "packageDigest": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        }
+      },
+      "required": [
+        "stableId",
+        "packageDigest"
+      ],
+      "additionalProperties": false
+    },
+    "Draft": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string",
+          "maxLength": 16000
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 16000
+        },
+        "skill": {
+          "$ref": "#/definitions/Skill"
+        },
+        "count": {
+          "enum": [
+            4,
+            8
+          ]
+        },
+        "model": {
+          "$ref": "#/definitions/Binding"
+        },
+        "reference": {
+          "anyOf": [
+            {
+              "$ref": "creator-resource-ref.schema.json"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "referenceRole": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "references": {
+          "$ref": "#/definitions/ReferenceList"
+        }
+      },
+      "required": [
+        "description",
+        "notes",
+        "skill",
+        "count",
+        "model"
+      ],
+      "additionalProperties": false
+    },
+    "GenerationDraft": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "taskType": {
+          "enum": [
+            "text_to_image",
+            "image_to_image"
+          ]
+        },
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "aspectRatio": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "resolutionId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        },
+        "adapterParameters": {
+          "type": "object"
+        },
+        "adapterSelection": {
+          "type": "object"
+        },
+        "operationInput": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "taskType"
+      ],
+      "additionalProperties": false
+    },
+    "ImageChoice": {
+      "type": "object",
+      "properties": {
+        "bindingId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "modelId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "capsDigest": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "draft": {
+          "$ref": "#/definitions/GenerationDraft"
+        },
+        "retained": {
+          "type": "object",
+          "properties": {
+            "negativePrompt": {
+              "type": "string",
+              "maxLength": 16000
+            },
+            "promptExtend": {
+              "type": "boolean"
+            },
+            "photographyStyle": {
+              "$ref": "#/definitions/Skill"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "bindingId",
+        "modelId",
+        "capsDigest",
+        "draft"
+      ],
+      "additionalProperties": false
+    },
+    "Viewport": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "width": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "height": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "scale": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "required": [
+        "x",
+        "y",
+        "width",
+        "height",
+        "scale"
+      ],
+      "additionalProperties": false
+    },
+    "Options": {
+      "type": "object",
+      "properties": {
+        "viewport": {
+          "$ref": "#/definitions/Viewport"
+        },
+        "aspectRatio": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "first": {
+          "$ref": "#/definitions/ImageChoice"
+        },
+        "followup": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ImageChoice"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "approveMaster": {
+          "type": "boolean"
+        },
+        "reference": {
+          "anyOf": [
+            {
+              "$ref": "creator-resource-ref.schema.json"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "references": {
+          "$ref": "#/definitions/ReferenceList"
+        }
+      },
+      "required": [
+        "viewport",
+        "aspectRatio",
+        "first",
+        "approveMaster"
+      ],
+      "additionalProperties": false
+    },
+    "PrepareArgs": {
+      "type": "object",
+      "properties": {
+        "actions": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "const": "draft"
+                  },
+                  "actionId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "scope": {
+                    "$ref": "#/definitions/Scope"
+                  },
+                  "planId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "runId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "input": {
+                    "$ref": "#/definitions/Draft"
+                  },
+                  "direct": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/definitions/Options"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "type",
+                  "actionId",
+                  "scope",
+                  "planId",
+                  "runId",
+                  "input"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "const": "saveDraft"
+                  },
+                  "actionId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "scope": {
+                    "$ref": "#/definitions/Scope"
+                  },
+                  "planId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "expectedPlanRevision": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "layout": {
+                    "type": "string",
+                    "maxLength": 16000
+                  },
+                  "prompts": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "shotId": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 512
+                        },
+                        "prompt": {
+                          "type": "string",
+                          "maxLength": 16000
+                        }
+                      },
+                      "required": [
+                        "shotId",
+                        "prompt"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "minItems": 4,
+                    "maxItems": 8
+                  }
+                },
+                "required": [
+                  "type",
+                  "actionId",
+                  "scope",
+                  "planId",
+                  "expectedPlanRevision",
+                  "layout",
+                  "prompts"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "const": "start"
+                  },
+                  "actionId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "scope": {
+                    "$ref": "#/definitions/Scope"
+                  },
+                  "planId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "runId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "expectedPlanRevision": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "shotIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512
+                    },
+                    "minItems": 1,
+                    "maxItems": 8
+                  },
+                  "options": {
+                    "$ref": "#/definitions/Options"
+                  }
+                },
+                "required": [
+                  "type",
+                  "actionId",
+                  "scope",
+                  "planId",
+                  "runId",
+                  "expectedPlanRevision",
+                  "shotIds",
+                  "options"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "const": "acceptMaster"
+                  },
+                  "actionId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "scope": {
+                    "$ref": "#/definitions/Scope"
+                  },
+                  "planId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "runId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "candidateVersion": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  }
+                },
+                "required": [
+                  "type",
+                  "actionId",
+                  "scope",
+                  "planId",
+                  "runId",
+                  "candidateVersion"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "const": "redoMaster"
+                  },
+                  "actionId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "scope": {
+                    "$ref": "#/definitions/Scope"
+                  },
+                  "planId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "runId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "candidateVersion": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "operationId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  }
+                },
+                "required": [
+                  "type",
+                  "actionId",
+                  "scope",
+                  "planId",
+                  "runId",
+                  "candidateVersion",
+                  "operationId"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "const": "stop"
+                  },
+                  "actionId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "scope": {
+                    "$ref": "#/definitions/Scope"
+                  },
+                  "planId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "runId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  }
+                },
+                "required": [
+                  "type",
+                  "actionId",
+                  "scope",
+                  "planId",
+                  "runId"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 1
+        }
+      },
+      "required": [
+        "actions"
+      ],
+      "additionalProperties": false
+    },
+    "ReferenceList": {
+      "type": "array",
+      "maxItems": 9,
+      "uniqueItems": true,
+      "items": {
+        "anyOf": [
+          {
+            "$ref": "creator-resource-ref.schema.json"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "sceneLocalImage"
+              },
+              "relativePath": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              }
+            },
+            "required": [
+              "kind",
+              "relativePath"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,267 @@
+{
+  "schemaVersion": 1,
+  "contractId": "creator-setup",
+  "note": "Frozen enums and limits for Creator Setup Wizard. Real IPC DTOs land in later Sxx; this file is the SSOT for state/action/source/measurement.",
+  "resourceIdSource": {
+    "file": "packages/runtime-requirements/catalog.json",
+    "pointer": "/modules/*/moduleId",
+    "note": "RI061: one resource id namespace (= runtime_intake moduleId). build.rs emits creator_setup::contract::KNOWN_RESOURCE_IDS from it; this file keeps no second list."
+  },
+  "contentSchemaVersion": 1,
+  "sessionSchemaVersion": 1,
+  "platforms": [
+    "windows",
+    "macos",
+    "linux"
+  ],
+  "providerIds": [
+    "baidu-pan",
+    "quark-pan",
+    "other"
+  ],
+  "messagePlaceholders": [
+    "extractionCode",
+    "requiredGiB",
+    "freeGiB",
+    "resourceId",
+    "reason"
+  ],
+  "requiredMessageKeys": [
+    "wizard.title",
+    "wizard.subtitle",
+    "wizard.entry.open",
+    "content.source.bundled",
+    "content.source.cached",
+    "content.source.fresh",
+    "content.refresh.failed",
+    "content.refresh.notModified",
+    "source.open",
+    "source.code.label",
+    "source.baidu.label",
+    "source.quark.label",
+    "source.pending.layout",
+    "download.fullBundle.intro",
+    "download.fullBundle.spaceHint",
+    "download.extract.hint",
+    "storage.recommend",
+    "storage.benchmark.confirm",
+    "storage.insufficient",
+    "install.progress",
+    "verify.L1",
+    "verify.L2",
+    "verify.L3",
+    "state.awaitingUserDownload",
+    "state.readyToInstall",
+    "state.verified",
+    "state.failed",
+    "state.interrupted",
+    "recovery.retry",
+    "recovery.cancel",
+    "recovery.chooseOtherSource",
+    "comfy.userInstallOnly",
+    "pending.device",
+    "pending.cloud"
+  ],
+  "forbiddenUrlSchemes": [
+    "javascript",
+    "file",
+    "data",
+    "blob",
+    "http"
+  ],
+  "localArtifactsOnly": true,
+  "sessionFields": [
+    "id",
+    "schemaVersion",
+    "revision",
+    "entryReason",
+    "selectedProfileRefs",
+    "sourceRootPreferences",
+    "selectedInstanceRef",
+    "contentRevision",
+    "planFingerprint",
+    "currentStep",
+    "operationRefs",
+    "lastObservation",
+    "updatedAt"
+  ],
+  "resourceStates": [
+    "awaitingPrerequisite",
+    "awaitingUserDownload",
+    "awaitingExtraction",
+    "checking",
+    "readyToInstall",
+    "installing",
+    "installedUnverified",
+    "verifying",
+    "verified",
+    "failed",
+    "interrupted"
+  ],
+  "sessionTerminalOutcomes": [
+    "completed",
+    "failed",
+    "cancelled",
+    "interrupted"
+  ],
+  "contentSources": [
+    "bundled",
+    "cached",
+    "fresh"
+  ],
+  "sourceStatuses": [
+    "active",
+    "disabled"
+  ],
+  "recommendationBands": [
+    "recommended",
+    "trial",
+    "unsupported",
+    "unknown"
+  ],
+  "mediaTypeLabels": [
+    "ssd",
+    "hdd",
+    "removable",
+    "unknown"
+  ],
+  "measurementModes": [
+    "sequentialWriteFlush",
+    "sequentialRead",
+    "unbufferedWriteWhenSupported"
+  ],
+  "measurementStatuses": [
+    "ok",
+    "failed",
+    "cancelled",
+    "unsupported",
+    "timedOut"
+  ],
+  "ipcCommands": [
+    "creator_setup_get_snapshot",
+    "creator_setup_refresh_content",
+    "creator_setup_probe",
+    "creator_setup_assess_storage",
+    "creator_setup_benchmark_storage",
+    "creator_setup_update_choices",
+    "creator_setup_prepare",
+    "creator_setup_execute",
+    "creator_setup_verify",
+    "creator_setup_cancel",
+    "creator_setup_resolve_action",
+    "creator_setup_get_declined_modules",
+    "creator_setup_set_declined_modules"
+  ],
+  "refreshContentOutcomes": [
+    "applied",
+    "notModified",
+    "failed"
+  ],
+  "verifyLevels": [
+    "L1_resource",
+    "L2_runtime",
+    "L3_service"
+  ],
+  "actions": {
+    "openExternalSource": {
+      "requires": [
+        "sourceId"
+      ],
+      "allowedSchemes": [
+        "https"
+      ],
+      "forbiddenSchemes": [
+        "javascript",
+        "file",
+        "data",
+        "blob"
+      ]
+    },
+    "retryOperation": {
+      "requires": [
+        "operationId"
+      ]
+    },
+    "cancelOperation": {
+      "requires": [
+        "operationId"
+      ]
+    },
+    "chooseInstallRoot": {
+      "requires": [
+        "path"
+      ]
+    },
+    "runStorageBenchmark": {
+      "requires": [
+        "volumeId"
+      ],
+      "userConfirmRequired": true
+    }
+  },
+  "storageAssessmentFields": [
+    "volumeId",
+    "mountPaths",
+    "physicalDiskGroup",
+    "filesystem",
+    "busType",
+    "mediaType",
+    "removable",
+    "isSystemVolume",
+    "totalBytes",
+    "freeBytes",
+    "maxFileBytes"
+  ],
+  "benchmarkResultFields": [
+    "volumeId",
+    "path",
+    "evaluatedAt",
+    "measurementMode",
+    "sampleBytes",
+    "readMibPerSec",
+    "writeMibPerSec",
+    "status"
+  ],
+  "benchmarkLimits": {
+    "maxWriteSampleBytes": 134217728,
+    "maxWriteBytesTotal": 268435456,
+    "maxReadBytesTotal": 536870912,
+    "maxDurationMsNonSystemVolume": 20000,
+    "note": "Per PLAN 7.3: write sample file <=128MiB, write total <=256MiB, read total <=512MiB, non-system volume wall <=20s."
+  },
+  "diskReservePolicy": {
+    "minReserveBytes": 10737418240,
+    "maxReserveBytes": 53687091200,
+    "fractionOfVolume": 0.05,
+    "formula": "max(10GiB, min(volume*5%, 50GiB))"
+  },
+  "contentPull": {
+    "ttlHours": 24,
+    "singleFlight": true,
+    "maxJsonBytes": 524288,
+    "usesEtag": true,
+    "clientPath": "/client/v1/creator-setup/content",
+    "queryParams": [
+      "locale",
+      "platform",
+      "clientVersion",
+      "schemaVersion"
+    ]
+  },
+  "persistence": {
+    "appDataSubdir": "creator-setup",
+    "atomicReplace": true,
+    "schemaValidateOnLoad": true
+  },
+  "installerPortsOnly": [
+    "offline_pack",
+    "offline_bundle"
+  ],
+  "forbidden": [
+    "cdnHostLargeArtifacts",
+    "secondInstallerPath",
+    "silentFallbackInstaller",
+    "fakeVerifiedWithoutProbe",
+    "recursiveDeleteUserChosenRoots"
+  ]
+}

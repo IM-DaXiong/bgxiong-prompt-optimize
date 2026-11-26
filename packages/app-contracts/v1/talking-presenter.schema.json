@@ -1,0 +1,239 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "talking-presenter.schema.json",
+  "title": "TalkingPresenter",
+  "description": "Digital presenter plan, selection, approval and delivery. Closed enums come from talking-presenter.json. Hosts do not infer intent by searching free text.",
+  "definitions": {
+    "nonBlank": { "type": "string", "minLength": 1, "maxLength": 512 },
+    "presenter.catalog.get": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "cursor": { "type": "string" }
+      }
+    },
+    "presenter.preferences.get": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scopeKind"],
+      "properties": {
+        "scopeKind": { "enum": ["node", "project", "global"] },
+        "projectRef": { "type": "string" },
+        "nodeRef": { "type": "string" }
+      }
+    },
+    "presenter.preferences.set": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scopeKind", "expectedRevision", "sourceTurnRef", "values"],
+      "properties": {
+        "scopeKind": { "enum": ["node", "project", "global"] },
+        "projectRef": { "type": "string" },
+        "nodeRef": { "type": "string" },
+        "expectedRevision": { "type": "integer", "minimum": 0 },
+        "sourceTurnRef": { "$ref": "#/definitions/nonBlank" },
+        "values": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "speechProfileRef": { "type": "string" },
+            "videoProfileRef": { "type": "string" },
+            "memoryScope": { "enum": ["run", "node", "project", "global"] },
+            "voiceId": { "type": "string" },
+            "speechEngineRef": { "type": "string" },
+            "referenceAudioRef": { "type": "string" },
+            "mode": { "type": "string" },
+            "speedHint": { "enum": ["slow", "normal", "fast"] },
+            "language": { "type": "string" },
+            "emotionMode": { "type": "string" },
+            "promptText": { "type": "string" },
+            "controlPrompt": { "type": "string" },
+            "styleControl": { "type": "string" },
+            "speechRate": { "type": "number" },
+            "byModelPickKey": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "mode": { "type": "string" },
+                  "speedHint": { "enum": ["slow", "normal", "fast"] },
+                  "speechRate": { "type": "number" },
+                  "language": { "type": "string" },
+                  "voiceId": { "type": "string" },
+                  "promptText": { "type": "string" },
+                  "controlPrompt": { "type": "string" },
+                  "styleControl": { "type": "string" },
+                  "emotionControl": { "type": "object" },
+                  "voiceCommit": { "type": "object" },
+                  "referenceMeta": { "type": ["object", "null"] }
+                }
+              }
+            },
+            "writeMode": { "enum": ["incremental", "overwrite"] },
+            "appendPrompt": { "type": "string" },
+            "aspectRatio": { "type": "string" },
+            "resolutionId": { "type": "string" },
+            "durationSeconds": { "type": "number" },
+            "fps": { "type": "number" },
+            "legacyConflictVoiceId": { "type": "string" },
+            "legacyConflictReferenceAudioRef": { "type": "string" },
+            "emotionControl": { "type": "object" },
+            "voiceCommit": { "type": "object" },
+            "referenceMeta": { "type": "object" }
+          }
+        }
+      }
+    },
+    "presenter.plan.prepare": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requestRef", "projectRef", "executionMode"],
+      "properties": {
+        "requestRef": { "$ref": "#/definitions/nonBlank" },
+        "projectRef": { "$ref": "#/definitions/nonBlank" },
+        "executionMode": { "enum": ["automatic", "canvas_only"] },
+        "textModelRef": { "type": "string" },
+        "speechRef": { "type": "string" },
+        "speechPreference": { "type": "object" },
+        "workflowRef": { "type": "string" },
+        "sourceText": { "type": "string" },
+        "inputRevision": { "type": "string" },
+        "storyId": { "type": "string" },
+        "allowedTurnRefs": { "type": "array", "items": { "type": "string" } },
+        "intent": { "type": "object" },
+        "direction": { "type": "object" },
+        "sceneRef": { "type": "string" },
+        "portraitRef": { "type": "string" },
+        "sceneGenerationAuthorized": { "type": "boolean" },
+        "sourceUnits": { "type": "array", "items": { "type": "object" } },
+        "cursor": { "type": "string" }
+      }
+    },
+    "presenter.plan.get": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["planRef"],
+      "properties": {
+        "planRef": { "$ref": "#/definitions/nonBlank" },
+        "cursor": { "type": "string" }
+      }
+    },
+    "presenter.plan.revise": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["planRef", "expectedRevision", "expectedHash"],
+      "properties": {
+        "planRef": { "$ref": "#/definitions/nonBlank" },
+        "expectedRevision": { "type": "integer", "minimum": 1 },
+        "expectedHash": { "$ref": "#/definitions/nonBlank" },
+        "textModelRef": { "type": "string" },
+        "speechRef": { "type": "string" },
+        "workflowRef": { "type": "string" }
+      }
+    },
+    "presenter.preflight.run": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["planRef", "expectedHash", "mode"],
+      "properties": {
+        "planRef": { "$ref": "#/definitions/nonBlank" },
+        "expectedHash": { "$ref": "#/definitions/nonBlank" },
+        "mode": { "enum": ["check", "prepare"] },
+        "prepareAuthorized": { "type": "boolean" }
+      }
+    },
+    "presenter.execution.start": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["planRef", "expectedHash", "approvalRef"],
+      "properties": {
+        "planRef": { "$ref": "#/definitions/nonBlank" },
+        "expectedHash": { "$ref": "#/definitions/nonBlank" },
+        "approvalRef": { "$ref": "#/definitions/nonBlank" }
+      }
+    },
+    "presenter.execution.get": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["runRef"],
+      "properties": {
+        "runRef": { "$ref": "#/definitions/nonBlank" },
+        "cursor": { "type": "string" }
+      }
+    },
+    "postproduction.describe": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "cursor": { "type": "string" }
+      }
+    },
+    "postproduction.baseSnapshot.get": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["deliveryRef"],
+      "properties": {
+        "deliveryRef": { "$ref": "#/definitions/nonBlank" }
+      }
+    },
+    "PresenterIntent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "requestRef", "inputRevision", "sourceTextRefs", "portraitRefs", "sceneRefs", "requirements", "durationIntent", "presentationIntent", "executionMode", "unresolvedQuestions"],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "requestRef": { "$ref": "#/definitions/nonBlank" },
+        "inputRevision": { "$ref": "#/definitions/nonBlank" },
+        "sourceTextRefs": { "type": "array", "items": { "$ref": "#/definitions/nonBlank" } },
+        "portraitRefs": { "type": "array", "items": { "$ref": "#/definitions/nonBlank" } },
+        "sceneRefs": { "type": "array", "items": { "$ref": "#/definitions/nonBlank" } },
+        "requirements": { "type": "array", "items": { "$ref": "#/definitions/Requirement" } },
+        "durationIntent": { "$ref": "#/definitions/DurationIntent" },
+        "presentationIntent": { "$ref": "#/definitions/PresentationIntent" },
+        "executionMode": { "enum": ["automatic", "canvas_only"] },
+        "unresolvedQuestions": { "type": "array", "items": { "$ref": "#/definitions/nonBlank" } }
+      }
+    },
+    "Requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requirementId", "sourceTurnRef", "originalText", "interpretedInstruction", "scope", "priority"],
+      "properties": {
+        "requirementId": { "$ref": "#/definitions/nonBlank" },
+        "sourceTurnRef": { "$ref": "#/definitions/nonBlank" },
+        "sourceSpanRef": { "type": ["string", "null"] },
+        "originalText": { "type": "string" },
+        "interpretedInstruction": { "type": "string" },
+        "scope": { "type": "string" },
+        "priority": { "enum": ["hard", "preference", "delegated"] },
+        "supersedes": { "type": ["string", "null"] }
+      }
+    },
+    "DurationIntent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode"],
+      "properties": {
+        "mode": { "enum": ["maximum", "approximate", "automatic", "needsClarification"] },
+        "maxMs": { "type": ["integer", "null"], "minimum": 0 },
+        "targetMs": { "type": ["integer", "null"], "minimum": 0 },
+        "tolerance": { "type": ["string", "null"] },
+        "basis": { "type": ["string", "null"] }
+      }
+    },
+    "PresentationIntent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["camera", "action", "continuity"],
+      "properties": {
+        "sceneRefs": { "type": "array", "items": { "type": "string" } },
+        "camera": { "type": "string" },
+        "shotSize": { "type": "string" },
+        "action": { "type": "string" },
+        "continuity": { "type": "string" },
+        "confirmedExceptions": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

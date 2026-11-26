@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "retry": {
+    "automaticRetriesPerItem": 3,
+    "backoffSeconds": [
+      2,
+      4,
+      8
+    ],
+    "repairRounds": 5,
+    "honorRetryAfter": true,
+    "retryableDisposition": "retrySameRequest"
+  },
+  "scheduler": {
+    "maxInFlight": 1
+  },
+  "pagination": {
+    "defaultPageSize": 50,
+    "maxPageSize": 200
+  },
+  "errors": {
+    "SC_SOURCE_CONFLICT": {
+      "class": "conflict",
+      "automaticModelRetry": false
+    },
+    "SC_TARGET_CONFLICT": {
+      "class": "conflict",
+      "automaticModelRetry": false
+    },
+    "SC_REGISTRY_CONFLICT": {
+      "class": "conflict",
+      "automaticModelRetry": false
+    },
+    "SC_SCOPE_BUSY": {
+      "class": "conflict",
+      "automaticModelRetry": false
+    },
+    "SC_REFERENCE_PROTECTED": {
+      "class": "protection",
+      "automaticModelRetry": false
+    },
+    "SC_INPUT_TOO_LARGE": {
+      "class": "input",
+      "automaticModelRetry": false
+    },
+    "SC_MODEL_UNAVAILABLE": {
+      "class": "model",
+      "automaticModelRetry": false
+    },
+    "SC_SKILL_INCOMPATIBLE": {
+      "class": "skill",
+      "automaticModelRetry": false
+    },
+    "SC_RESPONSE_JSON": {
+      "class": "response",
+      "automaticModelRetry": false
+    },
+    "SC_RESPONSE_SCHEMA": {
+      "class": "response",
+      "automaticModelRetry": false
+    },
+    "SC_OUTPUT_TRUNCATED": {
+      "class": "response",
+      "automaticModelRetry": false
+    },
+    "SC_IDENTITY_REFERENCE": {
+      "class": "response",
+      "automaticModelRetry": false
+    },
+    "SC_STORAGE_FAILED": {
+      "class": "storage",
+      "automaticModelRetry": false
+    },
+    "SC_CANCELLED": {
+      "class": "cancel",
+      "automaticModelRetry": false
+    },
+    "SC_OUTCOME_UNKNOWN": {
+      "class": "model",
+      "automaticModelRetry": false
+    },
+    "SC_PROTOCOL_RETIRED": {
+      "class": "protocol",
+      "automaticModelRetry": false
+    },
+    "SC_IDEMPOTENCY_CONFLICT": {
+      "class": "conflict",
+      "automaticModelRetry": false
+    },
+    "SC_RUN_REVISION_STALE": {
+      "class": "conflict",
+      "automaticModelRetry": false
+    },
+    "SC_RUN_READ_ONLY": {
+      "class": "protocol",
+      "automaticModelRetry": false
+    }
+  },
+  "events": {
+    "runChanged": "story-creation:run-changed"
+  }
+}

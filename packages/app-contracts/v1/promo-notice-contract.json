@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "placement": ["main_bottom_left"],
+  "forceModes": ["none", "no_dismiss"],
+  "dismissKinds": [
+    "never_again",
+    "snooze",
+    "mute_calendar_days",
+    "session_only",
+    "until_campaign_end"
+  ],
+  "actionTypes": ["dismiss", "openUrl", "openSettingsTab"],
+  "settingsTabIds": [
+    "accounts",
+    "capabilities",
+    "comfyuiWorkflows",
+    "diagnostics",
+    "dataStorage",
+    "localEngine",
+    "localModels",
+    "keyboardShortcuts",
+    "appUpdate",
+    "errorReport",
+    "experimental",
+    "layoutAnalysisDebug"
+  ],
+  "widthFloorPx": 240,
+  "widthCeilingPx": 420,
+  "heightFloorPx": 120,
+  "heightCeilingPx": 560,
+  "maxTitleChars": 80,
+  "maxBodyChars": 800,
+  "maxCtaCount": 2,
+  "maxCampaignIdChars": 64,
+  "priorityMin": 0,
+  "priorityMax": 10000,
+  "snoozeSecondsMin": 60,
+  "snoozeSecondsMax": 2592000,
+  "muteCalendarDaysMin": 1,
+  "muteCalendarDaysMax": 30,
+  "httpsAllowlistHosts": [
+    "www.bgxiong.com",
+    "bgxiong.com",
+    "cdn.bgxiong.com"
+  ],
+  "dismissStorageKey": "promoNotice.dismissRecords.v1",
+  "cacheStorageKeyPrefix": "promoNotice.cache.v1",
+  "maxDismissRecords": 64,
+  "refreshIntervalMs": 1800000,
+  "reselectTickMs": 15000
+}

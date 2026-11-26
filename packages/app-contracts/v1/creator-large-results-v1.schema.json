@@ -1,0 +1,127 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-large-results-v1.schema.json",
+  "definitions": {
+    "readArgs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "resourceRef"
+      ],
+      "properties": {
+        "resourceRef": {
+          "type": "string",
+          "pattern": "^toolres_[A-Za-z0-9_]+$",
+          "maxLength": 128
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxBytes": {
+          "type": "integer",
+          "minimum": 1024,
+          "maximum": 1048576
+        }
+      }
+    },
+    "readResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "resourceRef",
+        "contentSha256",
+        "offset",
+        "returnedBytes",
+        "totalBytes",
+        "nextOffset",
+        "hasMore",
+        "text",
+        "scope"
+      ],
+      "properties": {
+        "resourceRef": {
+          "type": "string"
+        },
+        "contentSha256": {
+          "type": "string"
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "returnedBytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "totalBytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "nextOffset": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "hasMore": {
+          "type": "boolean"
+        },
+        "text": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "producerPrincipalId",
+            "namespaceId",
+            "sourceToolId",
+            "requestRef",
+            "toolId",
+            "toolCallId"
+          ],
+          "properties": {
+            "requestRef": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "toolId": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "toolCallId": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "producerPrincipalId": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "namespaceId": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "sourceToolId": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

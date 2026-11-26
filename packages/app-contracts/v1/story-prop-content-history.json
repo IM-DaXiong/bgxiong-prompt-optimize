@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "historyNodeIdPrefix": "story-prop:",
+  "fields": [
+    "title",
+    "narrativeRole",
+    "notes",
+    "visualSeed",
+    "aliases",
+    "firstAppearanceHint",
+    "visualSeedMaterial",
+    "visualSeedDimensions",
+    "visualSeedKeyDetails"
+  ],
+  "fieldPayloads": {
+    "title": "plain-text",
+    "aliases": "json-string-array",
+    "firstAppearanceHint": "plain-text",
+    "visualSeed": "plain-text",
+    "visualSeedMaterial": "plain-text",
+    "visualSeedDimensions": "plain-text",
+    "visualSeedKeyDetails": "plain-text"
+  }
+}

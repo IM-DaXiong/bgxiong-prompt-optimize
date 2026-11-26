@@ -1,0 +1,240 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-receipt-storage.schema.json",
+  "title": "Creator receipt storage v1",
+  "description": "Same-database shared canonical UTF-8 JSON. Object keys sorted recursively; arrays preserve order; null and empty string remain distinct. Equal hash requires equal bytes; mismatch is RECEIPT_HASH_COLLISION, never overwrite. Public reads are authorized through an owning effect/scope, never through a naked payload ID. Public projection never returns undo/inverse. Missing referenced bytes are RECEIPT_INTEGRITY_ERROR and cannot trigger business reexecution. Business writes, operation terminal claim, payload refs, effects and evidence commit atomically. Serialization and hashing of large input happen outside the DB connection.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "resultRef"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "resultRef": {
+      "$ref": "#/$defs/resultRef"
+    }
+  },
+  "$defs": {
+    "payloadRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "payloadId",
+        "kind",
+        "contentHash",
+        "byteLength"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "payloadId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "result",
+            "undo",
+            "checkpoint",
+            "delta"
+          ]
+        },
+        "contentHash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "byteLength": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "resultRef": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/payloadRef"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "result"
+            }
+          }
+        }
+      ]
+    },
+    "privateUndoRef": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/payloadRef"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "undo"
+            }
+          }
+        }
+      ]
+    },
+    "retentionPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "minimumUndoSteps",
+        "ackDiagnosticHours",
+        "diagnosticDays",
+        "maxOwnersPerBatch",
+        "maxPayloadBytesPerBatch"
+      ],
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "minimumUndoSteps": {
+          "const": 50
+        },
+        "ackDiagnosticHours": {
+          "const": 24
+        },
+        "diagnosticDays": {
+          "const": 7
+        },
+        "maxOwnersPerBatch": {
+          "const": 100
+        },
+        "maxPayloadBytesPerBatch": {
+          "const": 4194304
+        }
+      }
+    },
+    "resultCursor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "payloadId",
+        "byteOffset"
+      ],
+      "properties": {
+        "payloadId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "byteOffset": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "resultPageRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "scopeKey": {
+          "type": "string",
+          "minLength": 1
+        },
+        "cursor": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "payloadId",
+            "byteOffset"
+          ],
+          "properties": {
+            "payloadId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "byteOffset": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "byteBudget": {
+          "type": "integer",
+          "minimum": 256,
+          "maximum": 16384
+        }
+      },
+      "description": "Read only this owning effect public result. Provide one of its scope routes as scopeKey; omit scopeKey only for an effect without scopes. Omit cursor for the first page and byteBudget for the default budget. Append UTF-8 JSON fragments using each returned nextCursor; null nextCursor ends the result. No payload-ID lookup or private inverse read."
+    },
+    "resultPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "resultRef",
+        "byteOffset",
+        "fragment",
+        "nextCursor"
+      ],
+      "properties": {
+        "resultRef": {
+          "$ref": "#/$defs/resultRef"
+        },
+        "byteOffset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "fragment": {
+          "type": "string"
+        },
+        "nextCursor": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "additionalProperties": false,
+          "required": [
+            "payloadId",
+            "byteOffset"
+          ],
+          "properties": {
+            "payloadId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "byteOffset": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-lifecycle": {
+    "protected": [
+      "claimed",
+      "applying",
+      "pendingEffects",
+      "unknown",
+      "activeRequest",
+      "unfinishedSaga",
+      "pinned",
+      "undoWindow",
+      "checkpointDependency"
+    ],
+    "permanent": [
+      "idempotencyKey",
+      "operationSkeleton",
+      "effectSkeleton",
+      "publicResult"
+    ],
+    "collectible": "Only formally released undo/checkpoint/delta with no reachable owner; age alone never releases business data. ACKs are local-session diagnostics, never commit or idempotency proof."
+  },
+  "x-errors": [
+    "RECEIPT_INTEGRITY_ERROR",
+    "RECEIPT_HASH_COLLISION",
+    "RECEIPT_SCOPE_DENIED",
+    "RECEIPT_OWNER_MISSING",
+    "RECEIPT_TRANSACTION_REQUIRED"
+  ]
+}

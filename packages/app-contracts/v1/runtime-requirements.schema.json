@@ -1,0 +1,1133 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "runtime-requirements.schema.json",
+  "title": "RuntimeRequirementBundleV1",
+  "description": "RI002. What the host needs, never how to download it.",
+  "schemaVersion": 1,
+  "definitions": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "need": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "value"
+          ],
+          "properties": {
+            "kind": {
+              "const": "known"
+            },
+            "value": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "reason"
+          ],
+          "properties": {
+            "kind": {
+              "const": "unknown"
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ],
+      "description": "Measured/declared need. Unknown must be explicit (kind=unknown + reason); never an estimate dressed as known."
+    },
+    "moduleKind": {
+      "enum": [
+        "runtime",
+        "model",
+        "environment",
+        "workflow",
+        "integrationAsset"
+      ]
+    },
+    "artifactTrustClass": {
+      "enum": [
+        "executable",
+        "library",
+        "weights",
+        "data",
+        "workflow"
+      ]
+    },
+    "verifyLevel": {
+      "enum": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ]
+    },
+    "supportStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reason",
+        "evidenceRefs"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "supported",
+            "unsupported",
+            "unknown"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidenceRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        }
+      }
+    },
+    "searchIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "projects",
+        "publishers",
+        "keywords",
+        "documentationHints"
+      ],
+      "properties": {
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "publishers": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "keywords": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "documentationHints": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        }
+      },
+      "description": "Search clues only. There is deliberately no download URL / mirror / domain allow-list field."
+    },
+    "compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "platforms",
+        "versionRange",
+        "protocols",
+        "consumerPortRequirements"
+      ],
+      "properties": {
+        "platforms": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "windows-x64",
+              "windows-arm64",
+              "darwin-aarch64",
+              "darwin-x86_64",
+              "linux-x64"
+            ]
+          },
+          "minItems": 1
+        },
+        "versionRange": {
+          "type": "string",
+          "minLength": 1
+        },
+        "protocols": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "consumerPortRequirements": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "key",
+              "requirement"
+            ],
+            "properties": {
+              "key": {
+                "type": "string",
+                "minLength": 1
+              },
+              "requirement": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "minItems": 0
+        }
+      }
+    },
+    "dependencyRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "moduleRef",
+        "versionRange",
+        "shared"
+      ],
+      "properties": {
+        "moduleRef": {
+          "$ref": "#/definitions/id"
+        },
+        "versionRange": {
+          "type": "string",
+          "minLength": 1
+        },
+        "shared": {
+          "type": "boolean"
+        }
+      }
+    },
+    "deliverable": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "relativePath",
+        "required",
+        "format",
+        "bytes",
+        "digest"
+      ],
+      "properties": {
+        "role": {
+          "enum": [
+            "mainExecutable",
+            "library",
+            "modelShard",
+            "tokenizer",
+            "config",
+            "mmproj",
+            "defaultVoice",
+            "font",
+            "wheelhouse",
+            "hfCache",
+            "workflow",
+            "node",
+            "pythonRequirements",
+            "other"
+          ]
+        },
+        "relativePath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "format": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bytes": {
+          "$ref": "#/definitions/need"
+        },
+        "digest": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "algorithm",
+                "value"
+              ],
+              "properties": {
+                "algorithm": {
+                  "const": "sha256"
+                },
+                "value": {
+                  "type": "string",
+                  "minLength": 64,
+                  "maxLength": 64
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "ioPort": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "mediaType",
+        "description"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mediaType": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "preparationFacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "externallyPrepared",
+        "finalEnvPath",
+        "interpreter",
+        "environmentVariables",
+        "startProtocol",
+        "ports",
+        "writableWhileRunning",
+        "allowsExistingUserResources"
+      ],
+      "properties": {
+        "externallyPrepared": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "finalEnvPath": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "interpreter": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "environmentVariables": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "startProtocol": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ports": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "writableWhileRunning": {
+          "type": "boolean"
+        },
+        "allowsExistingUserResources": {
+          "type": "boolean"
+        }
+      }
+    },
+    "targetSlotTemplate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "slotKind",
+        "rootRef",
+        "relativeLayout"
+      ],
+      "properties": {
+        "slotKind": {
+          "$ref": "runtime-intake-target.schema.json#/definitions/slotKind"
+        },
+        "rootRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "relativeLayout": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "runProtocol": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entry",
+        "healthEndpoint",
+        "endpoints"
+      ],
+      "properties": {
+        "entry": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "healthEndpoint": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "endpoints": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        }
+      }
+    },
+    "check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "probeId",
+        "level",
+        "input",
+        "success",
+        "required",
+        "costRequiresAuthorization"
+      ],
+      "properties": {
+        "probeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "level": {
+          "$ref": "#/definitions/verifyLevel"
+        },
+        "input": {
+          "type": "string",
+          "minLength": 1
+        },
+        "success": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "costRequiresAuthorization": {
+          "type": "boolean"
+        }
+      }
+    },
+    "failureGuidance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirementRef",
+        "expectedFact",
+        "fixScope",
+        "resubmitTool",
+        "completionCriterion"
+      ],
+      "properties": {
+        "requirementRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedFact": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fixScope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "resubmitTool": {
+          "enum": [
+            "runtime.intake.resubmit",
+            "runtime.targets.prepare"
+          ]
+        },
+        "completionCriterion": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "idMapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runtimeKey",
+        "offlineBundleIds",
+        "engineId"
+      ],
+      "properties": {
+        "runtimeKey": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "offlineBundleIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "engineId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        }
+      },
+      "description": "One-way mapping from moduleId (= creator-setup resourceId) to the other three existing id schemes."
+    },
+    "fitRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profileId",
+        "bandSource",
+        "bands"
+      ],
+      "properties": {
+        "profileId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "bandSource": {
+          "const": "creator_setup.profiles"
+        },
+        "bands": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "recommended",
+              "trial",
+              "unsupported",
+              "unknown"
+            ]
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "licenseGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required",
+        "licenses"
+      ],
+      "properties": {
+        "required": {
+          "type": "boolean"
+        },
+        "licenses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "acceptedBy"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "acceptedBy": {
+                "const": "user"
+              }
+            }
+          },
+          "minItems": 0
+        }
+      }
+    },
+    "systemPrerequisite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "requirement",
+        "probeId",
+        "handledBy"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "driverMinVersion",
+            "vcRuntime",
+            "pathCharset",
+            "pathLength",
+            "symlinkCapability",
+            "other"
+          ]
+        },
+        "requirement": {
+          "type": "string",
+          "minLength": 1
+        },
+        "probeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "handledBy": {
+          "enum": [
+            "externalAgent",
+            "user"
+          ]
+        }
+      }
+    },
+    "provisioningSplit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "externalLayer",
+        "hostOfflineBuildLayer",
+        "hostBuildRef",
+        "pythonRequirements"
+      ],
+      "properties": {
+        "externalLayer": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "hostOfflineBuildLayer": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "hostBuildRef": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "pythonRequirements": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "sourceRef",
+                "sha256",
+                "wheelPlatformTags"
+              ],
+              "properties": {
+                "sourceRef": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "sha256": {
+                  "type": "string",
+                  "minLength": 64,
+                  "maxLength": 64
+                },
+                "wheelPlatformTags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "minItems": 0
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "hostRoute": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "routeKind",
+        "id",
+        "estimatedBytes",
+        "usesOwnCdn"
+      ],
+      "properties": {
+        "routeKind": {
+          "enum": [
+            "runtimeKey",
+            "offlineBundle"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "estimatedBytes": {
+          "$ref": "#/definitions/need"
+        },
+        "usesOwnCdn": {
+          "type": "boolean"
+        }
+      }
+    },
+    "acquisitionOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "externalPrepare",
+        "hostRoutes"
+      ],
+      "properties": {
+        "externalPrepare": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "allowed",
+            "note"
+          ],
+          "properties": {
+            "allowed": {
+              "type": "boolean"
+            },
+            "note": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "hostRoutes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/hostRoute"
+          },
+          "minItems": 0
+        }
+      }
+    },
+    "module": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "moduleId",
+        "displayName",
+        "consumerPortId",
+        "kind",
+        "requiredFor",
+        "optional",
+        "support",
+        "searchIdentity",
+        "compatibility",
+        "dependencyRefs",
+        "deliverables",
+        "io",
+        "preparationFacts",
+        "targetSlots",
+        "runProtocol",
+        "checks",
+        "failureGuidance",
+        "mapping",
+        "resourceNeed",
+        "fit",
+        "licenseGate",
+        "systemPrerequisites",
+        "artifactTrustClass",
+        "provisioningSplit",
+        "acquisitionOptions"
+      ],
+      "properties": {
+        "moduleId": {
+          "$ref": "#/definitions/id"
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "consumerPortId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "$ref": "#/definitions/moduleKind"
+        },
+        "requiredFor": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "optional": {
+          "type": "boolean"
+        },
+        "support": {
+          "$ref": "#/definitions/supportStatus"
+        },
+        "searchIdentity": {
+          "$ref": "#/definitions/searchIdentity"
+        },
+        "compatibility": {
+          "$ref": "#/definitions/compatibility"
+        },
+        "dependencyRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/dependencyRef"
+          },
+          "minItems": 0
+        },
+        "deliverables": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/deliverable"
+          },
+          "minItems": 0
+        },
+        "io": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "inputs",
+            "outputs"
+          ],
+          "properties": {
+            "inputs": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ioPort"
+              },
+              "minItems": 0
+            },
+            "outputs": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ioPort"
+              },
+              "minItems": 0
+            }
+          }
+        },
+        "preparationFacts": {
+          "$ref": "#/definitions/preparationFacts"
+        },
+        "targetSlots": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/targetSlotTemplate"
+          },
+          "minItems": 0
+        },
+        "runProtocol": {
+          "$ref": "#/definitions/runProtocol"
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/check"
+          },
+          "minItems": 0
+        },
+        "failureGuidance": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/failureGuidance"
+          },
+          "minItems": 0
+        },
+        "mapping": {
+          "$ref": "#/definitions/idMapping"
+        },
+        "resourceNeed": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "diskBytes",
+            "diskPeakBytes",
+            "vramMib",
+            "ramMib"
+          ],
+          "properties": {
+            "diskBytes": {
+              "$ref": "#/definitions/need"
+            },
+            "diskPeakBytes": {
+              "$ref": "#/definitions/need"
+            },
+            "vramMib": {
+              "$ref": "#/definitions/need"
+            },
+            "ramMib": {
+              "$ref": "#/definitions/need"
+            }
+          }
+        },
+        "fit": {
+          "$ref": "#/definitions/fitRef"
+        },
+        "licenseGate": {
+          "$ref": "#/definitions/licenseGate"
+        },
+        "systemPrerequisites": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/systemPrerequisite"
+          },
+          "minItems": 0
+        },
+        "artifactTrustClass": {
+          "$ref": "#/definitions/artifactTrustClass"
+        },
+        "provisioningSplit": {
+          "$ref": "#/definitions/provisioningSplit"
+        },
+        "acquisitionOptions": {
+          "$ref": "#/definitions/acquisitionOptions"
+        }
+      }
+    },
+    "purpose": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "purposeId",
+        "summary",
+        "minimalModuleRefs",
+        "optionalModuleRefs",
+        "cloudVendorAlternative"
+      ],
+      "properties": {
+        "purposeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "minimalModuleRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/id"
+          },
+          "minItems": 0
+        },
+        "optionalModuleRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/id"
+          },
+          "minItems": 0
+        },
+        "cloudVendorAlternative": {
+          "type": "boolean"
+        }
+      }
+    },
+    "requirementBundle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "bundleRef",
+        "revision",
+        "hostCompatibility",
+        "purposes",
+        "modules",
+        "targetTemplates",
+        "verificationPolicy",
+        "feedbackPolicy",
+        "documentationRefs",
+        "contentDigest"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "bundleRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "hostCompatibility": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "appVersion",
+            "platforms"
+          ],
+          "properties": {
+            "appVersion": {
+              "type": "string",
+              "minLength": 1
+            },
+            "platforms": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1
+            }
+          }
+        },
+        "purposes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/purpose"
+          },
+          "minItems": 1
+        },
+        "modules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/module"
+          },
+          "minItems": 1
+        },
+        "targetTemplates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/targetSlotTemplate"
+          },
+          "minItems": 0
+        },
+        "verificationPolicy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "levels",
+            "notRunIsNotPassed"
+          ],
+          "properties": {
+            "levels": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/verifyLevel"
+              },
+              "minItems": 1
+            },
+            "notRunIsNotPassed": {
+              "const": true
+            }
+          }
+        },
+        "feedbackPolicy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "resubmitTool",
+            "resubmitLimit"
+          ],
+          "properties": {
+            "resubmitTool": {
+              "const": "runtime.intake.resubmit"
+            },
+            "resubmitLimit": {
+              "const": null
+            }
+          }
+        },
+        "documentationRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "contentDigest": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64
+        }
+      }
+    }
+  },
+  "$ref": "#/definitions/requirementBundle"
+}

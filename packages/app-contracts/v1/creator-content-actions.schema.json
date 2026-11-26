@@ -1,0 +1,174 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-content-actions.schema.json",
+  "title": "CreatorContentActions",
+  "description": "W5 Batch4: content.change.prepare payload. Applied by change.apply (plan kind content.change) via ContentPlanApplier; agent_skills index snapshot (library steps) + binding compensation; undoClass=none. Generation preference writes are not content skill actions.",
+  "type": "object",
+  "required": [
+    "actions"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "description": "stableIds must be exactly the installed stableIds in the new order; expectedRevision guards against a concurrent change. AppSettingsWrite.",
+            "required": [
+              "type",
+              "actionId",
+              "stableIds",
+              "expectedRevision"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "content.skill.order"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "stableIds": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "expectedRevision": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "IPC save_agent_skill_edit (SaveAgentSkillEditReq). Raw-file edit of an installed standard package, compare-and-swap on expectedPackageDigest. AppSettingsWrite.",
+            "required": [
+              "type",
+              "actionId",
+              "edit"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "content.skill.edit"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "edit": {
+                "type": "object",
+                "required": [
+                  "stableId",
+                  "expectedPackageDigest",
+                  "ops"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "stableId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "expectedPackageDigest": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "ops": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "op",
+                        "path"
+                      ],
+                      "additionalProperties": false,
+                      "properties": {
+                        "op": {
+                          "enum": [
+                            "putText",
+                            "putBinary",
+                            "delete"
+                          ]
+                        },
+                        "path": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "text": {
+                          "type": "string"
+                        },
+                        "bytesBase64": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "IPC import_agent_skill_package. Installs a standard Agent Skills package (folder, ZIP or SKILL.md) from a local path. replaceDigest is the installed digest the user agreed to replace. AppSettingsWrite.",
+            "required": [
+              "type",
+              "actionId",
+              "path"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "content.skill.install"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "replaceDigest": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "Uninstalls one skill by stableId (optional package digest guard). AppSettingsWrite.",
+            "required": [
+              "type",
+              "actionId",
+              "stableId"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "content.skill.uninstall"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "stableId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "expectedPackageDigest": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

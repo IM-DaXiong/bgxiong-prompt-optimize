@@ -1,0 +1,5 @@
+{
+  "schemaVersion": 1,
+  "maxItemsPerEnqueue": 16,
+  "progressEventName": "local_media_upload_progress"
+}

@@ -1,0 +1,384 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-clips-actions.schema.json",
+  "title": "CreatorClipsActions",
+  "description": "W5 Batch4: clips.change.prepare payload. Applied by change.apply (plan kind clips.change) via ClipsPlanApplier; journal compensation on failure; undoClass=none (receipt carries no undoToken). No entitlement gate (IPC clips_* have none).",
+  "type": "object",
+  "required": [
+    "actions"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "description": "IPC clips_import_apply core (insert_missing|insert_all only; overwrite_by_source is not kernel-reversible → MODE_NOT_REVERSIBLE). Compensation deletes created rows only.",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "sourceType",
+              "sourceItems"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "clips.create"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sourceType": {
+                "enum": [
+                  "segment",
+                  "storyboard_shot",
+                  "clip_framework_shot"
+                ]
+              },
+              "sourceItems": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "sourceId",
+                    "contentJson"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "sourceId": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "sourceSceneId": {
+                      "type": "string"
+                    },
+                    "sourceShotId": {
+                      "type": "string"
+                    },
+                    "contentJson": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "sourceSceneId": {
+                "type": "string"
+              },
+              "mode": {
+                "enum": [
+                  "insert_missing",
+                  "insert_all",
+                  "overwrite_by_source"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "IPC clips_update (editable fields; videoState is task-owned). CAS on clip field revision.",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "clipId",
+              "expectedRevision",
+              "patch"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "clips.update"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "clipId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "expectedRevision": {
+                "type": "string",
+                "minLength": 1
+              },
+              "patch": {
+                "type": "object",
+                "minProperties": 1,
+                "additionalProperties": false,
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "overrideVisualPrompt": {
+                    "type": "string"
+                  },
+                  "overrideCameraPrompt": {
+                    "type": "string"
+                  },
+                  "overridePerformancePrompt": {
+                    "type": "string"
+                  },
+                  "overrideDialogue": {
+                    "type": "string"
+                  },
+                  "overrideStylePrompt": {
+                    "type": "string"
+                  },
+                  "overrideDurationHintSec": {
+                    "type": "number"
+                  },
+                  "paddingRefs": {
+                    "type": "string"
+                  },
+                  "clipContentStyleDomain": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "IPC clips_update restricted to override prompt fields (clip prompt editor). CAS on clip field revision.",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "clipId",
+              "expectedRevision",
+              "patch"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "clips.prompt.patch"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "clipId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "expectedRevision": {
+                "type": "string",
+                "minLength": 1
+              },
+              "patch": {
+                "type": "object",
+                "minProperties": 1,
+                "additionalProperties": false,
+                "properties": {
+                  "overrideVisualPrompt": {
+                    "type": "string"
+                  },
+                  "overrideCameraPrompt": {
+                    "type": "string"
+                  },
+                  "overridePerformancePrompt": {
+                    "type": "string"
+                  },
+                  "overrideDialogue": {
+                    "type": "string"
+                  },
+                  "overrideStylePrompt": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "IPC clips_delete / clips_delete_batch (removes local video files). Irreversible: alone + confirm.",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "clipIds",
+              "confirm"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "clips.delete"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "clipIds": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "confirm": {
+                "const": true
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "IPC clips_duplicate.",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "clipId"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "clips.duplicate"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "clipId": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "IPC clips_reorder (full order).",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "orderedClipIds"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "clips.reorder"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "orderedClipIds": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "IPC clips_edge_upsert.",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "clipIdFrom",
+              "clipIdTo",
+              "targetPortIndex"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "clips.edge.connect"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "clipIdFrom": {
+                "type": "string",
+                "minLength": 1
+              },
+              "clipIdTo": {
+                "type": "string",
+                "minLength": 1
+              },
+              "targetPortIndex": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "sortOrder": {
+                "type": "integer"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "IPC clips_delete_edges_and_compact_ports (default policy).",
+            "required": [
+              "type",
+              "actionId",
+              "storyId",
+              "edgeIds"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "clips.edge.disconnect"
+              },
+              "actionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "storyId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "edgeIds": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

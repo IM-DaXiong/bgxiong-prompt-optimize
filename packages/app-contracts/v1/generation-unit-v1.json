@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 1,
+  "capsExtensionKey": "multiShot",
+  "multiShotSupport": ["unknown", "singleShot", "multiShot"],
+  "takeStatus": ["submitted", "completed", "failed"]
+}

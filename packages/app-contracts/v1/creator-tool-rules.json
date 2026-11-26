@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "rules": [
+    {
+      "id": "asr",
+      "dependencies": [
+        "core"
+      ],
+      "source": {
+        "kind": "static",
+        "text": "ASR语音转文字与TTS语音合成不同。先读asr.models.list及asr.preferences.get；默认与排序独立，不能按首项选默认。selection default解析项目默认，explicit严格指定配置，缺失或能力不满足不得换模型。识别只使用localSource授权的完整sourceRef；禁止传任意路径。默认/排序/运行时变更先prepare再change.apply，原样带最新修订或指纹。卸载先asr.models.list传uninstallModule:{engineId,moduleRevision}显式请求预览，再将返回uninstallPreview原样提交asr.module.uninstall，不自造目标。普通列举不计算卸载摘要。无运行实例不代表坏了：首次识别prepare负责启动。状态、实例和卸载预览的读取不启动服务。"
+      }
+    },
+    {
+      "id": "core",
+      "dependencies": [],
+      "source": {
+        "kind": "internal_material",
+        "task": "creator-execute"
+      }
+    },
+    {
+      "id": "request_calls",
+      "dependencies": [
+        "core"
+      ],
+      "source": {
+        "kind": "static",
+        "text": "先使用本轮已有的用户原话、当前页面和工具定义，仅补读完成委托所缺的事实。已列出的工具可直接调用。并行读取彼此独立的候选，再按正文定位用户指的对象。普通读取、修改和答复可直接办理；会话已绑定时只填业务参数。遇到影响决定且无法从现有资料消除的歧义时，用 request.checkpoint 的 question 向用户提一个具体问题，按已发布的工具定义填写。完成后用用户的语言交代实际变化或等待事项，详细程度随用户要求。"
+      }
+    },
+    {
+      "id": "canvas_edges",
+      "dependencies": [
+        "core"
+      ],
+      "source": {
+        "kind": "internal_material",
+        "task": "creator-canvas-edit"
+      }
+    },
+    {
+      "id": "scene_replan",
+      "dependencies": [
+        "core"
+      ],
+      "source": {
+        "kind": "scene_replan"
+      }
+    },
+    {
+      "id": "runtime_intake",
+      "dependencies": [
+        "core"
+      ],
+      "source": {
+        "kind": "runtime_intake"
+      }
+    },
+    {
+      "id": "text_edit",
+      "dependencies": [
+        "core"
+      ],
+      "source": {
+        "kind": "internal_material",
+        "task": "creator-text-edit"
+      }
+    },
+    {
+      "id": "request_stop",
+      "dependencies": [
+        "core"
+      ],
+      "source": {
+        "kind": "internal_material",
+        "task": "creator-conversation"
+      }
+    },
+    {
+      "id": "external_image_delivery",
+      "dependencies": [
+        "core"
+      ],
+      "source": {
+        "kind": "static",
+        "text": "Image generation for this flow happens in the external agent. Creator imports the finished image with media.import on an exact projectId, supplying bytesB64 or an authorized sourceRef. targetNodeId appends to that existing compatible image node; omitting it creates an image node through the existing writer. context.get navigation.activeCanvasProjectId names the currently open canvas; lastCanvasProjectId is an observed last-visited candidate, not implicit write authorization. Resolve the user target first and freeze its stable IDs. Stage/upload or an empty node is not a delivered image. Verify returned node, media version and effect; use canvas.change.prepare node.create with explicit placement when the user requests a position. Existing media.change.prepare image.deliver remains available for versioned delivery; no new internal image/video generation rules are opened."
+      }
+    }
+  ]
+}

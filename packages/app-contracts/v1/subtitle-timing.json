@@ -1,0 +1,5 @@
+{
+  "schemaVersion": 1,
+  "silenceGapMs": 400,
+  "displayToleranceMs": 100
+}

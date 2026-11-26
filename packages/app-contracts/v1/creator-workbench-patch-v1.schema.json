@@ -1,0 +1,351 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "creator-workbench-patch-v1.schema.json",
+  "title": "CreatorWorkbenchPatchV1",
+  "description": "S10: structured workbench read/patch contract. Complements (does not replace) the surface.patch text-value contract. Each workbench kind has a closed, typed field set; unknown fields are rejected, never stripped. Which fields are editable and their allowed values at run time come from fieldCaps (model/workbench capabilities), not from this file. Kinds without a field set here are not patchable in v1.",
+  "definitions": {
+    "nonBlank": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "pattern": "\\S"
+    },
+    "promptText": {
+      "type": "string",
+      "description": "Full prompt body; never truncated by the host."
+    },
+    "fcVideoFields": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "not": {
+        "required": [
+          "resolution",
+          "resolutionValue"
+        ]
+      },
+      "properties": {
+        "promptText": {
+          "$ref": "#/definitions/promptText"
+        },
+        "providerKind": {
+          "$ref": "#/definitions/nonBlank"
+        },
+        "modelId": {
+          "$ref": "#/definitions/nonBlank"
+        },
+        "intentInputMode": {
+          "$ref": "#/definitions/nonBlank"
+        },
+        "aspectRatio": {
+          "$ref": "#/definitions/nonBlank"
+        },
+        "durationSeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 600
+        },
+        "resolutionValue": {
+          "$ref": "video-resolution-selection.schema.json#/definitions/value"
+        },
+        "resolution": {
+          "$ref": "#/definitions/nonBlank"
+        },
+        "referenceImageNodeIds": {
+          "type": "array",
+          "maxItems": 12,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/definitions/nonBlank"
+          }
+        },
+        "modelPickKey": {
+          "$ref": "#/definitions/nonBlank",
+          "description": "Exact key from fieldCaps.modelPickKey.allowedValues. Set alone and re-read before setting model-dependent parameters."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "modelPickKey"
+            ]
+          },
+          "then": {
+            "maxProperties": 1
+          }
+        }
+      ]
+    },
+    "promptOnlyFields": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "required": [
+        "promptText"
+      ],
+      "properties": {
+        "promptText": {
+          "$ref": "#/definitions/promptText"
+        }
+      }
+    },
+    "patch": {
+      "description": "Discriminated by workbenchKind; fields is the typed field set of that kind.",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "workbenchKind",
+            "fields"
+          ],
+          "properties": {
+            "workbenchKind": {
+              "const": "fcVideo"
+            },
+            "fields": {
+              "$ref": "#/definitions/fcVideoFields"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "workbenchKind",
+            "fields"
+          ],
+          "properties": {
+            "workbenchKind": {
+              "const": "fcImage"
+            },
+            "fields": {
+              "$ref": "#/definitions/fcImageFields"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "workbenchKind",
+            "fields"
+          ],
+          "properties": {
+            "workbenchKind": {
+              "const": "fcAudio"
+            },
+            "fields": {
+              "$ref": "#/definitions/promptOnlyFields"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "workbenchKind",
+            "fields"
+          ],
+          "properties": {
+            "workbenchKind": {
+              "const": "fcTextExtract"
+            },
+            "fields": {
+              "$ref": "#/definitions/promptOnlyFields"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "workbenchKind",
+            "fields"
+          ],
+          "properties": {
+            "workbenchKind": {
+              "const": "fcTextStoryboard"
+            },
+            "fields": {
+              "$ref": "#/definitions/promptOnlyFields"
+            }
+          }
+        }
+      ]
+    },
+    "fieldCap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "valueType",
+        "editable"
+      ],
+      "properties": {
+        "valueType": {
+          "enum": [
+            "text",
+            "integer",
+            "textList",
+            "resolutionValue"
+          ]
+        },
+        "editable": {
+          "type": "boolean"
+        },
+        "reasonCode": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Why the field is not editable (e.g. model capability), when editable=false."
+        },
+        "allowedValues": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "minimum": {
+          "type": "integer"
+        },
+        "maximum": {
+          "type": "integer"
+        },
+        "maxItems": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "resolutionValueCaps": {
+          "$ref": "video-resolution-selection.schema.json#/definitions/valueCaps"
+        }
+      }
+    },
+    "readInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "surfaceId"
+      ],
+      "properties": {
+        "surfaceId": {
+          "$ref": "#/definitions/nonBlank"
+        }
+      }
+    },
+    "readOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "surfaceId",
+        "state",
+        "draftRevision",
+        "persistenceMode",
+        "fieldCaps"
+      ],
+      "properties": {
+        "surfaceId": {
+          "$ref": "#/definitions/nonBlank"
+        },
+        "state": {
+          "$ref": "#/definitions/patch"
+        },
+        "draftRevision": {
+          "$ref": "#/definitions/nonBlank"
+        },
+        "resourceRevision": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/nonBlank"
+            }
+          ]
+        },
+        "persistenceMode": {
+          "enum": [
+            "draftThenPersist",
+            "persistedOnly",
+            "sessionOnly"
+          ]
+        },
+        "fieldCaps": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/fieldCap"
+          }
+        }
+      }
+    },
+    "patchInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "surfaceId",
+        "expectedDraftRevision",
+        "persistMode",
+        "patch"
+      ],
+      "properties": {
+        "surfaceId": {
+          "$ref": "#/definitions/nonBlank"
+        },
+        "expectedDraftRevision": {
+          "$ref": "#/definitions/nonBlank"
+        },
+        "persistMode": {
+          "enum": [
+            "draft",
+            "persist"
+          ],
+          "description": "draft = update the open workbench draft only; persist = also save through the workbench's existing save path. persist is invalid on sessionOnly surfaces; draft is invalid on persistedOnly surfaces."
+        },
+        "patch": {
+          "$ref": "#/definitions/patch"
+        }
+      }
+    },
+    "fcImageFields": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "not": {
+        "required": [
+          "resolution",
+          "resolutionValue"
+        ]
+      },
+      "properties": {
+        "promptText": {
+          "$ref": "#/definitions/promptText"
+        },
+        "modelPickKey": {
+          "$ref": "#/definitions/nonBlank",
+          "description": "Exact key from fieldCaps.modelPickKey.allowedValues. Set alone and re-read before setting model-dependent parameters."
+        },
+        "aspectRatio": {
+          "$ref": "#/definitions/nonBlank"
+        },
+        "resolution": {
+          "$ref": "#/definitions/nonBlank"
+        },
+        "resolutionValue": {
+          "$ref": "video-resolution-selection.schema.json#/definitions/value"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "modelPickKey"
+            ]
+          },
+          "then": {
+            "maxProperties": 1
+          }
+        }
+      ]
+    }
+  }
+}
