@@ -136,7 +136,7 @@ impl TextCompleter for ShellTextCompleter {
         let has_output_schema = call.schema.is_some();
         let policy = http_image_count_policy(call.image_count_policy);
         // Completer resolves thinking / max_tokens; do not grow TextCall fields here.
-        let thinking = text_thinking::thinking_for_call(json_mode || has_output_schema);
+        let thinking = text_thinking::thinking_for_call(&self.config, json_mode || has_output_schema);
         let max_tokens = text_caps::resolve_max_tokens(&self.config)?;
         let kind = self.config.provider_kind.as_str();
         let poster = ReqwestPoster;
