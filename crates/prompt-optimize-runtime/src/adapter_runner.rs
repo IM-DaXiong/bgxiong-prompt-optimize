@@ -145,6 +145,16 @@ fn locate_adapter_runtime() -> Result<(PathBuf, PathBuf, PathBuf), String> {
         .ok()
         .and_then(|exe| exe.parent().map(Path::to_path_buf))
         .ok_or_else(|| "无法解析本程序目录，找不到适配运行时。".to_string())?;
+    let dir = match std::env::var_os("BGX_PROMPT_OPTIMIZE_ADAPTER_RUNTIME_DIR") {
+        Some(configured) => {
+            let path = PathBuf::from(configured);
+            if !path.is_absolute() {
+                return Err("适配运行时目录必须是绝对路径。".into());
+            }
+            path
+        }
+        None => dir,
+    };
     let sdk = dir.join("adapter-sdk-v2");
     let cli = dir.join(exe_name("bgx-adapter-v2"));
     let worker = sdk.join(exe_name("bgx-adapter-v2-worker"));

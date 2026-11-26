@@ -5,13 +5,16 @@ use std::{fs, path::PathBuf};
 use tauri::{AppHandle, Manager};
 
 pub fn shell_app_data_dir(app: &AppHandle) -> Result<PathBuf, OptimizeError> {
-    let dir = app
-        .path()
-        .app_data_dir()
-        .map_err(|error| {
-            error_ui::err("SHELL_APP_DATA", format!("无法定位本程序数据目录：{error}"))
-        })?
-        .join(APP_DATA_DIR_NAME);
+    let dir = if let Some(path) = std::env::var_os("BGX_PROMPT_OPTIMIZE_DATA_DIR") {
+        require_absolute(&PathBuf::from(path), "工具数据目录")?
+    } else {
+        app.path()
+            .app_data_dir()
+            .map_err(|error| {
+                error_ui::err("SHELL_APP_DATA", format!("无法定位本程序数据目录：{error}"))
+            })?
+            .join(APP_DATA_DIR_NAME)
+    };
     reject_host_pointers(&dir)?;
     fs::create_dir_all(&dir).map_err(|error| {
         error_ui::err("SHELL_APP_DATA", format!("无法创建本程序数据目录：{error}"))
