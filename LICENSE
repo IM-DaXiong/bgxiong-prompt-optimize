@@ -1,0 +1,55 @@
+BGXiong Prompt Optimize License
+比格熊提示词优化使用许可（自定义）
+
+Copyright (c) 2026 BGXiong / 比格熊（天途影像）
+
+适用范围
+
+本许可适用于比格熊在本仓发布并有权按本许可授权的提示词优化工具、CLI、SDK、
+协议文档及示例。随附独立许可的材料适用各自条款。官方创作 Skill 适用
+bgxiong-content-skills 的许可。从主程序同步的共享代码和资源以原有授权为准。
+
+允许
+
+1. 个人使用、学习、复制和修改。
+2. 在自己的项目和产品中使用、修改和集成，包括内部商用及随自己的收费产品交付。
+3. 按本许可免费再分发原版或修改版，并随附本版权声明及完整许可。
+
+禁止
+
+1. 将本许可覆盖的组件单独出售，或以付费包、付费镜像、付费组件库的形式提供。
+   此条适用于原版、修改版和重新打包的版本。
+2. 以去除上述限制的条款重新授权。
+3. 再分发时删除或篡改本版权声明或许可。
+
+本许可涉及软件和文档的使用权。比格熊名称、标识及商标另行授权。
+本材料按现状提供，不作任何明示或暗示担保。
+
+Scope
+
+This license applies to the BGXiong Prompt Optimize software, CLI, SDK,
+protocol documentation, and examples published here that BGXiong may license
+under these terms. Separately licensed material remains subject to its own
+terms. Official creative Skills are subject to the bgxiong-content-skills
+license. Shared code and resources synchronized from the host application
+remain subject to their original permissions.
+
+Permitted
+
+1. Use, study, copy, and modify the material for personal use.
+2. Use, modify, and integrate the material in your own projects and products,
+   including internal commercial use and distribution with your own paid products.
+3. Redistribute original or modified copies free of charge under this license,
+   retaining the copyright notice and the complete license.
+
+Prohibited
+
+1. Selling a covered component as a standalone product or offering it as part
+   of a paid pack, mirror, or component library. This applies to original,
+   modified, and repackaged versions.
+2. Relicensing the material under terms that remove the above restrictions.
+3. Removing or altering the copyright notice or license when redistributing it.
+
+This license covers the use of the software and documentation. The BGXiong
+name, logos, and trademarks are subject to separate permission.
+The material is provided "as is", without express or implied warranty.
