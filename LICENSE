@@ -12,15 +12,19 @@ bgxiong-content-skills 的许可。从主程序同步的共享代码和资源以
 允许
 
 1. 个人使用、学习、复制和修改。
-2. 在自己的项目和产品中使用、修改和集成，包括内部商用及随自己的收费产品交付。
+2. 在自己的项目中使用和修改，包括在自有商业项目的内部流程中使用本工具，
+   制作和交付该项目的成果。
 3. 按本许可免费再分发原版或修改版，并随附本版权声明及完整许可。
 
 禁止
 
-1. 将本许可覆盖的组件单独出售，或以付费包、付费镜像、付费组件库的形式提供。
-   此条适用于原版、修改版和重新打包的版本。
-2. 以去除上述限制的条款重新授权。
-3. 再分发时删除或篡改本版权声明或许可。
+以下限制适用于本许可覆盖的原版、修改版和重新打包的版本。
+
+1. 单独出售这些组件，或以付费包、付费镜像、付费组件库的形式提供。
+2. 把这些组件作为付费功能向第三方提供，或者作为收费产品的一部分向第三方交付，
+   包括嵌入、预装和捆绑交付。组件是否单独计价均适用。
+3. 以去除上述限制的条款重新授权。
+4. 再分发时删除或篡改本版权声明或许可。
 
 本许可涉及软件和文档的使用权。比格熊名称、标识及商标另行授权。
 本材料按现状提供，不作任何明示或暗示担保。
@@ -37,18 +41,25 @@ remain subject to their original permissions.
 Permitted
 
 1. Use, study, copy, and modify the material for personal use.
-2. Use, modify, and integrate the material in your own projects and products,
-   including internal commercial use and distribution with your own paid products.
+2. Use and modify the material in your own projects, including use in the
+   internal workflow of your own commercial projects to create and deliver
+   those projects' work products.
 3. Redistribute original or modified copies free of charge under this license,
    retaining the copyright notice and the complete license.
 
 Prohibited
 
-1. Selling a covered component as a standalone product or offering it as part
-   of a paid pack, mirror, or component library. This applies to original,
-   modified, and repackaged versions.
-2. Relicensing the material under terms that remove the above restrictions.
-3. Removing or altering the copyright notice or license when redistributing it.
+The following restrictions apply to original, modified, and repackaged versions
+covered by this license.
+
+1. Selling a covered component on its own or offering it as part of a paid
+   pack, mirror, or component library.
+2. Offering a covered component to third parties as a paid feature or
+   delivering it to third parties as part of a paid product, including by
+   embedding, preinstalling, or bundling it. This applies whether or not the
+   component is priced separately.
+3. Relicensing the material under terms that remove the above restrictions.
+4. Removing or altering the copyright notice or license when redistributing it.
 
 This license covers the use of the software and documentation. The BGXiong
 name, logos, and trademarks are subject to separate permission.

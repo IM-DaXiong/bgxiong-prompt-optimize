@@ -64,7 +64,7 @@ python ./examples/python/optimize.py --cli (Join-Path $runtimeDir "bgxiong-promp
 
 ## 许可
 
-允许个人使用、修改和商用集成，也可随自己的收费产品交付。禁止单独出售本许可覆盖的原版或改版，包括作为付费包、付费镜像或付费组件库提供。免费再分发须保留原版权和许可声明。[自定义使用许可](LICENSE)
+允许个人使用，也可以在自己的商业项目中使用和修改本工具，用它制作、交付项目成果。许可覆盖的原版、改版或重新打包版本均不得单独出售、作为付费功能提供，或嵌入、预装、捆绑到收费产品中交付。免费再分发须保留原版权和许可声明。[自定义使用许可](LICENSE)
 
 官方创作 Skill 沿用内容仓的许可。仓内同步的主程序文件可按输入清单追溯来源。[官方创作 Skill 许可](https://github.com/IM-DaXiong/bgxiong-content-skills/blob/main/LICENSE) · [主程序输入清单](deps/host-inputs.lock.json)
 
