@@ -29,7 +29,7 @@
 当前独立窗口和 CLI 的快捷目标支持**纯文生视频的提示词改写**。首帧、首尾帧和多参考素材模式通过集成端提供素材，具体以接入目标声明的模式为准。
 
 - **MiniMax 海螺 H3**（`video/h3@1`）采用分段结构，分开组织主体、场景概述、动作、镜头与声音。对白、歌词和画面内文字按原语言处理。
-- **Seedance 2.0 系列**（`video/seedance@1`）按主体和动作时序组织镜头描述，把已有的动作与运镜安排写到对应段落。
+- **Seedance 2.0 和 2.5 系列**共用 **Seedance** 目标（`video/seedance@1`）。按主体和事件先后组织镜头，把原稿里的动作、运镜、台词和声音写进对应段落。优化后的文生视频提示词可用于两个系列，提交时在生成工具中选择所用版本。[火山方舟 Seedance 提示词指南](https://docs.volcengine.com/docs/ark/seedance-2-5-prompt-guide?lang=zh)
 - **可灵 Kling Classic、Kling Omni v1、Kling Omni v2**（`video/kling.classic@1`、`video/kling.omni@1`、`video/kling.omni@2`）各用对应档案，将主体、动作、镜头和原话整理为所选版本的表达。
 - **万相 Wan**（`video/wan@1`）沿时间顺序组织主体动作和镜头描述，保留原稿明确给出的对白和声音用途。
 - **LTX-2.5 段落格式**（`video/ltx@1`）把动作、镜头、光线与声音按先后写进连贯段落，适合连续描述。
